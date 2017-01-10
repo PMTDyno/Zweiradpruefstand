@@ -1,0 +1,1 @@
+../../ArduinoNano/src/global.h

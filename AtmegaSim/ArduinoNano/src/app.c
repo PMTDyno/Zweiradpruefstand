@@ -9,7 +9,7 @@
 #include <util/delay.h>
 #include "sys.h"
 #else
-#include "sys_sim.h"
+#include "../../AtmegaSimSharedLib/src/sys_sim.h"
 #endif
 #include "app.h"
 

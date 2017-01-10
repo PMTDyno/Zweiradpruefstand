@@ -1,5 +1,15 @@
 *.class
 
+# Netbeans
+**/build
+**/dist
+**/nbproject/private
+**/.dep.inc
+
+# Codeblocks
+**/bin
+**/obj
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

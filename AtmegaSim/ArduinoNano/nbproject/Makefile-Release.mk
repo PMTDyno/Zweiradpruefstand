@@ -15,14 +15,14 @@ NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
 CC=avr-gcc
-CCC=avr-g++
-CXX=avr-g++
+CCC=g++
+CXX=g++
 FC=gfortran
 AS=avr-as
 
 # Macros
-CND_PLATFORM=WinAVR-Windows
-CND_DLIB_EXT=dll
+CND_PLATFORM=GNU_AVR-Linux
+CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -58,9 +58,9 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/arduino.elf.exe
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/arduino.elf
 
-${CND_DISTDIR}/arduino.elf.exe: ${OBJECTFILES}
+${CND_DISTDIR}/arduino.elf: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}
 	${LINK.c} -o ${CND_DISTDIR}/arduino.elf ${OBJECTFILES} ${LDLIBSOPTIONS} -mmcu=atmega328p -Wl,-Map=${CND_DISTDIR}/arduino.map,--cref
 

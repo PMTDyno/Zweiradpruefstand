@@ -48,6 +48,8 @@
           <incDir>
             <pElem>/usr/lib/jvm/java-8-oracle/include/linux</pElem>
             <pElem>/usr/lib/jvm/java-8-oracle/include</pElem>
+            <pElem>/usr/lib/jvm/default-java/include/linux</pElem>
+            <pElem>/usr/lib/jvm/default-java/include</pElem>
           </incDir>
           <commandLine>-g</commandLine>
           <preprocessorList>

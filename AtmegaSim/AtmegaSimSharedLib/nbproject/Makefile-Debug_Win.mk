@@ -21,8 +21,8 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=Cygwin_2-Windows
-CND_DLIB_EXT=dll
+CND_PLATFORM=GNU-Linux
+CND_DLIB_EXT=so
 CND_CONF=Debug_Win
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -62,22 +62,22 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libAtmegaSimSharedLib.${CND_DLIB_EXT}: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libAtmegaSimSharedLib.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -g -shared
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libAtmegaSimSharedLib.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -g -shared -fPIC
 
 ${OBJECTDIR}/src/app.o: src/app.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/app.o src/app.c
+	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/app.o src/app.c
 
 ${OBJECTDIR}/src/jni_App.o: src/jni_App.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/jni_App.o src/jni_App.c
+	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/jni_App.o src/jni_App.c
 
 ${OBJECTDIR}/src/sys_sim.o: src/sys_sim.c
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sys_sim.o src/sys_sim.c
+	$(COMPILE.c) -g -Wall -DSIMULATION -I/usr/lib/jvm/java-8-oracle/include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/sys_sim.o src/sys_sim.c
 
 # Subprojects
 .build-subprojects:

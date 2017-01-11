@@ -15,13 +15,13 @@ NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
 CC=avr-gcc
-CCC=g++
-CXX=g++
+CCC=avr-g++
+CXX=avr-g++
 FC=gfortran
 AS=avr-as
 
 # Macros
-CND_PLATFORM=GNU_AVR-Linux
+CND_PLATFORM=GNU-AVR-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist

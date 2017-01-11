@@ -35,7 +35,7 @@
   <confs>
     <conf name="Release" type="1">
       <toolsSet>
-        <compilerSet>GNU_AVR|GNU</compilerSet>
+        <compilerSet>GNU-AVR|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>

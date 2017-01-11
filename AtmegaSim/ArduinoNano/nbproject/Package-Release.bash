@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-CND_PLATFORM=GNU_AVR-Linux
+CND_PLATFORM=GNU-AVR-Linux
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build

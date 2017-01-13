@@ -141,11 +141,13 @@ public class PortCom implements Port, SerialPortEventListener
 
   //private static boolean block = false;
   @Override
-  public synchronized void writeBytes (byte[] s) throws CommunicationException
+  public synchronized void writeBytes (byte[] data) throws CommunicationException
   {
+    LOG.finer(data, "PortCom: writebytes(byte [])");
     try
     {
-      serialPort.writeBytes(s);
+      serialPort.writeBytes(data);
+      LOG.debug("bytes written");
     }
     catch (SerialPortException ex)
     {
@@ -167,6 +169,7 @@ public class PortCom implements Port, SerialPortEventListener
       try
       {
         byte[] ba = serialPort.readBytes();
+        LOG.finer("PortCom: %s bytes received", ba.length);
         synchronized (receivedChunks)
         {
           receivedChunks.add(new PortChunk(ba));

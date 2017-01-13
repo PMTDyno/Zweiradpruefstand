@@ -20,6 +20,9 @@ extern __pid_t sys_pid ();
 
 #define ISR(x) void x ()
 
+#define cli(...) // cli()
+#define sei(...) // sei()
+
 #ifdef __cplusplus
 }
 #endif

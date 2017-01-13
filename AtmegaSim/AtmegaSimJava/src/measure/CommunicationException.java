@@ -18,7 +18,7 @@ public class CommunicationException extends Exception {
      * Constructs an instance of <code>CommunicationException</code> with the specified Exception.
      * @param ex the Exception
      */
-    public CommunicationException(Exception ex)
+    public CommunicationException(Throwable ex)
     {
         super(ex);
     }

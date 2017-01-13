@@ -1,6 +1,7 @@
 package measure;
 
 import java.util.LinkedList;
+import jni.App;
 import logging.Logger;
 
 
@@ -12,7 +13,8 @@ public class PortSim implements Port
 {
   private static final Logger LOG = Logger.getLogger(PortSim.class.getName());
 
-
+  private static jni.App app = new App();
+  
   public static enum SIM_MODE
   {
     NORMAL,
@@ -24,10 +26,10 @@ public class PortSim implements Port
   private SIM_MODE mode = SIM_MODE.NORMAL;
   private String port;
   private final String [] availablePorts = { "SIM-NORMAL", "SIM-DELAYED" };
+  private JniAppThread jniAppThread;
 
   public PortSim ()
   {
-    LOG.fine("test");
   }
 
   @Override
@@ -60,6 +62,9 @@ public class PortSim implements Port
     {
       if (port.endsWith(m.name()))
       {
+        app.init();
+        jniAppThread = new JniAppThread();
+        jniAppThread.start();
         this.port = port;
         mode = m;
         LOG.fine("PortSim: openPort(%s)", port);
@@ -77,6 +82,12 @@ public class PortSim implements Port
       throw new CommunicationException("no port open");
     LOG.fine("PortSim: closePort()");
     this.port = null;
+    if (jniAppThread != null)
+    {
+      jniAppThread.interrupt();
+      jniAppThread = null;
+    }
+      
   }
 
 
@@ -126,29 +137,38 @@ public class PortSim implements Port
 
 
   @Override
-  public void writeBytes (byte [] b) throws CommunicationException
+  public void writeBytes (byte [] data) throws CommunicationException
   {
-    LOG.finer(b, "PortSim: writebytes(byte []) [mode=%s]", mode.name());
-    
+    LOG.finer(data, "PortSim: writebytes(byte []) [mode=%s]", mode.name());
     try
     {
-      switch (mode)
-      {
-        case NORMAL:
-          break;
-        case DELAYED:
-          break;
-        case NOTHING:
-          break;
-        default:
-          throw new UnsupportedOperationException("no mode set");
-      }
+      for (byte b : data)
+        app.uart_isr(b);
     }
-    catch (Exception ex)
+    catch (Throwable th)
     {
-      LOG.warning(ex);
-      throw new CommunicationException(ex);
+      LOG.warning(th);
+      throw new CommunicationException(th);
     }
+//    try
+//    {
+//      switch (mode)
+//      {
+//        case NORMAL:
+//          break;
+//        case DELAYED:
+//          break;
+//        case NOTHING:
+//          break;
+//        default:
+//          throw new UnsupportedOperationException("no mode set");
+//      }
+//    }
+//    catch (Exception ex)
+//    {
+//      LOG.warning(ex);
+//      throw new CommunicationException(ex);
+//    }
   }
 
 
@@ -179,6 +199,27 @@ public class PortSim implements Port
   }
 
 
+  private class JniAppThread extends Thread
+  {
 
+    @Override
+    public void run ()
+    {
+      while (!Thread.currentThread().isInterrupted())
+      {
+        try
+        {
+          Thread.sleep(1);
+          app.main();
+        }
+        catch (InterruptedException ex) {}
+        catch (Throwable th)
+        {
+          LOG.warning(th);
+        }
+      }
+    }
+    
+  }
 
 }

@@ -117,14 +117,14 @@ void sys_printf (const char *format, ...)
 JNIEXPORT void JNICALL Java_jni_App_init (JNIEnv *env, jobject obj)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_init()");
+  //sys_log(__FILE__, __LINE__, getpid(), "app_init()");
   app_init();
 }
 
 JNIEXPORT void JNICALL Java_jni_App_main (JNIEnv *env, jobject obj)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_main()");
+  //sys_log(__FILE__, __LINE__, getpid(), "app_main()");
   app_main();
 }
 
@@ -208,6 +208,6 @@ JNIEXPORT void JNICALL Java_jni_App_timer2_1ovf (JNIEnv *env, jobject obj)
 JNIEXPORT void JNICALL Java_jni_App_uart_1isr (JNIEnv *env, jobject obj, jbyte byte)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_uart_isr(0x%02x)", (unsigned char)byte);
+  //sys_log(__FILE__, __LINE__, getpid(), "app_uart_isr(0x%02x)", (unsigned char)byte);
   app_uart_isr((uint8_t) byte);
 }

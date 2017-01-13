@@ -9,7 +9,7 @@ import jni.App;
 
 /**
  *
- * @author Manfred Steiner<sx@htl-kaindorf.at>
+ * @author sx@htl-kaindorf.at
  */
 public class AppGui extends javax.swing.JFrame
 {

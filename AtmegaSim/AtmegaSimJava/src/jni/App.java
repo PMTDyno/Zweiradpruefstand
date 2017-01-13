@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 /**
  *
- * @author Manfred Steiner<sx@htl-kaindorf.at>
+ * @author sx@htl-kaindorf.at
  */
 public class App
 {

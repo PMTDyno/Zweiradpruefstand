@@ -1,1 +1,1 @@
-#include "../../ArduinoNano/src/global.h"
+../../ArduinoNano/src/global.h

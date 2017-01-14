@@ -25,22 +25,26 @@ public class Communication
   private int packageNumber;    // 0 or 1, the last used number of a sent frame
   private long sendTime;        // timestamp when sending packet
   private byte [] pendingFrame; // last frame send server, waiting for response if not null
-            
+  private Thread receiveOsiLayer2Thread;            
 
   public Communication (Port port)
   {
     this.port = port;
   }
   
-  public void connect ()
+  public void connect () throws CommunicationException
   {
     try
     {
+      receiveOsiLayer2Thread = new ReceiveOsiLayer2Thread();
+      receiveOsiLayer2Thread.start();
       sendFrame("refresh");
     }
     catch (Exception ex)
     {
-      
+      if (ex instanceof CommunicationException)
+        throw (CommunicationException)ex;
+      throw new CommunicationException(ex);
     }
   }
   
@@ -66,6 +70,50 @@ public class Communication
     port.writeBytes(ba);
     pendingFrame = ba;
     sendTime = System.currentTimeMillis();
+  }
+  
+  
+  private class ReceiveOsiLayer2Thread extends Thread
+  {
+    private FrameBytes frameBytes;
+    
+    @Override
+    public void run ()
+    {
+      while (!Thread.currentThread().isInterrupted())
+      {
+        try
+        {
+          byte b = port.readByte();
+          //LOG.debug("readByte returns with %02x", b);
+          
+          if (frameBytes == null && b != SOT)
+          {
+            LOG.warning("receiving unexpected byte %02x", b);
+            continue;
+          }
+          else if (b == SOT)
+          {
+            frameBytes = new FrameBytes();
+          }
+          frameBytes.update(b);
+          
+          if (b == EOT) 
+          {
+            byte [] frame = frameBytes.frameBytes();
+            // to do: check CRC
+            // to do: decode and execute in higher OSI layers
+            LOG.debug(frame, "RX-OSI2: Frame received");
+            frameBytes = null;
+          }
+        }
+        catch (Exception ex)
+        {
+          LOG.warning(ex);
+        }
+      }
+    }
+    
   }
   
   

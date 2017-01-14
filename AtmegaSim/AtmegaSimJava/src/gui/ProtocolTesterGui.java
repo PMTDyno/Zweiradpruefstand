@@ -67,6 +67,9 @@ public class ProtocolTesterGui extends javax.swing.JFrame
       jbutUpdate.setEnabled(false);
       jbutOpen.setEnabled(false);
       jbutClose.setEnabled(true);
+      
+      jbutTestConnect.setEnabled(true);
+      jbutTestSend.setEnabled(true);
     }
     else
     {
@@ -75,6 +78,9 @@ public class ProtocolTesterGui extends javax.swing.JFrame
       jbutUpdate.setEnabled(true);
       jbutOpen.setEnabled(true);
       jbutClose.setEnabled(false);
+
+      jbutTestConnect.setEnabled(false);
+      jbutTestSend.setEnabled(false);
     }
   }
   
@@ -93,7 +99,20 @@ public class ProtocolTesterGui extends javax.swing.JFrame
       if (item.equals(selected))
       {
         m.setSelectedItem(item);
+        selected = null;
         break;
+      }
+    }
+    if (selected != null)
+    {
+      for (int i=0; i<m.getSize(); i++)
+      {
+        String item = (String)m.getElementAt(i);
+        if ( item.contains("USB0") )
+        {
+          m.setSelectedItem(item);
+          break;
+        }
       }
     }
   }

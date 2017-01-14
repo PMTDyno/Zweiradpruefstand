@@ -1,5 +1,7 @@
 package measure;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import jni.App;
 import logging.Logger;
@@ -13,7 +15,7 @@ public class PortSim implements Port
 {
   private static final Logger LOG = Logger.getLogger(PortSim.class.getName());
 
-  private static jni.App app = new App();
+  private static final jni.App app = new App();
   
   public static enum SIM_MODE
   {
@@ -25,7 +27,7 @@ public class PortSim implements Port
   private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
   private SIM_MODE mode = SIM_MODE.NORMAL;
   private String port;
-  private final String [] availablePorts = { "SIM-NORMAL", "SIM-DELAYED" };
+  private final String [] availablePorts = { "SIM-NORMAL" };
   private JniAppThread jniAppThread;
 
   public PortSim ()
@@ -62,6 +64,15 @@ public class PortSim implements Port
     {
       if (port.endsWith(m.name()))
       {
+        app.setOut(new OutputStream() {
+
+          @Override
+          public void write (int b) throws IOException
+          {
+            receiveByte(b);
+          }
+          
+        });
         app.init();
         jniAppThread = new JniAppThread();
         jniAppThread.start();
@@ -91,54 +102,22 @@ public class PortSim implements Port
   }
 
 
-  void runDelayed (byte[] response)
+  private void receiveByte (int b)
   {
-    new Thread(new Runnable()
+    synchronized (receivedChunks)
     {
-
-      @Override
-      public void run ()
-      {
-
-        try
-        {
-          Thread.sleep(150);
-        }
-        catch (InterruptedException ex)
-        {
-          LOG.warning(ex);
-        }
-        LOG.info("chunk received");
-        synchronized (receivedChunks)
-        {
-          receivedChunks.add(new PortChunk(response));
-          receivedChunks.notifyAll();
-        }
-      }
-
+      //LOG.info("PORTSIM: add chunk byte %02x", b);
+      receivedChunks.add(new PortChunk(b));
+      receivedChunks.notifyAll();
     }
-    ).start();
   }
-
-
-  void runNormal (byte[] response)
-  {
-    String str = new String(response);
-    for (int i = 0; i < 10; i++)
-    {
-
-    }
-//        synchronized (receivedChunks)
-//        {
-//            receivedChunks.add(new Chunk(response));
-//            receivedChunks.notifyAll();
-//        }
-  }
-
+  
 
   @Override
   public void writeBytes (byte [] data) throws CommunicationException
   {
+    if (!isOpened())
+      throw new CommunicationException("Port not open, cannot write bytes");
     LOG.finer(data, "PortSim: writebytes(byte []) [mode=%s]", mode.name());
     try
     {
@@ -150,25 +129,6 @@ public class PortSim implements Port
       LOG.warning(th);
       throw new CommunicationException(th);
     }
-//    try
-//    {
-//      switch (mode)
-//      {
-//        case NORMAL:
-//          break;
-//        case DELAYED:
-//          break;
-//        case NOTHING:
-//          break;
-//        default:
-//          throw new UnsupportedOperationException("no mode set");
-//      }
-//    }
-//    catch (Exception ex)
-//    {
-//      LOG.warning(ex);
-//      throw new CommunicationException(ex);
-//    }
   }
 
 
@@ -179,19 +139,26 @@ public class PortSim implements Port
     {
       try
       {
-        if (receivedChunks.isEmpty())
+        while (receivedChunks.isEmpty())
         {
           receivedChunks.wait();
         }
+
         final PortChunk ch = receivedChunks.getFirst();
+
         final byte rv = ch.next();
         if (!ch.isByteAvailable())
-        {
+        {  
+          //LOG.info("PORTSIM: remove chunk byte %02x", rv);
           receivedChunks.removeFirst();
         }
         return rv;
       }
       catch (InterruptedException ex)
+      {
+        throw ex;
+      }
+      catch (Exception ex)
       {
         throw new CommunicationException(ex);
       }

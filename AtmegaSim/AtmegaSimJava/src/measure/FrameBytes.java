@@ -1,6 +1,7 @@
 package measure;
 
 import java.io.ByteArrayOutputStream;
+import java.security.MessageDigest;
 
 
 /**
@@ -37,8 +38,8 @@ public class FrameBytes
     endTimeMillis = System.currentTimeMillis();
   }
 
-
-  byte[] getFrameBytes ()
+  
+  byte [] frameBytes ()
   {
     if (byteArrayCache == null)
     {

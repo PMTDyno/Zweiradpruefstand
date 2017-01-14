@@ -118,7 +118,7 @@ public class PortCom implements Port, SerialPortEventListener
 
         final byte rv = ch.next();
         if (!ch.isByteAvailable())
-        {  //private static boolean block = false;
+        {  
           receivedChunks.removeFirst();
         }
         return rv;
@@ -126,10 +126,6 @@ public class PortCom implements Port, SerialPortEventListener
       catch (InterruptedException ex)
       {
         throw ex;
-      }
-      catch (IndexOutOfBoundsException ex)
-      {
-        throw new CommunicationException(ex);
       }
       catch (Exception ex)
       {

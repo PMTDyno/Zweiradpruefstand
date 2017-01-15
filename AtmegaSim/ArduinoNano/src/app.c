@@ -37,6 +37,11 @@ void app_incErrCnt (volatile uint8_t *cnt)
     (*cnt)++;
 }
 
+uint8_t app_isHexChar (uint8_t c)
+{
+  return (c>='0' && c<='9') || (c>='a' && c<='f');
+}
+
 //--------------------------------------------------------
 
 void app_main (void)
@@ -44,19 +49,63 @@ void app_main (void)
   //sys_log(__FILE__, __LINE__, sys_pid(), "main()");
   if (sys_clearEvent(APP_EVENT_FRAME_RECEIVED))
   {
-    app.uart.txBuffer[0] = app.uart.recBuffer[0];  // SOT
-    app.uart.txBuffer[1] = app.uart.recBuffer[1];  // Package Number
-    app.uart.txBuffer[2] = APP_ACK;
-    app.uart.txBuffer[3] = 'O';
-    app.uart.txBuffer[4] = 'K';
-    app.uart.txBuffer[5] = APP_GS;
-    app.uart.txBuffer[6] = '0';
-    app.uart.txBuffer[7] = '0';
-    app.uart.txBuffer[8] = '0';
-    app.uart.txBuffer[9] = '0';
-    app.uart.txBuffer[10] = APP_EOT;
+    struct App_FrameStart *pStart = (struct App_FrameStart *) app.uart.recBuffer;
+    struct App_FrameEnd *pEnd = (struct App_FrameEnd *) &app.uart.recBuffer[app.uart.recIndex-6];
+    uint8_t i = 0;
+    
+    if (pStart->sot != APP_SOT || (pStart->sn != '0' && pStart->sn != '1') ||
+        pEnd->gs != APP_GS || pEnd->eot != APP_EOT ||
+        !app_isHexChar(pEnd->crc[0]) || !app_isHexChar(pEnd->crc[1]) ||
+        !app_isHexChar(pEnd->crc[2]) || !app_isHexChar(pEnd->crc[3]))
+    {
+      // frame error
+      sys_log(__FILE__, __LINE__, sys_pid(), "frame error");
+      app_incErrCnt(&app.uart.errCnt_recFrameError);
+      app.uart.txBuffer[i++] = APP_SOT;
+      app.uart.txBuffer[i++] = pStart->sn;
+      app.uart.txBuffer[i++] = APP_NAK;
+    }
+    else if (pStart->sn != (app.uart.expectedSn + '0') && app.uart.txBuffer[0] == APP_SOT)
+    {
+      // wrong sequence number and last frame in app.uart.txBuffer
+      sys_log(__FILE__, __LINE__, sys_pid(), "wrong sequence number, send again last frame");
+      sys_printf((char *)app.uart.txBuffer);
+      sys_log(__FILE__, __LINE__, sys_pid(), "%d bytes Response sent", strlen((const char *)app.uart.txBuffer));
+      cli();
+      app.uart.framePending = 0;
+      app.uart.recIndex = 0;
+      sei();
+      return;
+    }
+    else if (pStart->sn != (app.uart.expectedSn + '0'))
+    {
+      // wrong sequence number but no frame in app.uart.txBuffer available
+      app.uart.txBuffer[i++] = APP_SOT;
+      app.uart.txBuffer[i++] = ((app.uart.expectedSn + 1) % 2) + '0';
+      app.uart.txBuffer[i++] = APP_ACK;
+    }
+    else
+    {
+      // frame ok
+      sys_log(__FILE__, __LINE__, sys_pid(), "frame ok", 11);
+      app.uart.txBuffer[i++] = APP_SOT;
+      app.uart.txBuffer[i++] = pStart->sn;
+      app.uart.txBuffer[i++] = APP_ACK;
+      app.uart.txBuffer[i++] = 'O';
+      app.uart.txBuffer[i++] = 'K';
+      app.uart.expectedSn = (app.uart.expectedSn + 1) % 2;
+    }
+    
+    app.uart.txBuffer[i++] = APP_GS;
+    app.uart.txBuffer[i++] = '0';
+    app.uart.txBuffer[i++] = '0';
+    app.uart.txBuffer[i++] = '0';
+    app.uart.txBuffer[i++] = '0';
+    app.uart.txBuffer[i++] = APP_EOT;
+    app.uart.txBuffer[i++] = 0;
+    
     sys_printf((char *)app.uart.txBuffer);
-    sys_log(__FILE__, __LINE__, sys_pid(), "%d bytes Response sent", 11);
+    sys_log(__FILE__, __LINE__, sys_pid(), "%d bytes Response sent", i-1);
     cli();
     app.uart.framePending = 0;
     app.uart.recIndex = 0;
@@ -132,7 +181,7 @@ void app_uart_isr (uint8_t b)
   }
   
   if (app.uart.recIndex == 0 && b != APP_SOT)
-      return;
+    return;
 
   app.uart.recBuffer[app.uart.recIndex++] = b;
   

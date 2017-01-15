@@ -41,6 +41,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   // *******************************************************************************************************
    
   private Port port;
+  Communication comm;
   
   /**
    * Creates new form ProtocolTesterGui
@@ -176,8 +177,8 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   {
     try
     {
-      String frame = "hello";
-      port.writeBytes(frame.getBytes());
+      String data = "hello";
+      comm.sendData(data);
     }
     catch (Exception ex)
     {
@@ -189,7 +190,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   {
     try
     {
-      Communication comm = new Communication(port);
+      comm = new Communication(port);
       comm.connect();
     }
     catch (Exception ex)

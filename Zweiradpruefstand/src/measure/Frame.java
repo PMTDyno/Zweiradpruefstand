@@ -39,7 +39,7 @@ public class Frame
                 throw new CommunicationException("no frame captured");
 
             if(bytes.getFrameBytes().length < 1)
-                throw new CommunicationException("no frame captured");?
+                throw new CommunicationException("no frame captured");
 
             //START STOP
             frame = new String(bytes.getFrameBytes(), "utf-8");
@@ -50,7 +50,7 @@ public class Frame
                 throw new CommunicationException("frame not ending with SC_STOP");
 
             LOG.fine("START/STOP CORRECT");
-?
+
             //PACKAGE
             int p = Integer.parseInt(frame.substring(1, 2));
             if(p != Communication.getCurrentPackage())

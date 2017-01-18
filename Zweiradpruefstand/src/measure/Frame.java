@@ -16,7 +16,6 @@ public class Frame
   private final FrameBytes bytes;
   private String frame;
   private String data;
-  private boolean ack = false;
 
 
   public Frame (FrameBytes bytes) throws CommunicationException
@@ -61,71 +60,49 @@ public class Frame
 
       LOG.fine("SOT/EOT CORRECT");
 
-      
-      if (frame.indexOf('=') < 0)
+      //DATA AVAILABLE?
+      int index = frame.indexOf('=');
+      if (index < 0)
       {
         throw new CommunicationException("missing seperator '='");
       }
 
-      data = frame.substring(2, frame.indexOf('='));
+      data = frame.substring(2, index);
       if (data == null || data.isEmpty())
       {
         throw new CommunicationException("no data available");
       }
+
+      if (data.split("-", 3).length != 3)
+      {
+        throw new CommunicationException("wrong format! missing '-'");
+      }
+
       LOG.fine("DATA AVAILABLE");
 
       //CHECKSUM
-      String checksum = frame.substring(frame.indexOf(Communication.C_GROUP_SEP) + 1, frame.indexOf(Communication.EOT));
-      if (!Crc16.checkCRC(frame.substring(0, frame.indexOf(Communication.C_GROUP_SEP) + 1), checksum))
+      String checksum = frame.substring(index + 1, frame.indexOf(Communication.EOT));
+      if (!Crc16.checkCRC(frame.substring(0, index + 1), checksum))
       {
         throw new CommunicationException("checksum not matching");
       }
 
       LOG.fine("CHECKSUM MATCHING");
 
-      //BASE64
-      data = new String(Communication.DECODER.decode(data), "utf-8");
 
-      //SEND ACK
-      if (frame.charAt(1) != Communication.C_ACK && frame.charAt(1) != Communication.C_NACK)
-      {
-        LOG.info("Frame correct!");
-        Communication.getInstance().sendAck(p, true);
-      }
-      Communication.acceptPackage();
-      catch (CommunicationException ex
-
-
-  
-  
-    )
-        {
-            Communication.getInstance().sendAck(Communication.getCurrentPackage(), false);
-    //LOG.warning(ex.getMessage());
-    throw ex;
-  }
-      catch (Exception ex
-
-
-  
-  
-    )
-        {
-            throw new CommunicationException(ex);
-  }
+      LOG.info("Frame correct!");
     }
-
-
-
-
-  /**
-   *
-   * @return true if the frame is an acknowledge
-   */
-  public boolean isAck ()
-  {
-    return ack;
+    catch (CommunicationException ex)
+    {
+      //LOG.warning(ex.getMessage());
+      throw ex;
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
   }
+
 
 
   @Override

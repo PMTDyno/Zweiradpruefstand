@@ -53,11 +53,7 @@
 * ![d] gui elements description  
 
 ####v1.0
-* automatic starting(custom rpm)
-* automatic stopping
-* maximal rollerspeed (kmh)
-* 4 stroke bug 
-* Bugfixing
+* Complete new communication!
 * ![d] Cleaning
 * ![d] Performance  
   

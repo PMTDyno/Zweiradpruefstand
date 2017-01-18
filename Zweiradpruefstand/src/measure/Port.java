@@ -6,8 +6,7 @@ package measure;
  */
 public interface Port
 {
-    
-    void openPort() throws CommunicationException;
+    void openPort(String port) throws CommunicationException;
     void closePort() throws CommunicationException;
     void writeBytes(byte[] s) throws CommunicationException;
     //String readString(int byteCount, int timeout) throws CommunicationException;

@@ -13,7 +13,6 @@ import logging.Logger;
 public class PortSim implements Port
 {
 
-    private static final Logger LOGP = Logger.getParentLogger();
     private static final Logger LOG = Logger.getLogger(PortSim.class.getName());
     
     
@@ -44,6 +43,13 @@ public class PortSim implements Port
         return port;
     }
 
+
+  @Override
+  public void openPort (String port) throws CommunicationException
+  {
+    LOG.info("PortSim: openPort(" + port + ")");
+  }
+
     public static enum SIM_MODE
     {
         NORMAL,
@@ -51,23 +57,16 @@ public class PortSim implements Port
         NOTHING;
     }
 
-    @Override
-    public void openPort() throws CommunicationException
-    {
-        LOG.info("PortSim: openPort()");
-        
-    }
-
     private void sendFrame(int pack, String str) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        baos.write(Communication.C_START);
+        baos.write(Communication.SOT);
         baos.write(String.valueOf(pack).getBytes());
         baos.write(Communication.ENCODER.encode(str.getBytes()));
         baos.write(Communication.C_GROUP_SEP);
         baos.write(Crc16.getCRC(new String(baos.toByteArray(), "utf-8")).getBytes("utf-8"));
-        baos.write(Communication.C_STOP);
+        baos.write(Communication.EOT);
 
         synchronized (receivedChunks)
         {
@@ -80,10 +79,10 @@ public class PortSim implements Port
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        baos.write(Communication.C_START);
+        baos.write(Communication.SOT);
         baos.write(String.valueOf(pack).getBytes());
         baos.write(Communication.C_ACK);
-        baos.write(Communication.C_STOP);
+        baos.write(Communication.EOT);
 
         synchronized (receivedChunks)
         {
@@ -150,9 +149,9 @@ public class PortSim implements Port
             byte[] sb;
             sb = s;
             byte[] response = new byte[sb.length + 2];
-            response[0] = Communication.C_START;
+            response[0] = Communication.SOT;
             System.arraycopy(sb, 0, response, 1, sb.length);
-            response[sb.length + 1] = Communication.C_STOP;
+            response[sb.length + 1] = Communication.EOT;
             switch (mode)
             {
                 case NORMAL:

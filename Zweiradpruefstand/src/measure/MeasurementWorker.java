@@ -18,7 +18,6 @@ public class MeasurementWorker extends SwingWorker
 {
 
     private final Data data = Data.getInstance();
-    private static final Logger LOGP = Logger.getParentLogger();
     private static final Logger LOG = Logger.getLogger(Communication.class.getName());
 
     private final Gui gui;

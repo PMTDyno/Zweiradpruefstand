@@ -1498,7 +1498,7 @@ public class Gui extends javax.swing.JFrame
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try
         {
-            com = new Communication(jComboBoxPort.getSelectedItem().toString());schueler.conf
+            com = new Communication(jComboBoxPort.getSelectedItem().toString());
 
             LOG.fine(String.format("Connected to Port: %s", com.getPort()));
 

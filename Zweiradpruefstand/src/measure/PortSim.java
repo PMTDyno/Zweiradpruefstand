@@ -1,9 +1,8 @@
 package measure;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.logging.Level;
+import jssc.SerialPort;
 import logging.Logger;
 
 /**
@@ -18,13 +17,11 @@ public class PortSim implements Port
     
     private final LinkedList<Chunk> receivedChunks = new LinkedList<>();
     private SIM_MODE mode;
-    private final String port;
+    private String port;
 
-    PortSim(String port)
+    public PortSim()
     {
-        LOG.setLevel(Level.ALL);
-        this.port = port;
-        LOG.info("PortSim: PortSim(%s)", port);
+        LOG.info("PortSim: PortSim()");
     }
 
     @Override
@@ -50,45 +47,12 @@ public class PortSim implements Port
     LOG.info("PortSim: openPort(" + port + ")");
   }
 
+
     public static enum SIM_MODE
     {
         NORMAL,
         DELAYED,
         NOTHING;
-    }
-
-    private void sendFrame(int pack, String str) throws IOException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        baos.write(Communication.SOT);
-        baos.write(String.valueOf(pack).getBytes());
-        baos.write(Communication.ENCODER.encode(str.getBytes()));
-        baos.write(Communication.C_GROUP_SEP);
-        baos.write(Crc16.getCRC(new String(baos.toByteArray(), "utf-8")).getBytes("utf-8"));
-        baos.write(Communication.EOT);
-
-        synchronized (receivedChunks)
-        {
-            receivedChunks.add(new Chunk(baos.toByteArray()));
-            receivedChunks.notifyAll();
-        }
-    }
-
-    private void sendAck(int pack, boolean ack) throws IOException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        baos.write(Communication.SOT);
-        baos.write(String.valueOf(pack).getBytes());
-        baos.write(Communication.C_ACK);
-        baos.write(Communication.EOT);
-
-        synchronized (receivedChunks)
-        {
-            receivedChunks.add(new Chunk(baos.toByteArray()));
-            receivedChunks.notifyAll();
-        }
     }
 
     @Override

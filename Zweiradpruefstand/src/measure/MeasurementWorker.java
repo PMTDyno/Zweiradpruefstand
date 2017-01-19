@@ -3,11 +3,9 @@ package measure;
 import data.Data;
 import logging.Logger;
 import javax.swing.SwingWorker;
-import gui.Gui;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 
 /**
  * starts the measurement and collects all the data
@@ -20,7 +18,7 @@ public class MeasurementWorker extends SwingWorker
     private final Data data = Data.getInstance();
     private static final Logger LOG = Logger.getLogger(Communication.class.getName());
 
-    private final Gui gui;
+    //private final Gui gui;
     private final Communication com;
 
     private int wheelRpm[];
@@ -28,10 +26,9 @@ public class MeasurementWorker extends SwingWorker
     private boolean done = false;
     private boolean error = true;
 
-    public MeasurementWorker(Gui gui, Communication com)
+    public MeasurementWorker(Communication com)
     {
-        LOG.setLevel(Level.ALL);
-        this.gui = gui;
+        //this.gui = gui;
         this.com = com;
     }
 
@@ -39,12 +36,13 @@ public class MeasurementWorker extends SwingWorker
     protected Object doInBackground()
     {
         error = true;
-
-        String[] data1 = new String[gui.getMaxElements()];
+        //int len = gui.getMaxElements();
+        int len = 10;
+        String[] data1 = new String[len];
         String[] data2 = new String[data1.length];
 
         byte[] bytes;
-        String tmp;
+        String[] tmp;
         String[] measure = new String[2];
         String[] cacheWheelRpm = new String[data1.length];
         String[] cacheMotorRpm = new String[data1.length];
@@ -60,13 +58,12 @@ public class MeasurementWorker extends SwingWorker
                 if(!isCancelled())
                 {
                     tmp = com.getFrameData();
-                    int index = tmp.indexOf(Communication.C_UNIT_SEP);
-                    cacheWheelRpm[i] = tmp.substring(0, index);
-                    cacheMotorRpm[i] = tmp.substring(index + 1, tmp.length());
+                    cacheWheelRpm[i] = tmp[0];
+                    cacheMotorRpm[i] = tmp[1];
 
-                    LOG.info(String.format("Data: %s", tmp));
                     LOG.info(String.format("Wheel: %s", cacheWheelRpm[i]));
                     LOG.info(String.format("Motor: %s", cacheMotorRpm[i]));
+                    LOG.info(String.format("Timestamp: %s", tmp[2]));
 
                     //TWEAK 500 AND 60
 //                    if(Integer.parseInt(cacheMotorRpm[i]) < 2000 || Integer.parseInt(cacheWheelRpm[i]) < 10)
@@ -97,12 +94,12 @@ public class MeasurementWorker extends SwingWorker
                 //if maximum reached
                 if(i == data1.length - 1)
                 {
-                    gui.setCancellingEnabled(false);
+                    //gui.setCancellingEnabled(false);
                     com.setSuccess(true);
                 }
             }
 
-            com.sendFrame("stop");
+            //com.sendFrame("stop");
             LOG.finest("stop sent");
 
             if(com.isSuccess())
@@ -136,24 +133,24 @@ public class MeasurementWorker extends SwingWorker
         {
             LOG.severe("Error sending/receiving data", ex);
             done = true;
-            gui.showErrorMessage("Fehler bei Messung", "Fehler bei Datenübertragung.\n"
-                                 + "Erneut verbinden und/oder Messung wiederholen.");
+            //gui.showErrorMessage("Fehler bei Messung", "Fehler bei Datenübertragung.\n"
+            //                     + "Erneut verbinden und/oder Messung wiederholen.");
             return null;
         }
         catch (TimeoutException ex)
         {
             LOG.severe("No response from controller - Timeout");
             done = true;
-            gui.showErrorMessage("Fehler bei Messung", "Keine Antwort von Gerät bekommen (Timeout).\n"
-                                 + "Messung wiederholen.");
+            //gui.showErrorMessage("Fehler bei Messung", "Keine Antwort von Gerät bekommen (Timeout).\n"
+            //                     + "Messung wiederholen.");
             return null;
         }
         catch (Exception ex)
         {
             LOG.severe(ex);
             done = true;
-            gui.showErrorMessage("Fehler bei Messung", "Unbekannter Error.\n"
-                                 + "Bitte Messung wiederholen.");
+            //gui.showErrorMessage("Fehler bei Messung", "Unbekannter Error.\n"
+            //                     + "Bitte Messung wiederholen.");
             return null;
         }
 
@@ -213,26 +210,26 @@ public class MeasurementWorker extends SwingWorker
             data.setMotorRpm(null);
             data.setMotorRpm(motorRpm);
 
-            gui.measurementDone(this); //send the gui method that it finished. also sends the worker as parameter
+            //gui.measurementDone(this); //send the gui method that it finished. also sends the worker as parameter
         }
         else
         {
             try
             {
-                com.sendFrame("stop");
+                //com.sendFrame("stop");
                 LOG.finest("sent stop");
             }
-            catch (CommunicationException ex)
-            {
-                LOG.severe("Could not send stop", ex);
-            }
+//            catch (CommunicationException ex)
+//            {
+//                LOG.severe("Could not send stop", ex);
+//            }
             catch (Exception ex)
             {
                 LOG.severe(ex);
             }
 
             com.setSuccess(false);
-            gui.measurementDone(this);
+            //gui.measurementDone(this);
         }
     }
 

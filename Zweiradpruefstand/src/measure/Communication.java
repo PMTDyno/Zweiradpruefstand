@@ -1,15 +1,11 @@
 package measure;
 
 import data.Data;
-import gui.Gui;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import javax.swing.SwingWorker;
 import logging.Logger;
 
@@ -44,35 +40,45 @@ public class Communication
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
 
+  public Communication ()
+  {
+    //false == port
+    //true == simulation
 
-  /**
-   *
-   * @param serialPort
-   * @throws measure.CommunicationException
-   * @throws java.util.concurrent.TimeoutException
-   */
-  public Communication () throws CommunicationException
+    if (false)
+    {
+      port = new PortSim();
+      ((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
+    }
+    else
+    {
+      port = new PortCom();
+    }
+
+  }
+
+  public void init (String serialPort) throws CommunicationException, TimeoutException
   {
     try
     {
+      port.openPort(serialPort);
+
+      receiveThread = new Thread(getFrame);
+      receiveThread.start();
+
       refreshEco();
+      connected = true;
+    }
+    catch (CommunicationException | TimeoutException ex)
+    {
+      throw ex;
     }
     catch (Exception ex)
     {
       port = null;
       throw new CommunicationException(ex);
     }
-  }
 
-
-  public void init (String serialPort)
-  {
-    port = new PortSim("");
-    ((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
-    //port = new PortCom(serialPort);
-
-    receiveThread = new Thread(getFrame);
-    receiveThread.start();
   }
 
 
@@ -88,13 +94,13 @@ public class Communication
    * @throws CommunicationException
    * @throws TimeoutException
    */
-  public String getFrameData () throws CommunicationException, TimeoutException
+  public String[] getFrameData () throws CommunicationException, TimeoutException
   {
     for (int i = 0; i < 3; i++)
     {
       try
       {
-        return readFrame(TIMEOUT, TIMOUT_UNIT).getData();
+        return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split("-", 3);
       }
       catch (CommunicationException ex)
       {
@@ -161,11 +167,9 @@ public class Communication
   }
 
 
-  public static String[] getAvailablePorts ()
+  public String[] getAvailablePorts ()
   {
-
-    //return new PortCom("list").getPortList();
-    return new PortSim("list").getPortList();
+    return port.getPortList();
   }
 
 
@@ -227,6 +231,11 @@ public class Communication
     this.success = success;
   }
 
+  public boolean isOpened ()
+  {
+    return connected;
+  }
+
 
   /**
    * only accepts request, start and measure as parameter
@@ -237,16 +246,18 @@ public class Communication
    *
    */
   public void sendFrame (String data) throws CommunicationException,
-                                             TimeoutException
+                                             TimeoutException, IllegalArgumentException
   {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    //build frame
+    if (!data.equals("refresh") && !data.equals("start") && !data.equals("measure"))
+    {
+      throw new IllegalArgumentException();
+    }
+
     try
     {
-      //build frame
-      if (!data.equals("request") || !data.equals("start") || !data.equals("measure"))
-      {
-        throw new IllegalArgumentException();
-      }
 
 
       baos.write(SOT);
@@ -277,13 +288,12 @@ public class Communication
    *
    * @param data the string to be converted and set
    */
-  public void setEco (String data)
+  public void setEco (String[] data)
   {
-    String rv[] = data.split("-", 3);
 
-    double temperature = Double.parseDouble(rv[0]);
-    int humidity = Integer.parseInt(rv[1]);
-    double pressure = Double.parseDouble(rv[2]);
+    double temperature = Double.parseDouble(data[0]);
+    int humidity = Integer.parseInt(data[1]);
+    double pressure = Double.parseDouble(data[2]);
 
 //        System.out.println(temperature);
 //        System.out.println(humidity);
@@ -372,5 +382,29 @@ public class Communication
     }
 
   };
+
+
+  public void cancelWorker ()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void stopWorker ()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void setWorker (Object object)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void start (Object object)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 
 }

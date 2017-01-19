@@ -41,7 +41,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   // *******************************************************************************************************
    
   private Port port;
-  Communication comm;
+  Communication comm = new Communication();
   
   /**
    * Creates new form ProtocolTesterGui
@@ -61,7 +61,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   
   private void updateSwingControls ()
   {
-    if (port != null && port.isOpened())
+    if (port != null && comm.isOpened())
     {
       jchkSimulate.setEnabled(false);
       jcbPorts.setEnabled(false);
@@ -177,8 +177,8 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   {
     try
     {
-      String data = "hello";
-      comm.sendData(data);
+      String data = "refresh";
+      comm.sendFrame(data);
     }
     catch (Exception ex)
     {
@@ -190,8 +190,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   {
     try
     {
-      comm = new Communication(port);
-      comm.connect();
+      comm.init(port.getPort());
     }
     catch (Exception ex)
     {

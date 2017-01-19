@@ -1,335 +1,410 @@
 package measure;
 
-import java.io.UnsupportedEncodingException;
+import data.Data;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.swing.SwingWorker;
 import logging.Logger;
 
 
 /**
  *
- * @author ...
+ * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
 public class Communication
 {
+
+  private static final Data DATA = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(Communication.class.getName());
-  
-  public static final byte SOT = 2;  // 0x02  Start of Text
-  public static final byte EOT = 3;  // 0x03  End of Text 
-  public static final byte GS = 29;  // 0x1d  Group Seperator
-  public static final byte US = 31;  // 0x1f  Unit Seperator
-  public static final byte ACK = 6;  // 0x06
-  public static final byte NAK = 21; // 0x15
-  
-  private static byte [] cutByteArray (byte [] ba, int start, int length)
-  {
-    byte [] rv = new byte [length];
-    for (int i = start; i<(start+length); i++)
-      rv[i-start] = ba[i];
-    return rv;
-  }
-  
-  
-  // ************************************************************************************
-  
-  private final Port port;
-  private int packageNumber;    // 0 or 1, the last used number of a sent frame
-  private long sendTime;        // timestamp when sending packet
-  private byte [] pendingFrame; // last frame send server, waiting for response if not null
-  private Thread receiveOsiLayer2Thread;  
-  private final OsiReceive osiReceive = new OsiReceive();
-  private final OsiTransmit osiTransmit = new OsiTransmit();
 
-  public Communication (Port port)
+  //private static final int TIMEOUT = 100;
+  //private static final TimeUnit TIMOUT_UNIT = TimeUnit.MILLISECONDS;
+  private static final int TIMEOUT = 5;
+  private static final TimeUnit TIMOUT_UNIT = TimeUnit.SECONDS;
+
+  private boolean success = false;
+  private static boolean connected = false;
+
+  private SwingWorker worker = null;
+
+  //The ASCII Control Bytes
+  public static final byte SOT = 2; //0x02
+  public static final byte EOT = 3; //0x03
+
+  public final LinkedList<Frame> receivedFrames = new LinkedList<>();
+
+  private Port port;
+  private Thread receiveThread;
+  private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
+
+  public Communication ()
   {
-    this.port = port;
+    //false == port
+    //true == simulation
+
+    if (false)
+    {
+      port = new PortSim();
+      ((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
+    }
+    else
+    {
+      port = new PortCom();
+    }
+
   }
-  
-  public void connect () throws CommunicationException
+
+  public void init (String serialPort) throws CommunicationException, TimeoutException
   {
     try
     {
-      receiveOsiLayer2Thread = new ReceiveThread();
-      receiveOsiLayer2Thread.start();
-      sendFrame("refresh");
+      port.openPort(serialPort);
+
+      receiveThread = new Thread(getFrame);
+      receiveThread.start();
+
+      refreshEco();
+      connected = true;
+    }
+    catch (CommunicationException | TimeoutException ex)
+    {
+      throw ex;
     }
     catch (Exception ex)
     {
-      if (ex instanceof CommunicationException)
-        throw (CommunicationException)ex;
+      port = null;
       throw new CommunicationException(ex);
     }
-  }
-  
-  public void sendData (String data) throws CommunicationException
-  {
-    try
-    {
-      sendFrame(data);
-    }
-    catch (Exception ex)
-    {
-      if (ex instanceof CommunicationException)
-        throw (CommunicationException)ex;
-      throw new CommunicationException(ex);
-    }
-  }
-  
-  
-  private void sendFrame (String data) throws UnsupportedEncodingException, CommunicationException
-  {
-    byte [] dataBytes = data.getBytes("UTF-8"); 
-//    byte [] ba = new byte [dataBytes.length + 8];
-//    ba[0] = SOT;
-//    ba[1] = (byte)(packageNumber + '0');
-//    System.arraycopy(dataBytes, 0, ba, 2, dataBytes.length);
-//    ba[2 + dataBytes.length] = GS;
-//    
-//    // CRC
-//    ba[2 + dataBytes.length + 1] = '0';
-//    ba[2 + dataBytes.length + 2] = '0';
-//    ba[2 + dataBytes.length + 3] = '0';
-//    ba[2 + dataBytes.length + 4] = '0';
-//    
-//    ba[2 + dataBytes.length + 5] = EOT;
-//     
-//    LOG.finest(ba, "Communication.sendFrame(): now sending frame");
-//    port.writeBytes(ba);
-//    pendingFrame = ba;
-//    sendTime = System.currentTimeMillis();
-    osiTransmit.layer7(dataBytes);
 
   }
 
 
-  
-  
-  private class OsiTransmit
+  public String getPort ()
   {
-    private int nextSn;
-    private byte [] pendingFrame;
-    private long timeoutMillis;
-    
-
-    public int getPendingFrameSN ()
-    {
-      if (pendingFrame != null)
-        return (int)(pendingFrame[1] - '0');
-      else
-        return -1; // no frame pending
-    }
-
-    private void layer7 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer7: send data");
-      layer6(data);
-    }
-        
-    private void layer6 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer6: send data");
-      // to do Base64 encoding
-      layer5(data);
-    }
-    
-    private void layer5 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer5: send data");
-      layer4(data);
-    }
-
-    private void layer4 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer4: send data");
-      byte [] ba = new byte [data.length + 1] ;
-      ba[0] = (byte)(nextSn + '0');
-      nextSn = (nextSn + 1) % 2;
-      System.arraycopy(data, 0, ba, 1, data.length);
-      layer3(ba);
-    }
-
-    private void layer3 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer3: send data");
-      layer2(data);
-    }
-
-    private void layer2 (byte [] data) throws CommunicationException
-    {
-      LOG.finer(data, "OsiTransmit-layer2: send data");
-      byte [] ba = new byte [data.length + 7];
-      ba[0] = SOT;
-      System.arraycopy(data, 0, ba, 1, data.length);
-      ba[1+data.length] = GS;
-      
-      // to do calculate CRC
-      ba[1 + data.length + 1] = '0';
-      ba[1 + data.length + 2] = '0';
-      ba[1 + data.length + 3] = '0';
-      ba[1 + data.length + 4] = '0';
-      
-      ba[1 + data.length + 5] = EOT;
-      layer1(ba);
-    }
-
-    private void layer1 (byte [] frame) throws CommunicationException
-    {
-      LOG.finer(frame, "OsiTransmit-layer1: send data");
-      port.writeBytes(frame);
-      pendingFrame = frame;
-      timeoutMillis = System.currentTimeMillis() + 100;
-    }
+    return port.getPort();
   }
-  
-  
-  
-  private class OsiReceive 
-  {
-    private FrameBytes frameBytes;
 
-    private void layer7 (byte [] frame, int start, int length)
-    {
-      LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer7: data received");
-    }
-    
-    private void layer6 (byte [] frame, int start, int length)
-    {
-      LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer6: data received");
-      // to do Base64 decoding
-      layer7(frame, start, length);
-    }
-    
-    private void layer5 (byte [] frame, int start, int length)
-    {
-      LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer5: data received");
-      layer6(frame, start, length);
-    }
-    
-    private void layer4 (byte [] frame, int start, int length)
+
+  /**
+   *
+   * @return The captured and already checked Frame Data
+   * @throws CommunicationException
+   * @throws TimeoutException
+   */
+  public String[] getFrameData () throws CommunicationException, TimeoutException
+  {
+    for (int i = 0; i < 3; i++)
     {
       try
       {
-        LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer4: data received");
-        final byte sn = frame[start]; // packet sequence number
-        if (sn != '0' && sn != '1')
-          throw new OsiReceiveException("Frame error, unvalid SN field");
-        
-        final int snValue = (int)(sn - '0');
-        final int expectedSn = osiTransmit.getPendingFrameSN();
-        if (expectedSn != 0 && expectedSn != 1)
-          throw new OsiReceiveException("No frame pending");
-        if (expectedSn != snValue)
+        return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split("-", 3);
+      }
+      catch (CommunicationException ex)
+      {
+        LOG.warning(ex);
+      }
+      catch (TimeoutException ex)
+      {
+        if (i == 2)
         {
-          LOG.finer(frame, "OsiReceive-layer4: wrong package number, expect %d");
-          // to do inform to repeat
-          return;
+          throw ex;
         }
-        
-        final byte ack = frame[start+1];
-        if (ack != ACK && ack != NAK)
-          throw new OsiReceiveException("Frame error, unvalid ACK field");
-        if (ack == NAK)
-        {
-          LOG.finer(frame, "OsiReceive-layer4: NAK received");
-          // to do inform to repeat
-          return;
-        }
-        
-        layer5(frame, start+2, length-2);
+        LOG.fine(String.format("%s. Timeout", i + 1));
       }
-      catch (OsiReceiveException ex)
+      catch (InterruptedException ex)
       {
-        LOG.warning(frame, "OsiReceive-layer4: %s", ex.getMessage(), length);
-        // to do, inform upper layers to repeat last frame
-      }
-      catch (Exception ex)
-      {
-        LOG.warning(frame, "OsiReceive-layer4 internal error", ex);
-      }
-      
-    }
-    
-    
-    private void layer3 (byte [] frame, int start, int length)
-    {
-      LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer3: data received");
-      layer4(frame, start, length);
-    }
-    
-    
-    private void layer2 (byte [] frame, int start, int length)
-    {
-      LOG.finer(cutByteArray(frame, start, length), "OsiReceive-layer2: frame received");      
-      if (length < 7 || frame[start + length - 6] != GS)
-      {
-        LOG.warning(frame, "OsiReceive-layer2: Frame error (length=%d)", length);
-        // to do, inform upper layers to repeat last frame
-        return;
-      }
-      // to do check CRC 
-      layer3(frame, start+1, start+frame.length-7);
-    }
-    
-    
-    private void layer1 (byte b)
-    {
-      LOG.finest("OsiReceive-layer1: byte %02x", b);
-      if (frameBytes == null && b != SOT)
-        LOG.warning("receiving unexpected byte %02x", b);
-
-      else if (b == SOT)
-      {
-        frameBytes = new FrameBytes();
-      }
-      frameBytes.update(b);
-
-      if (b == EOT) 
-      {
-        byte [] frame = frameBytes.frameBytes();
-        LOG.debug(frame, "RX-OSI-1: Frame received");
-        layer2(frame, 0, frame.length);
-        frameBytes = null;
-      }
-    }  
-    
-    
-    private class OsiReceiveException extends Exception
-    {
-      public OsiReceiveException (String message)
-      {
-        super(message);
       }
     }
-    
-    
+    throw new CommunicationException("received wrong frames");
   }
-  
-  
-  
-  
-  
 
-  
-  private class ReceiveThread extends Thread
+
+  /**
+   *
+   * @param timeout
+   * @param unit
+   * @return
+   * @throws CommunicationException
+   * @throws TimeoutException
+   * @throws InterruptedException
+   */
+  public Frame readFrame (long timeout, TimeUnit unit)
+          throws CommunicationException, TimeoutException,
+                 InterruptedException
   {
-    @Override
-    public void run ()
+    synchronized (receivedFrameList)
     {
-      while (!Thread.currentThread().isInterrupted())
+      long startTimeMillis = System.currentTimeMillis();
+      while (true)
       {
+        if (!receivedFrameList.isEmpty())
+        {
+          return receivedFrameList.removeFirst();
+        }
+
+        long to = startTimeMillis + unit.toMillis(timeout)
+                - System.currentTimeMillis();
+        if (to <= 0)
+        {
+          throw new TimeoutException();
+        }
+        //is the following good practise?
+        //probably not.., why not?
         try
         {
-          byte b = port.readByte();
-          //LOG.debug("readByte returns with %02x", b);
-          osiReceive.layer1(b);
+          receivedFrameList.wait(to);
         }
-        catch (Exception ex)
+        catch (InterruptedException ex)
         {
           LOG.warning(ex);
         }
       }
     }
-    
+
   }
-  
-  
-  
+
+
+  public String[] getAvailablePorts ()
+  {
+    return port.getPortList();
+  }
+
+
+  public void disconnect () throws CommunicationException
+  {
+    try
+    {
+      if (port != null)
+      {
+        port.closePort();
+        connected = false;
+      }
+      else
+      {
+        throw new CommunicationException("closing Port failed");
+      }
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
+  }
+
+
+  public static boolean isConnected ()
+  {
+    return connected;
+  }
+
+
+  public void refreshEco () throws CommunicationException, TimeoutException
+  {
+
+    try
+    {
+      sendFrame("refresh");
+      setEco(getFrameData());
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
+  }
+
+
+  public boolean isSuccess ()
+  {
+    return success;
+  }
+
+
+  /**
+   * set to true if the measurement finished succesfully
+   *
+   * @param success
+   */
+  public void setSuccess (boolean success)
+  {
+    this.success = success;
+  }
+
+  public boolean isOpened ()
+  {
+    return connected;
+  }
+
+
+  /**
+   * only accepts request, start and measure as parameter
+   *
+   * @param data request, start or measure
+   * @throws CommunicationException
+   * @throws TimeoutException
+   *
+   */
+  public void sendFrame (String data) throws CommunicationException,
+                                             TimeoutException, IllegalArgumentException
+  {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    //build frame
+    if (!data.equals("refresh") && !data.equals("start") && !data.equals("measure"))
+    {
+      throw new IllegalArgumentException();
+    }
+
+    try
+    {
+
+
+      baos.write(SOT);
+      baos.write(data.getBytes());
+      baos.write(EOT);
+
+
+      //send frame until ack - max 3 times
+      for (int i = 0; i < 3; i++)
+      {
+        port.writeBytes(baos.toByteArray());
+        LOG.info("Frame written: %s", baos.toString());
+      }
+    }
+    catch (IOException ex)
+    {
+      throw new CommunicationException("Error converting data string to bytes");
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
+  }
+
+
+  /**
+   * converts the data string to 3 ecosystem variables and sets them in the data.data class
+   *
+   * @param data the string to be converted and set
+   */
+  public void setEco (String[] data)
+  {
+
+    double temperature = Double.parseDouble(data[0]);
+    int humidity = Integer.parseInt(data[1]);
+    double pressure = Double.parseDouble(data[2]);
+
+//        System.out.println(temperature);
+//        System.out.println(humidity);
+//        System.out.println(pressure);
+    if (temperature < (-100) || temperature > 100
+            || humidity < 0 || humidity > 100
+            || pressure < 0 || pressure > 2000)
+    {
+      throw new IllegalStateException();
+    }
+
+    DATA.setTemperature(temperature);
+    DATA.setHumidity(humidity);
+    DATA.setPressure(pressure);
+
+  }
+
+  //Runnable or Thread?, better would be to use modern kind of
+  // multithreading -> executors
+  private Runnable getFrame = new Runnable()
+  {
+
+    @Override
+    public void run ()
+    {
+      try
+      {
+        FrameBytes frame = null;
+        while (true)
+        {
+          byte b = port.readByte();
+          //System.out.println(b);
+          switch (b)
+          {
+
+            //ignore \n and \r
+            case 10:
+              break;
+            case 13:
+              break;
+
+            case SOT:
+              frame = new FrameBytes();
+              frame.update(b);
+              break;
+
+            case EOT:
+              if (frame != null)
+              {
+                frame.update(b);
+                LOG.info(String.format("Frame received: %s", new String(frame.getFrameBytes(), "utf-8")));
+                synchronized (receivedFrameList)
+                {
+                  receivedFrameList.add(new Frame(frame));
+                  receivedFrameList.notifyAll();
+                  frame = null;
+                }
+              }
+              else
+              {
+                LOG.warning("missing C_START");
+              }
+              break;
+
+            default:
+              if (frame != null)
+              {
+                frame.update(b);
+              }
+              else
+              {
+                LOG.warning("missing C_START " + String.format("'%c'", b));
+              }
+          }
+        }
+      }
+      catch (CommunicationException ex)
+      {
+        ex.printStackTrace(System.err);
+        LOG.warning(ex.getMessage());
+      }
+      catch (Exception ex)
+      {
+        LOG.warning(ex);
+      }
+    }
+
+  };
+
+
+  public void cancelWorker ()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void stopWorker ()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void setWorker (Object object)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
+  public void start (Object object)
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
 }

@@ -1,6 +1,7 @@
 package measure;
 
 import java.util.LinkedList;
+import java.util.logging.Level;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -16,14 +17,16 @@ import logging.Logger;
  */
 public class PortCom implements Port, SerialPortEventListener
 {
-  private static final Logger LOG = Logger.getLogger(PortCom.class.getName());
+
+  private static final Logger LOG = Logger.getLogger(MeasurementWorker.class.getName());
 
   private SerialPort serialPort;
-  private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
+  private final LinkedList<Chunk> receivedChunks = new LinkedList<>();
 
 
   public PortCom ()
   {
+    LOG.setLevel(Level.ALL);
   }
 
 
@@ -50,12 +53,11 @@ public class PortCom implements Port, SerialPortEventListener
   @Override
   public void openPort (String port) throws CommunicationException
   {
-    if (serialPort != null)
-      throw new CommunicationException("serial port already open");
     try
     {
       serialPort = new SerialPort(port);
-      LOG.fine("Open serial port %s (57600/8N1)", serialPort.getPortName());
+
+
       if (!serialPort.openPort())
       {
         throw new CommunicationException("open Port failed");
@@ -83,7 +85,6 @@ public class PortCom implements Port, SerialPortEventListener
   {
     try
     {
-      LOG.fine("close serial port %s", serialPort.getPortName());
       if (!serialPort.closePort())
       {
         throw new CommunicationException("closing Port failed");
@@ -109,16 +110,17 @@ public class PortCom implements Port, SerialPortEventListener
     {
       try
       {
+
         while (receivedChunks.isEmpty())
         {
           receivedChunks.wait();
         }
 
-        final PortChunk ch = receivedChunks.getFirst();
+        final Chunk ch = receivedChunks.getFirst();
 
         final byte rv = ch.next();
         if (!ch.isByteAvailable())
-        {  
+        {
           receivedChunks.removeFirst();
         }
         return rv;
@@ -126,6 +128,11 @@ public class PortCom implements Port, SerialPortEventListener
       catch (InterruptedException ex)
       {
         throw ex;
+      }
+      catch (IndexOutOfBoundsException ex)
+      {
+        LOG.severe("Index out of Bounds");
+        throw new CommunicationException(ex);
       }
       catch (Exception ex)
       {
@@ -135,19 +142,17 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-  //private static boolean block = false;
+
   @Override
-  public synchronized void writeBytes (byte[] data) throws CommunicationException
+  public synchronized void writeBytes (byte[] s) throws CommunicationException
   {
-    LOG.finer(data, "PortCom: writebytes(byte [])");
     try
     {
-      serialPort.writeBytes(data);
-      LOG.debug("bytes written");
+      serialPort.writeBytes(s);
     }
     catch (SerialPortException ex)
     {
-      throw new CommunicationException("writing String failed");
+      throw new CommunicationException("writing bytes failed");
     }
     catch (Exception ex)
     {
@@ -165,10 +170,9 @@ public class PortCom implements Port, SerialPortEventListener
       try
       {
         byte[] ba = serialPort.readBytes();
-        LOG.finer("PortCom: %s bytes received", ba.length);
         synchronized (receivedChunks)
         {
-          receivedChunks.add(new PortChunk(ba));
+          receivedChunks.add(new Chunk(ba));
           receivedChunks.notifyAll();
         }
       }
@@ -181,10 +185,41 @@ public class PortCom implements Port, SerialPortEventListener
   }
 
 
-  @Override
-  public boolean isOpened ()
+  private class Chunk
   {
-    return serialPort != null && serialPort.isOpened();
+
+    private final byte[] data;
+    private int nextIndex = 0;
+
+
+    public Chunk (byte[] data)
+    {
+//            if(data == null)
+//                throw new IllegalArgumentException();
+      this.data = data;
+    }
+
+
+    public byte next ()
+    {
+      try
+      {
+        return data[nextIndex++];
+      }
+      catch (Exception ex)
+      {
+        ex.printStackTrace(System.err);
+      }
+      return 10; // \n
+      
+    }
+
+
+    public boolean isByteAvailable ()
+    {
+      return nextIndex < data.length;
+    }
+
   }
 
 }

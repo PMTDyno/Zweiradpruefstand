@@ -1,8 +1,6 @@
 package measure;
 
 import java.io.ByteArrayOutputStream;
-import java.security.MessageDigest;
-
 
 /**
  *
@@ -10,61 +8,50 @@ import java.security.MessageDigest;
  */
 public class FrameBytes
 {
+    private final ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
+    private long startTimeMillis;
+    private long endTimeMillis;
+    private byte [] byteArrayCache;
 
-  private final ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-  private long startTimeMillis;
-  private long endTimeMillis;
-  private byte[] byteArrayCache;
-
-
-  public FrameBytes ()
-  {
-  }
-
-
-  public void update (byte b)
-  {
-    if (byteArrayCache != null)
+    public FrameBytes()
     {
-      throw new IllegalStateException("frame already ended");
     }
 
-    if (baos.size() == 0)
+    public void update (byte b)
     {
-      startTimeMillis = System.currentTimeMillis();
+        if (byteArrayCache != null)
+            throw new IllegalStateException("frame already ended");
+        
+        if (baos.size() == 0)
+            startTimeMillis = System.currentTimeMillis();
+        
+        baos.write(b);
+        endTimeMillis = System.currentTimeMillis();
+    }
+    
+    byte [] getFrameBytes ()
+    {
+        if (byteArrayCache == null)
+        {
+            byteArrayCache = baos.toByteArray();
+        }
+        return byteArrayCache;
     }
 
-    baos.write(b);
-    endTimeMillis = System.currentTimeMillis();
-  }
-
-  
-  byte [] frameBytes ()
-  {
-    if (byteArrayCache == null)
+    public long getStartTimeMillis()
     {
-      byteArrayCache = baos.toByteArray();
+        return startTimeMillis;
     }
-    return byteArrayCache;
-  }
 
+    public long getEndTimeMillis()
+    {
+        return endTimeMillis;
+    }
 
-  public long getStartTimeMillis ()
-  {
-    return startTimeMillis;
-  }
-
-
-  public long getEndTimeMillis ()
-  {
-    return endTimeMillis;
-  }
-
-
-  @Override
-  public String toString ()
-  {
-    return "Frame{" + baos.size() + "Bytes}";
-  }
-
+    @Override
+    public String toString()
+    {
+        return "Frame{" + baos.size() +  "Bytes}";
+    }
+    
 }

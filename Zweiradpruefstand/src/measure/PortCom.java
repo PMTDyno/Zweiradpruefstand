@@ -21,7 +21,7 @@ public class PortCom implements Port, SerialPortEventListener
   private static final Logger LOG = Logger.getLogger(MeasurementWorker.class.getName());
 
   private SerialPort serialPort;
-  private final LinkedList<Chunk> receivedChunks = new LinkedList<>();
+  private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
 
 
   public PortCom ()
@@ -116,7 +116,7 @@ public class PortCom implements Port, SerialPortEventListener
           receivedChunks.wait();
         }
 
-        final Chunk ch = receivedChunks.getFirst();
+        final PortChunk ch = receivedChunks.getFirst();
 
         final byte rv = ch.next();
         if (!ch.isByteAvailable())
@@ -148,7 +148,14 @@ public class PortCom implements Port, SerialPortEventListener
   {
     try
     {
+      if(serialPort == null)
+        throw new CommunicationException("serialPort == null");
+      
       serialPort.writeBytes(s);
+    }
+    catch(CommunicationException ex)
+    {
+      throw ex;
     }
     catch (SerialPortException ex)
     {
@@ -172,7 +179,7 @@ public class PortCom implements Port, SerialPortEventListener
         byte[] ba = serialPort.readBytes();
         synchronized (receivedChunks)
         {
-          receivedChunks.add(new Chunk(ba));
+          receivedChunks.add(new PortChunk(ba));
           receivedChunks.notifyAll();
         }
       }
@@ -184,42 +191,10 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-
-  private class Chunk
+  @Override
+  public boolean isOpened ()
   {
-
-    private final byte[] data;
-    private int nextIndex = 0;
-
-
-    public Chunk (byte[] data)
-    {
-//            if(data == null)
-//                throw new IllegalArgumentException();
-      this.data = data;
-    }
-
-
-    public byte next ()
-    {
-      try
-      {
-        return data[nextIndex++];
-      }
-      catch (Exception ex)
-      {
-        ex.printStackTrace(System.err);
-      }
-      return 10; // \n
-      
-    }
-
-
-    public boolean isByteAvailable ()
-    {
-      return nextIndex < data.length;
-    }
-
+    return serialPort != null;
   }
 
 }

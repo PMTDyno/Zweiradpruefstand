@@ -49,7 +49,7 @@ public class Gui extends javax.swing.JFrame
 
   private final ProgSetDialog progset;
   private final VehicleSetDialog vehicleset;
-  private Communication com = new Communication();
+  private Communication com;
   private ChartPanel chartPanel;
   private final Data data = Data.getInstance();
   
@@ -110,7 +110,8 @@ public class Gui extends javax.swing.JFrame
 
     progset = new ProgSetDialog(this, true);
     vehicleset = new VehicleSetDialog(this, true);
-
+    com = new Communication();
+    System.out.println("com set");
     //com = new PortSim();
     refreshPorts();
 
@@ -745,12 +746,13 @@ public class Gui extends javax.swing.JFrame
      */
     LOGP.addHandler(new logging.LogOutputStreamHandler(System.out));
     LOG.setLevel(DEBUGLEVEL);
+    LOGP.setLevel(Level.ALL);
     try
     {
       String opt = System.getProperty("DebugLevel");
       if (opt != null)
       {
-        LOGP.setLevel(Level.ALL);
+        
         LOG.setLevel(Level.parse(opt));
       }
     }
@@ -1285,7 +1287,7 @@ public class Gui extends javax.swing.JFrame
     {
       jbutConnect.setEnabled(true);
     }
-
+    
     jComboBoxPort.removeAllItems();
     for (String availablePort : com.getAvailablePorts())
     {
@@ -1576,14 +1578,14 @@ public class Gui extends javax.swing.JFrame
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
-    jbutDisconnect.setEnabled(Communication.isConnected());
-    jbutConnect.setEnabled(!Communication.isConnected());
-    jbutRefreshDevice.setEnabled(!Communication.isConnected());
-    jRefresh.setEnabled(Communication.isConnected());
-    jComboBoxPort.setEnabled(!Communication.isConnected());
-    jStart.setEnabled(Communication.isConnected());
+    jbutDisconnect.setEnabled(com.isConnected());
+    jbutConnect.setEnabled(!com.isConnected());
+    jbutRefreshDevice.setEnabled(!com.isConnected());
+    jRefresh.setEnabled(com.isConnected());
+    jComboBoxPort.setEnabled(!com.isConnected());
+    jStart.setEnabled(com.isConnected());
 
-    if (Communication.isConnected())
+    if (com.isConnected())
     {
       jLabelStatus.setText("verbunden");
       jLabelStatus.setForeground(new Color(0, 130, 0));

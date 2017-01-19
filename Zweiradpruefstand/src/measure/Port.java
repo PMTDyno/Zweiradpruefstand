@@ -13,6 +13,7 @@ public interface Port
   
   void writeBytes (byte[] s) throws CommunicationException;
   byte readByte () throws CommunicationException, InterruptedException;
+  boolean isOpened();
   
   String[] getPortList ();
   String getPort ();

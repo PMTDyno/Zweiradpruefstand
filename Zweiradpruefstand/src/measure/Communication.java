@@ -12,7 +12,7 @@ import logging.Logger;
 
 /**
  *
- * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
+ * @author Levin Messing <meslem12@htl-kaindorf.ac.at>
  */
 public class Communication
 {
@@ -44,11 +44,10 @@ public class Communication
   {
     //false == port
     //true == simulation
-
-    if (false)
+    if (true)
     {
       port = new PortSim();
-      ((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
+      //((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
     }
     else
     {
@@ -169,6 +168,7 @@ public class Communication
 
   public String[] getAvailablePorts ()
   {
+    System.out.println("getavail");
     return port.getPortList();
   }
 
@@ -194,7 +194,7 @@ public class Communication
   }
 
 
-  public static boolean isConnected ()
+  public boolean isConnected ()
   {
     return connected;
   }
@@ -231,12 +231,11 @@ public class Communication
     this.success = success;
   }
 
-  public boolean isOpened ()
+public boolean isOpened ()
   {
-    return connected;
+    return port.isOpened();
   }
-
-
+  
   /**
    * only accepts request, start and measure as parameter
    *
@@ -248,6 +247,9 @@ public class Communication
   public void sendFrame (String data) throws CommunicationException,
                                              TimeoutException, IllegalArgumentException
   {
+    if(port == null)
+      throw new CommunicationException("port == null in sendFrame()");
+    
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     //build frame
@@ -258,19 +260,20 @@ public class Communication
 
     try
     {
-
-
       baos.write(SOT);
       baos.write(data.getBytes());
       baos.write(EOT);
-
-
-      //send frame until ack - max 3 times
+      
+      //send frame max 3 times
       for (int i = 0; i < 3; i++)
       {
         port.writeBytes(baos.toByteArray());
         LOG.info("Frame written: %s", baos.toString());
       }
+    }
+    catch(NullPointerException ex)
+    {
+      ex.printStackTrace(System.err);
     }
     catch (IOException ex)
     {

@@ -168,7 +168,9 @@ public class Communication
 
   public String[] getAvailablePorts ()
   {
-    System.out.println("getavail");
+              
+    System.out.print("in getAvailablePorts()");
+     
     return port.getPortList();
   }
 

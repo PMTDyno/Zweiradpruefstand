@@ -28,7 +28,7 @@ public class PortSim implements Port
   private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
   private SIM_MODE mode = SIM_MODE.NORMAL;
   private String port;
-  private final String [] availablePorts = { "SIM-NORMAL" };
+  private final String [] availablePorts = { "SIM-NORMAL" , "Decoy"};
   private JniAppThread jniAppThread;
 
   public PortSim ()
@@ -45,6 +45,7 @@ public class PortSim implements Port
   @Override
   public String[] getPortList ()
   {
+    LOG.info("test");
     return availablePorts;
   }
 

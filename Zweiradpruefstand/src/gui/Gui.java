@@ -49,7 +49,7 @@ public class Gui extends javax.swing.JFrame
 
   private final ProgSetDialog progset;
   private final VehicleSetDialog vehicleset;
-  private Communication com;
+  private Communication com = new Communication();
   private ChartPanel chartPanel;
   private final Data data = Data.getInstance();
   
@@ -110,9 +110,7 @@ public class Gui extends javax.swing.JFrame
 
     progset = new ProgSetDialog(this, true);
     vehicleset = new VehicleSetDialog(this, true);
-    com = new Communication();
-    System.out.println("com set");
-    //com = new PortSim();
+
     refreshPorts();
 
     initChart();
@@ -702,9 +700,9 @@ public class Gui extends javax.swing.JFrame
         LOG.info("TRIGGERED");
         LOG.info("TRIGGERED");
         LOG.info("TRIGGERED");
-        this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
-        this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
-        this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
+        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
+        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
+        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
         this.easterEgg = 0;
       }
     }//GEN-LAST:event_jLabelDateMouseClicked
@@ -1279,6 +1277,7 @@ public class Gui extends javax.swing.JFrame
    */
   private void refreshPorts ()
   {
+    System.out.println("before getAvailablePorts()");
     if (com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
     {
       jbutConnect.setEnabled(false);
@@ -1287,6 +1286,8 @@ public class Gui extends javax.swing.JFrame
     {
       jbutConnect.setEnabled(true);
     }
+    
+    System.out.println("after getAvailablePorts()");
     
     jComboBoxPort.removeAllItems();
     for (String availablePort : com.getAvailablePorts())

@@ -25,20 +25,23 @@ public class Communication
   private static final int TIMEOUT = 5;
   private static final TimeUnit TIMOUT_UNIT = TimeUnit.SECONDS;
 
-  private boolean success = false;
   private static boolean connected = false;
 
-  private SwingWorker worker = null;
 
   //The ASCII Control Bytes
   public static final byte SOT = 2; //0x02
   public static final byte EOT = 3; //0x03
 
-  public final LinkedList<Frame> receivedFrames = new LinkedList<>();
-
   private Port port;
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
+
+
+  public enum Request
+  {
+    REFRESH, MEASURE, START
+  }
+
 
   public Communication ()
   {
@@ -55,6 +58,7 @@ public class Communication
     }
 
   }
+
 
   public void init (String serialPort) throws CommunicationException, TimeoutException
   {
@@ -168,9 +172,9 @@ public class Communication
 
   public String[] getAvailablePorts ()
   {
-              
+
     System.out.print("in getAvailablePorts()");
-     
+
     return port.getPortList();
   }
 
@@ -207,7 +211,7 @@ public class Communication
 
     try
     {
-      sendFrame("refresh");
+      sendFrame(Request.REFRESH);
       setEco(getFrameData());
     }
     catch (Exception ex)
@@ -217,55 +221,55 @@ public class Communication
   }
 
 
-  public boolean isSuccess ()
-  {
-    return success;
-  }
-
-
-  /**
-   * set to true if the measurement finished succesfully
-   *
-   * @param success
-   */
-  public void setSuccess (boolean success)
-  {
-    this.success = success;
-  }
-
-public boolean isOpened ()
+  public boolean isOpened ()
   {
     return port.isOpened();
   }
-  
+
+
   /**
    * only accepts request, start and measure as parameter
    *
-   * @param data request, start or measure
+   * @param request refresh, start or measure
    * @throws CommunicationException
    * @throws TimeoutException
    *
    */
-  public void sendFrame (String data) throws CommunicationException,
-                                             TimeoutException, IllegalArgumentException
+  public void sendFrame (Request request) throws CommunicationException,
+                                                 TimeoutException, IllegalArgumentException
   {
-    if(port == null)
-      throw new CommunicationException("port == null in sendFrame()");
-    
+    if (port == null)
+    {
+      throw new CommunicationException("port not initialized!");
+    }
+    if (!isOpened())
+    {
+      throw new CommunicationException("port not opened!");
+    }
+
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    //build frame
-    if (!data.equals("refresh") && !data.equals("start") && !data.equals("measure"))
-    {
-      throw new IllegalArgumentException();
-    }
 
     try
     {
+      //build frame
       baos.write(SOT);
-      baos.write(data.getBytes());
+      switch (request)
+      {
+        case REFRESH:
+          baos.write("refresh".getBytes("UTF-8"));
+          break;
+        case START:
+          baos.write("start".getBytes("UTF-8"));
+          break;
+        case MEASURE:
+          baos.write("measure".getBytes("UTF-8"));
+          break;
+        default:
+          LOG.severe("FATAL ERROR");
+      }
       baos.write(EOT);
-      
+
       //send frame max 3 times
       for (int i = 0; i < 3; i++)
       {
@@ -273,7 +277,7 @@ public boolean isOpened ()
         LOG.info("Frame written: %s", baos.toString());
       }
     }
-    catch(NullPointerException ex)
+    catch (NullPointerException ex)
     {
       ex.printStackTrace(System.err);
     }

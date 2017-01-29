@@ -52,8 +52,8 @@ public class Gui extends javax.swing.JFrame
   private Communication com = new Communication();
   private ChartPanel chartPanel;
   private final Data data = Data.getInstance();
-  
-          
+
+
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -750,7 +750,7 @@ public class Gui extends javax.swing.JFrame
       String opt = System.getProperty("DebugLevel");
       if (opt != null)
       {
-        
+
         LOG.setLevel(Level.parse(opt));
       }
     }
@@ -859,88 +859,26 @@ public class Gui extends javax.swing.JFrame
 
 
   /**
-   * Checks if the worker is done and if an error occured.<br>
-   * Then sets the worker to <code>null</code> <br>
-   * Calculates the measurement and updates the chart.
-   *
-   * @param w The Worker
-   */
-  public void measurementDone (MeasurementWorker w)
-  {
-    try
-    {
-      if (w != null)
-      {
-        w.get(); //warten bis worker fertig ist
-      }
-    }
-    catch (InterruptedException | ExecutionException ex)
-    {
-      LOG.severe("Measurement failed", ex);
-      showErrorMessage("Fehler bei Messung", "Fehler bei Messung aufgetreten.\n"
-                       + "Messung wiederholen.");
-    }
-    catch (CancellationException ex)
-    {
-    }
-    catch (Exception ex)
-    {
-      LOG.severe("Unsupported Exception", ex);
-      showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-    }
-    finally
-    {
-      com.setWorker(null);
-      if (com.isSuccess())
-      {
-        calculate();
-        updateSeriesPower();
-        updateSeriesTorque();
-
-        updateChartLabels();
-
-        jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png")));
-        jPrint.setEnabled(true);
-        jSave.setEnabled(true);
-        jStart.setEnabled(true);
-        jRefresh.setEnabled(true);
-        LOG.finer("powerchart updated");
-      }
-      else
-      {
-
-        jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png")));
-        jStop.setEnabled(false);
-        jCancel.setEnabled(false);
-        jStart.setEnabled(true);
-        jRefresh.setEnabled(true);
-        LOG.warning("measurement aborted!");
-      }
-    }
-  }
-
-
-  /**
-   *
-   * @return the maximum elements of measure data
-   */
-  public int getMaxElements ()
-  {
-    return (data.getMaxMeasureTimeSec() * 1000) / (data.getPeriodTimeMs());
-  }
-
-
-  /**
    * Enables the Cancelling Buttons if the boolean is true
    *
    * @param b boolean
    */
-  public void setCancellingEnabled (boolean b)
+  public void setRunning (boolean b)
   {
     jStop.setEnabled(b);
     jCancel.setEnabled(b);
   }
-
+  
+  /**
+   * Sets the buttons available to start measurement if true
+   * @param b 
+   */
+  public void setReady(boolean b)
+  {
+    setRunning(!b);
+    jStart.setEnabled(b);
+    jRefresh.setEnabled(b);
+  }
 
   /**
    * Shows an error message relative to the main GUI
@@ -948,7 +886,7 @@ public class Gui extends javax.swing.JFrame
    * @param title The Title of the Frame
    * @param message The displayed message
    */
-  public final void showErrorMessage (String title, String message)
+  public void showErrorMessage (String title, String message)
   {
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
@@ -1044,6 +982,69 @@ public class Gui extends javax.swing.JFrame
   private void start ()
   {
     com.start(this);
+  }
+
+
+  private class Measure extends MeasurementWorker
+  {
+
+    public Measure (Communication com)
+    {
+      super(com);
+    }
+
+
+    @Override
+    protected void done ()
+    {
+      try
+      {
+        if (get() == null)
+        {
+          throw new CancellationException();
+        }
+        setReady(false);
+        data.setMeasureList(get());
+        calculate();
+        setReady(true);
+      }
+      catch (ExecutionException ex)
+      {
+        Throwable cause = ex.getCause();
+        if (cause instanceof CommunicationException)
+        {
+          LOG.severe(cause.getMessage());
+          showErrorMessage("Kommunikationsfehler", "Folgender Kommunikationsfehler ist aufgetreten: " + cause.getMessage());
+        }
+        else if (cause instanceof TimeoutException)
+        {
+          LOG.severe(cause.getMessage());
+          showErrorMessage("Timeout", "µC antwortet nicht - Timeout");
+        }
+        else
+        {
+          LOG.severe("Unknown Exception: " + cause.getMessage());
+          showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + cause.getMessage());
+        }
+      }
+      catch (InterruptedException ex)
+      {
+      }
+      catch (CancellationException ex)
+      {
+        LOG.info("Measurement aborted");
+        
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unknown Exception: " + ex);
+        showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
+      }
+
+
+    }
+
+
   }
 
 
@@ -1152,7 +1153,7 @@ public class Gui extends javax.swing.JFrame
       }
 
       //update
-      if (com.isSuccess())
+      if (data.getMeasureList() != null)
       {
         switch (updateLevel) //don't insert break!
         {
@@ -1277,7 +1278,6 @@ public class Gui extends javax.swing.JFrame
    */
   private void refreshPorts ()
   {
-    System.out.println("before getAvailablePorts()");
     if (com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
     {
       jbutConnect.setEnabled(false);
@@ -1286,9 +1286,7 @@ public class Gui extends javax.swing.JFrame
     {
       jbutConnect.setEnabled(true);
     }
-    
-    System.out.println("after getAvailablePorts()");
-    
+
     jComboBoxPort.removeAllItems();
     for (String availablePort : com.getAvailablePorts())
     {

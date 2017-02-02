@@ -45,12 +45,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
     mdz = Double.parseDouble(tmp[1].replace(',', '.'));
     time = Integer.parseInt(tmp[2]);
     
-    //if mdz < last measured mdz
-    if(mdz < list.get(list.size()-1).getMdz())
-    {
-      LOG.warning("OVERWRITING MDZ! last: " + mdz + " new: " + list.get(list.size()-1).getMdz());
-      mdz = list.get(list.size()-1).getMdz();
-    }
+//    //if mdz < last measured mdz
+//    if(mdz < list.get(list.size()-1).getMdz())
+//    {
+//      LOG.warning("OVERWRITING MDZ! last: " + mdz + " new: " + list.get(list.size()-1).getMdz());
+//      mdz = list.get(list.size()-1).getMdz();
+//    }
     
     return new Datapoint(wdz, mdz, time);
   }

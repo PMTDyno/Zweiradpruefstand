@@ -2,6 +2,7 @@ package gui;
 
 import data.Config;
 import data.Data;
+import data.ReadCSV;
 import measure.MeasurementWorker;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -10,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import measure.Communication;
 import measure.CommunicationException;
+import measure.Datapoint;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -119,453 +122,466 @@ public class Gui extends javax.swing.JFrame
 
 
   @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void initComponents()
+  {
+    java.awt.GridBagConstraints gridBagConstraints;
+
+    jFrameAbout = new javax.swing.JFrame();
+    jPanelLogo = new javax.swing.JPanel();
+    jLabel2 = new javax.swing.JLabel();
+    jLabelVersion = new javax.swing.JLabel();
+    jPanelInfo = new javax.swing.JPanel();
+    jLabelDevelopers = new javax.swing.JLabel();
+    jLabelInfo = new javax.swing.JLabel();
+    jLabelWarning = new javax.swing.JLabel();
+    jPanelInfo2 = new javax.swing.JPanel();
+    jLabelDate = new javax.swing.JLabel();
+    jLabelAuthor = new javax.swing.JLabel();
+    jFrameGuide = new javax.swing.JFrame();
+    jTabbedPane1 = new javax.swing.JTabbedPane();
+    jPanelMeasure = new javax.swing.JPanel();
+    jLabelGuideMeasure = new javax.swing.JLabel();
+    jPanelSettings = new javax.swing.JPanel();
+    jLabelGuideSettings = new javax.swing.JLabel();
+    jToolBar = new javax.swing.JToolBar();
+    jStart = new javax.swing.JButton();
+    jStop = new javax.swing.JButton();
+    jCancel = new javax.swing.JButton();
+    jRefresh = new javax.swing.JButton();
+    jSeparator1 = new javax.swing.JToolBar.Separator();
+    jProgSet = new javax.swing.JButton();
+    jVehicleSet = new javax.swing.JButton();
+    jSeparator2 = new javax.swing.JToolBar.Separator();
+    jPrint = new javax.swing.JButton();
+    jSave = new javax.swing.JButton();
+    jSeparator3 = new javax.swing.JToolBar.Separator();
+    jPanSerial = new javax.swing.JPanel();
+    jpanDevice = new javax.swing.JPanel();
+    jComboBoxPort = new javax.swing.JComboBox<>();
+    jpanEast = new javax.swing.JPanel();
+    jpanSerialButtons = new javax.swing.JPanel();
+    jbutConnect = new javax.swing.JButton();
+    jbutDisconnect = new javax.swing.JButton();
+    jbutRefreshDevice = new javax.swing.JButton();
+    jLabelStatus = new javax.swing.JLabel();
+    jChartPanel = new javax.swing.JPanel();
+    jMenuBar = new javax.swing.JMenuBar();
+    jFile = new javax.swing.JMenu();
+    jMenuOpen = new javax.swing.JMenuItem();
+    jSeparator6 = new javax.swing.JPopupMenu.Separator();
+    jMenuSave = new javax.swing.JMenuItem();
+    jMenuPrint = new javax.swing.JMenuItem();
+    jSeparator4 = new javax.swing.JPopupMenu.Separator();
+    jMenuSettings = new javax.swing.JMenuItem();
+    jMenuVehicle = new javax.swing.JMenuItem();
+    jSeparator5 = new javax.swing.JPopupMenu.Separator();
+    jMenuClose = new javax.swing.JMenuItem();
+    jHelp = new javax.swing.JMenu();
+    jMenuGuide = new javax.swing.JMenuItem();
+    jMenuAbout = new javax.swing.JMenuItem();
+
+    jFrameAbout.setTitle("Über...");
+    jFrameAbout.setLocation(new java.awt.Point(0, 0));
+    jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
+    jFrameAbout.setResizable(false);
+
+    jPanelLogo.setLayout(new java.awt.GridBagLayout());
+
+    jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
+    jLabel2.setText(" PMT Dyno");
+    jLabel2.setVerifyInputWhenFocusTarget(false);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+    jPanelLogo.add(jLabel2, gridBagConstraints);
+
+    jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+    jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabelVersion.setText("v");
+    jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+    jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+    gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
+    jPanelLogo.add(jLabelVersion, gridBagConstraints);
+
+    jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
+
+    jPanelInfo.setLayout(new java.awt.GridBagLayout());
+
+    jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelDevelopers.setText("<html> \n<center> <b>Diplomanten: </b> <br>\n Primus Christoph - Elektrotechnik<br>\n Messing Levin - Programm<br> \nTinauer Robert - Mechanik<br> \n</center>");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
+    jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
+
+    jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
+    jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
+    jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    jLabelInfo.setOpaque(true);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+    jPanelInfo.add(jLabelInfo, gridBagConstraints);
+
+    jLabelWarning.setText("Die Nutzung der Anlage des Prüfstandes erfolgt auf eigene Gefahr!");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+    jPanelInfo.add(jLabelWarning, gridBagConstraints);
+
+    jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
+
+    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
+
+    jLabelDate.setText("2016-2017");
+    jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
     {
-        java.awt.GridBagConstraints gridBagConstraints;
+      public void mouseClicked(java.awt.event.MouseEvent evt)
+      {
+        jLabelDateMouseClicked(evt);
+      }
+    });
+    jPanelInfo2.add(jLabelDate);
 
-        jFrameAbout = new javax.swing.JFrame();
-        jPanelLogo = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabelVersion = new javax.swing.JLabel();
-        jPanelInfo = new javax.swing.JPanel();
-        jLabelDevelopers = new javax.swing.JLabel();
-        jLabelInfo = new javax.swing.JLabel();
-        jLabelWarning = new javax.swing.JLabel();
-        jPanelInfo2 = new javax.swing.JPanel();
-        jLabelDate = new javax.swing.JLabel();
-        jLabelAuthor = new javax.swing.JLabel();
-        jFrameGuide = new javax.swing.JFrame();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanelMeasure = new javax.swing.JPanel();
-        jLabelGuideMeasure = new javax.swing.JLabel();
-        jPanelSettings = new javax.swing.JPanel();
-        jLabelGuideSettings = new javax.swing.JLabel();
-        jToolBar = new javax.swing.JToolBar();
-        jStart = new javax.swing.JButton();
-        jStop = new javax.swing.JButton();
-        jCancel = new javax.swing.JButton();
-        jRefresh = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        jProgSet = new javax.swing.JButton();
-        jVehicleSet = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JToolBar.Separator();
-        jPrint = new javax.swing.JButton();
-        jSave = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JToolBar.Separator();
-        jPanSerial = new javax.swing.JPanel();
-        jpanDevice = new javax.swing.JPanel();
-        jComboBoxPort = new javax.swing.JComboBox<>();
-        jpanEast = new javax.swing.JPanel();
-        jpanSerialButtons = new javax.swing.JPanel();
-        jbutConnect = new javax.swing.JButton();
-        jbutDisconnect = new javax.swing.JButton();
-        jbutRefreshDevice = new javax.swing.JButton();
-        jLabelStatus = new javax.swing.JLabel();
-        jChartPanel = new javax.swing.JPanel();
-        jMenuBar = new javax.swing.JMenuBar();
-        jFile = new javax.swing.JMenu();
-        jMenuSave = new javax.swing.JMenuItem();
-        jMenuPrint = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
-        jMenuSettings = new javax.swing.JMenuItem();
-        jMenuVehicle = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        jMenuClose = new javax.swing.JMenuItem();
-        jHelp = new javax.swing.JMenu();
-        jMenuGuide = new javax.swing.JMenuItem();
-        jMenuAbout = new javax.swing.JMenuItem();
+    jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabelAuthor.setText("Autor: Messing Levin");
+    jPanelInfo2.add(jLabelAuthor);
 
-        jFrameAbout.setTitle("Über...");
-        jFrameAbout.setLocation(new java.awt.Point(0, 0));
-        jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
-        jFrameAbout.setResizable(false);
+    jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
 
-        jPanelLogo.setLayout(new java.awt.GridBagLayout());
+    jFrameGuide.setTitle("Anleitung");
+    jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
+    jFrameGuide.setResizable(false);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
-        jLabel2.setText(" PMT Dyno");
-        jLabel2.setVerifyInputWhenFocusTarget(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        jPanelLogo.add(jLabel2, gridBagConstraints);
+    jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
 
-        jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jLabelVersion.setText("v");
-        jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-        jPanelLogo.add(jLabelVersion, gridBagConstraints);
+    jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelGuideMeasure.setText("<html> <h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
+    jPanelMeasure.add(jLabelGuideMeasure);
 
-        jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
+    jTabbedPane1.addTab("Messung", jPanelMeasure);
 
-        jPanelInfo.setLayout(new java.awt.GridBagLayout());
+    jPanelSettings.setLayout(new java.awt.GridLayout(1, 0));
 
-        jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelDevelopers.setText("<html> \n<center> <b>Diplomanten: </b> <br>\n Primus Christoph - Elektrotechnik<br>\n Messing Levin - Programm<br> \nTinauer Robert - Mechanik<br> \n</center>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
-        jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
+    jLabelGuideSettings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelGuideSettings.setText("todo"); // NOI18N
+    jPanelSettings.add(jLabelGuideSettings);
 
-        jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
-        jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
-        jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jLabelInfo.setOpaque(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        jPanelInfo.add(jLabelInfo, gridBagConstraints);
+    jTabbedPane1.addTab("Einstellungen", jPanelSettings);
 
-        jLabelWarning.setText("Die Nutzung der Anlage des Prüfstandes erfolgt auf eigene Gefahr!");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        jPanelInfo.add(jLabelWarning, gridBagConstraints);
+    jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
-        jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setIconImages(null);
 
-        jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
+    jToolBar.setRollover(true);
 
-        jLabelDate.setText("2016-2017");
-        jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
-                jLabelDateMouseClicked(evt);
-            }
-        });
-        jPanelInfo2.add(jLabelDate);
+    jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png"))); // NOI18N
+    jStart.setMnemonic('s');
+    jStart.setToolTipText("Messung starten");
+    jStart.setEnabled(false);
+    jStart.setFocusable(false);
+    jStart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jStart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jStart.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jStartActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jStart);
 
-        jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jLabelAuthor.setText("Autor: Messing Levin");
-        jPanelInfo2.add(jLabelAuthor);
+    jStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/stop48.png"))); // NOI18N
+    jStop.setToolTipText("Messung stoppen");
+    jStop.setEnabled(false);
+    jStop.setFocusable(false);
+    jStop.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jStop.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jStop.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jStopActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jStop);
 
-        jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
+    jCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cancel48.png"))); // NOI18N
+    jCancel.setToolTipText("Messung abbrechen");
+    jCancel.setEnabled(false);
+    jCancel.setFocusable(false);
+    jCancel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jCancel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jCancel.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jCancelActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jCancel);
 
-        jFrameGuide.setTitle("Anleitung");
-        jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
-        jFrameGuide.setResizable(false);
+    jRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/refresh48.png"))); // NOI18N
+    jRefresh.setToolTipText("Umgebungswerte aktualisieren");
+    jRefresh.setEnabled(false);
+    jRefresh.setFocusable(false);
+    jRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jRefresh.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jRefresh.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jRefreshActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jRefresh);
+    jToolBar.add(jSeparator1);
 
-        jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
+    jProgSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings48.png"))); // NOI18N
+    jProgSet.setToolTipText("Programmeinstellungen");
+    jProgSet.setFocusable(false);
+    jProgSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jProgSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jProgSet.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jProgSetActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jProgSet);
 
-        jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelGuideMeasure.setText("<html> <h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
-        jPanelMeasure.add(jLabelGuideMeasure);
+    jVehicleSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike48.png"))); // NOI18N
+    jVehicleSet.setToolTipText("Fahrzeugeinstellungen");
+    jVehicleSet.setFocusable(false);
+    jVehicleSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jVehicleSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jVehicleSet.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jVehicleSetActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jVehicleSet);
+    jToolBar.add(jSeparator2);
 
-        jTabbedPane1.addTab("Messung", jPanelMeasure);
+    jPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer48.png"))); // NOI18N
+    jPrint.setToolTipText("Drucken...");
+    jPrint.setEnabled(false);
+    jPrint.setFocusable(false);
+    jPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jPrint.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jPrintActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jPrint);
 
-        jPanelSettings.setLayout(new java.awt.GridLayout(1, 0));
+    jSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save48.png"))); // NOI18N
+    jSave.setToolTipText("Als Bild speichern");
+    jSave.setEnabled(false);
+    jSave.setFocusable(false);
+    jSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jSave.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jSaveActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jSave);
+    jToolBar.add(jSeparator3);
 
-        jLabelGuideSettings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelGuideSettings.setText("todo"); // NOI18N
-        jPanelSettings.add(jLabelGuideSettings);
+    jPanSerial.setLayout(new java.awt.BorderLayout());
 
-        jTabbedPane1.addTab("Einstellungen", jPanelSettings);
+    jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
+    jpanDevice.setLayout(new java.awt.GridBagLayout());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+    jpanDevice.add(jComboBoxPort, gridBagConstraints);
 
-        jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+    jPanSerial.add(jpanDevice, java.awt.BorderLayout.CENTER);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setIconImages(null);
+    jpanEast.setLayout(new java.awt.GridBagLayout());
 
-        jToolBar.setRollover(true);
+    jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-        jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png"))); // NOI18N
-        jStart.setMnemonic('s');
-        jStart.setToolTipText("Messung starten");
-        jStart.setEnabled(false);
-        jStart.setFocusable(false);
-        jStart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jStart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jStart.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jStartActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jStart);
+    jbutConnect.setText("Verbinden");
+    jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
+    jbutConnect.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutConnectActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutConnect);
 
-        jStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/stop48.png"))); // NOI18N
-        jStop.setToolTipText("Messung stoppen");
-        jStop.setEnabled(false);
-        jStop.setFocusable(false);
-        jStop.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jStop.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jStop.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jStopActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jStop);
+    jbutDisconnect.setText("Trennen");
+    jbutDisconnect.setEnabled(false);
+    jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutDisconnectActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutDisconnect);
 
-        jCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cancel48.png"))); // NOI18N
-        jCancel.setToolTipText("Messung abbrechen");
-        jCancel.setEnabled(false);
-        jCancel.setFocusable(false);
-        jCancel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jCancel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jCancel.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jCancelActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jCancel);
+    jbutRefreshDevice.setText("Aktualisieren");
+    jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutRefreshDeviceActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutRefreshDevice);
 
-        jRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/refresh48.png"))); // NOI18N
-        jRefresh.setToolTipText("Umgebungswerte aktualisieren");
-        jRefresh.setEnabled(false);
-        jRefresh.setFocusable(false);
-        jRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jRefresh.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jRefresh.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jRefreshActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jRefresh);
-        jToolBar.add(jSeparator1);
+    jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
 
-        jProgSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings48.png"))); // NOI18N
-        jProgSet.setToolTipText("Programmeinstellungen");
-        jProgSet.setFocusable(false);
-        jProgSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jProgSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jProgSet.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jProgSetActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jProgSet);
+    jLabelStatus.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+    jLabelStatus.setForeground(java.awt.Color.gray);
+    jLabelStatus.setText("getrennt");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    jpanEast.add(jLabelStatus, gridBagConstraints);
 
-        jVehicleSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike48.png"))); // NOI18N
-        jVehicleSet.setToolTipText("Fahrzeugeinstellungen");
-        jVehicleSet.setFocusable(false);
-        jVehicleSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jVehicleSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jVehicleSet.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jVehicleSetActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jVehicleSet);
-        jToolBar.add(jSeparator2);
+    jPanSerial.add(jpanEast, java.awt.BorderLayout.EAST);
 
-        jPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer48.png"))); // NOI18N
-        jPrint.setToolTipText("Drucken...");
-        jPrint.setEnabled(false);
-        jPrint.setFocusable(false);
-        jPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jPrint.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jPrintActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jPrint);
+    jToolBar.add(jPanSerial);
 
-        jSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save48.png"))); // NOI18N
-        jSave.setToolTipText("Als Bild speichern");
-        jSave.setEnabled(false);
-        jSave.setFocusable(false);
-        jSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jSave.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jSaveActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jSave);
-        jToolBar.add(jSeparator3);
+    getContentPane().add(jToolBar, java.awt.BorderLayout.PAGE_START);
 
-        jPanSerial.setLayout(new java.awt.BorderLayout());
+    jChartPanel.setLayout(new java.awt.GridLayout(1, 0));
+    getContentPane().add(jChartPanel, java.awt.BorderLayout.CENTER);
 
-        jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
-        jpanDevice.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        jpanDevice.add(jComboBoxPort, gridBagConstraints);
+    jFile.setText("Datei");
 
-        jPanSerial.add(jpanDevice, java.awt.BorderLayout.CENTER);
+    jMenuOpen.setText("Öffnen...");
+    jMenuOpen.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuOpenActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuOpen);
+    jFile.add(jSeparator6);
 
-        jpanEast.setLayout(new java.awt.GridBagLayout());
+    jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
+    jMenuSave.setText("Speichern...");
+    jMenuSave.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuSaveActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuSave);
 
-        jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
+    jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
+    jMenuPrint.setText("Drucken...");
+    jMenuPrint.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuPrintActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuPrint);
+    jFile.add(jSeparator4);
 
-        jbutConnect.setText("Verbinden");
-        jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
-        jbutConnect.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutConnectActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutConnect);
+    jMenuSettings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings16.png"))); // NOI18N
+    jMenuSettings.setText("Einstellungen");
+    jMenuSettings.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuSettingsActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuSettings);
 
-        jbutDisconnect.setText("Trennen");
-        jbutDisconnect.setEnabled(false);
-        jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutDisconnectActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutDisconnect);
+    jMenuVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike16.png"))); // NOI18N
+    jMenuVehicle.setText("Fahrzeug...");
+    jMenuVehicle.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuVehicleActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuVehicle);
+    jFile.add(jSeparator5);
 
-        jbutRefreshDevice.setText("Aktualisieren");
-        jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutRefreshDeviceActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutRefreshDevice);
+    jMenuClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+    jMenuClose.setText("Beenden");
+    jMenuClose.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuCloseActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuClose);
 
-        jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
+    jMenuBar.add(jFile);
 
-        jLabelStatus.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabelStatus.setForeground(java.awt.Color.gray);
-        jLabelStatus.setText("getrennt");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        jpanEast.add(jLabelStatus, gridBagConstraints);
+    jHelp.setText("Hilfe");
 
-        jPanSerial.add(jpanEast, java.awt.BorderLayout.EAST);
+    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
+    jMenuGuide.setText("Anleitung");
+    jMenuGuide.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuGuideActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuGuide);
 
-        jToolBar.add(jPanSerial);
+    jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
+    jMenuAbout.setText("Über...");
+    jMenuAbout.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuAboutActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuAbout);
 
-        getContentPane().add(jToolBar, java.awt.BorderLayout.PAGE_START);
+    jMenuBar.add(jHelp);
 
-        jChartPanel.setLayout(new java.awt.GridLayout(1, 0));
-        getContentPane().add(jChartPanel, java.awt.BorderLayout.CENTER);
+    setJMenuBar(jMenuBar);
 
-        jFile.setText("Datei");
-
-        jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
-        jMenuSave.setText("Speichern...");
-        jMenuSave.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuSaveActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuSave);
-
-        jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
-        jMenuPrint.setText("Drucken...");
-        jMenuPrint.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuPrintActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuPrint);
-        jFile.add(jSeparator4);
-
-        jMenuSettings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings16.png"))); // NOI18N
-        jMenuSettings.setText("Einstellungen");
-        jMenuSettings.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuSettingsActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuSettings);
-
-        jMenuVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike16.png"))); // NOI18N
-        jMenuVehicle.setText("Fahrzeug...");
-        jMenuVehicle.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuVehicleActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuVehicle);
-        jFile.add(jSeparator5);
-
-        jMenuClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
-        jMenuClose.setText("Beenden");
-        jMenuClose.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuCloseActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuClose);
-
-        jMenuBar.add(jFile);
-
-        jHelp.setText("Hilfe");
-
-        jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
-        jMenuGuide.setText("Anleitung");
-        jMenuGuide.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuGuideActionPerformed(evt);
-            }
-        });
-        jHelp.add(jMenuGuide);
-
-        jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
-        jMenuAbout.setText("Über...");
-        jMenuAbout.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuAboutActionPerformed(evt);
-            }
-        });
-        jHelp.add(jMenuAbout);
-
-        jMenuBar.add(jHelp);
-
-        setJMenuBar(jMenuBar);
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+    pack();
+  }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
       print();
@@ -707,6 +723,11 @@ public class Gui extends javax.swing.JFrame
       }
     }//GEN-LAST:event_jLabelDateMouseClicked
 
+  private void jMenuOpenActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuOpenActionPerformed
+  {//GEN-HEADEREND:event_jMenuOpenActionPerformed
+    readFile();
+  }//GEN-LAST:event_jMenuOpenActionPerformed
+
 
   /**
    * @param args the command line arguments
@@ -772,59 +793,61 @@ public class Gui extends javax.swing.JFrame
     });
   }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jCancel;
-    private javax.swing.JPanel jChartPanel;
-    private javax.swing.JComboBox<String> jComboBoxPort;
-    private javax.swing.JMenu jFile;
-    private javax.swing.JFrame jFrameAbout;
-    private javax.swing.JFrame jFrameGuide;
-    private javax.swing.JMenu jHelp;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabelAuthor;
-    private javax.swing.JLabel jLabelDate;
-    private javax.swing.JLabel jLabelDevelopers;
-    private javax.swing.JLabel jLabelGuideMeasure;
-    private javax.swing.JLabel jLabelGuideSettings;
-    private javax.swing.JLabel jLabelInfo;
-    private javax.swing.JLabel jLabelStatus;
-    private javax.swing.JLabel jLabelVersion;
-    private javax.swing.JLabel jLabelWarning;
-    private javax.swing.JMenuItem jMenuAbout;
-    private javax.swing.JMenuBar jMenuBar;
-    private javax.swing.JMenuItem jMenuClose;
-    private javax.swing.JMenuItem jMenuGuide;
-    private javax.swing.JMenuItem jMenuPrint;
-    private javax.swing.JMenuItem jMenuSave;
-    private javax.swing.JMenuItem jMenuSettings;
-    private javax.swing.JMenuItem jMenuVehicle;
-    private javax.swing.JPanel jPanSerial;
-    private javax.swing.JPanel jPanelInfo;
-    private javax.swing.JPanel jPanelInfo2;
-    private javax.swing.JPanel jPanelLogo;
-    private javax.swing.JPanel jPanelMeasure;
-    private javax.swing.JPanel jPanelSettings;
-    private javax.swing.JButton jPrint;
-    private javax.swing.JButton jProgSet;
-    private javax.swing.JButton jRefresh;
-    private javax.swing.JButton jSave;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JToolBar.Separator jSeparator2;
-    private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
-    private javax.swing.JButton jStart;
-    private javax.swing.JButton jStop;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JToolBar jToolBar;
-    private javax.swing.JButton jVehicleSet;
-    private javax.swing.JButton jbutConnect;
-    private javax.swing.JButton jbutDisconnect;
-    private javax.swing.JButton jbutRefreshDevice;
-    private javax.swing.JPanel jpanDevice;
-    private javax.swing.JPanel jpanEast;
-    private javax.swing.JPanel jpanSerialButtons;
-    // End of variables declaration//GEN-END:variables
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton jCancel;
+  private javax.swing.JPanel jChartPanel;
+  private javax.swing.JComboBox<String> jComboBoxPort;
+  private javax.swing.JMenu jFile;
+  private javax.swing.JFrame jFrameAbout;
+  private javax.swing.JFrame jFrameGuide;
+  private javax.swing.JMenu jHelp;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabelAuthor;
+  private javax.swing.JLabel jLabelDate;
+  private javax.swing.JLabel jLabelDevelopers;
+  private javax.swing.JLabel jLabelGuideMeasure;
+  private javax.swing.JLabel jLabelGuideSettings;
+  private javax.swing.JLabel jLabelInfo;
+  private javax.swing.JLabel jLabelStatus;
+  private javax.swing.JLabel jLabelVersion;
+  private javax.swing.JLabel jLabelWarning;
+  private javax.swing.JMenuItem jMenuAbout;
+  private javax.swing.JMenuBar jMenuBar;
+  private javax.swing.JMenuItem jMenuClose;
+  private javax.swing.JMenuItem jMenuGuide;
+  private javax.swing.JMenuItem jMenuOpen;
+  private javax.swing.JMenuItem jMenuPrint;
+  private javax.swing.JMenuItem jMenuSave;
+  private javax.swing.JMenuItem jMenuSettings;
+  private javax.swing.JMenuItem jMenuVehicle;
+  private javax.swing.JPanel jPanSerial;
+  private javax.swing.JPanel jPanelInfo;
+  private javax.swing.JPanel jPanelInfo2;
+  private javax.swing.JPanel jPanelLogo;
+  private javax.swing.JPanel jPanelMeasure;
+  private javax.swing.JPanel jPanelSettings;
+  private javax.swing.JButton jPrint;
+  private javax.swing.JButton jProgSet;
+  private javax.swing.JButton jRefresh;
+  private javax.swing.JButton jSave;
+  private javax.swing.JToolBar.Separator jSeparator1;
+  private javax.swing.JToolBar.Separator jSeparator2;
+  private javax.swing.JToolBar.Separator jSeparator3;
+  private javax.swing.JPopupMenu.Separator jSeparator4;
+  private javax.swing.JPopupMenu.Separator jSeparator5;
+  private javax.swing.JPopupMenu.Separator jSeparator6;
+  private javax.swing.JButton jStart;
+  private javax.swing.JButton jStop;
+  private javax.swing.JTabbedPane jTabbedPane1;
+  private javax.swing.JToolBar jToolBar;
+  private javax.swing.JButton jVehicleSet;
+  private javax.swing.JButton jbutConnect;
+  private javax.swing.JButton jbutDisconnect;
+  private javax.swing.JButton jbutRefreshDevice;
+  private javax.swing.JPanel jpanDevice;
+  private javax.swing.JPanel jpanEast;
+  private javax.swing.JPanel jpanSerialButtons;
+  // End of variables declaration//GEN-END:variables
 
 
   /*
@@ -868,17 +891,20 @@ public class Gui extends javax.swing.JFrame
     jStop.setEnabled(b);
     jCancel.setEnabled(b);
   }
-  
+
+
   /**
    * Sets the buttons available to start measurement if true
-   * @param b 
+   *
+   * @param b
    */
-  public void setReady(boolean b)
+  public void setReady (boolean b)
   {
     setRunning(!b);
     jStart.setEnabled(b);
     jRefresh.setEnabled(b);
   }
+
 
   /**
    * Shows an error message relative to the main GUI
@@ -984,6 +1010,29 @@ public class Gui extends javax.swing.JFrame
     com.start(this);
   }
 
+  ArrayList<Datapoint> list;
+
+
+  private void readFile ()
+  {
+    try
+    {
+
+      ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
+      list = fr.read();
+      System.out.println("Daten eingelesen");
+
+      calculate();
+
+
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace(System.err);
+      showErrorMessage("Error", ex.getMessage());
+    }
+  }
+
 
   private class Measure extends MeasurementWorker
   {
@@ -1033,7 +1082,7 @@ public class Gui extends javax.swing.JFrame
       catch (CancellationException ex)
       {
         LOG.info("Measurement aborted");
-        
+
       }
       catch (Exception ex)
       {
@@ -1428,65 +1477,139 @@ public class Gui extends javax.swing.JFrame
   }
 
 
+  //Funktioniert nicht!!!
+  private double getMaxRPM ()
+  {
+    System.out.println("getMAxRPMToDo!!");
+    return 1;
+  }
+
+// Filterung Funktioniert nicht!!
+
+  private ArrayList<Double> filterValues (ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
+  {/*
+     * double[] smoothedValue=new double[values.length]; smoothedValue[0]=0; for(int i=0;i<values.length-1;i++) {
+     * smoothedValue[i+1] = smoothedValue[i]+ (values[i+1] - smoothedValue[i]) /
+     * (smoothing/(list.get(i+1).getTime()-list.get(i).getTime())); }
+     *
+     * return smoothedValue;
+     */
+    ArrayList<Double> smoothedValues = new ArrayList<>();
+    smoothedValues.add(aL.get(0));
+    for (int i = 0; i < aL.size()-1; i++)
+    {
+      smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
+    }
+
+    return smoothedValues;
+
+  }
+
+
   /**
    * calculates torque and power with wheelRpm
    */
   private void calculate ()
   {
+    System.out.println("calculating...");
     //Winkelgeschw. = (Pi/180) * Umdr.
     //Winkelbeschl. = Winkelgeschw. / Zeit
     //Drehmoment = Winkelbeschl. * J(kgm^2)
     //Leistung = 2*Pi*Drehmoment*Umdr.
-    int length = data.getWheelRpm().length;
-
+    int length = list.size();
+    double smoothing = 0.07;
     double angularspeed[] = new double[length];
-    double diff[] = new double[length - 1];
-    double angularacc[] = new double[length - 1];
+    double diff[] = new double[length];
+    double angularacc[] = new double[length];
     double inertia = data.getInertia();
-    double[] torque = new double[length - 1];
-    double[] power = new double[length - 1];
+    double[] torque = new double[length];
+    double[] power = new double[length];
     double vmax = 0;
-    int periodTimeMs = data.getPeriodTimeMs();
-    int[] wheelRpm = data.getWheelRpm();
+    double[] engineRpm = new double[length];
 
-//        if(!data.isTwoStroke()) //if 4 stroke
-//        {
-//            convertToFourStroke();
-//        }
-    for (int i = 0; i < length; i++)
-    {
-      angularspeed[i] = (wheelRpm[i] / 60) * (2.0 * Math.PI);
-    }
+    
+    ArrayList<Double> trq = new ArrayList<>();
+    ArrayList<Double> pwr = new ArrayList<>();
+    ArrayList<Double> rpm = new ArrayList<>();
+    
+    ArrayList<Double> alpha = new ArrayList<>();
+    ArrayList<Double> omega = new ArrayList<>();
+    
+    
 
-    for (int i = 0; i < length - 1; i++)
+//    list.get(0).getTime()
+
+    for (int i = 0; i < list.size() - 1; i++)
     {
-      diff[i] = (angularspeed[i + 1]) - angularspeed[i];
-      if (angularspeed[i + 1] > angularspeed[i])
+        omega.add(list.get(i).getWdz());
+        rpm.add((list.get(i + 1).getMdz() + list.get(i).getMdz()) / 2);
+    }    
+    
+    omega= filterValues(omega, smoothing);
+    
+    for (int i = 0; i < omega.size() - 1; i++)
+    {
+      double temp=((omega.get(i + 1) - omega.get(i)) / (list.get(i + 1).getTime()-list.get(i).getTime()));
+      if(temp>0)
       {
-        vmax = angularspeed[i + 1] * 0.175 * 3.6;
+        alpha.add(temp);
       }
-    }
+      else
+      {
+        omega.remove(i+1);
+        rpm.remove(i+1);
+      }
+        
+    }    
+    alpha = filterValues(alpha, smoothing);
+    
+    for (int i = 0; i < alpha.size()- 1; i++)
+    {   
+      trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
+      pwr.add((trq.get(i) * ((omega.get(i + 1) + omega.get(i)) / 2))/1000*1.36 );
+//      System.out.println("pwr = " + pwr.get(i));
+      //series1.add(engineRpm[i], power[i]);
+      // series2.add(engineRpm[i], torque[i]);
 
-    for (int i = 0; i < length - 1; i++)
+    }
+    
+    trq= filterValues(trq,smoothing);
+    pwr= filterValues(pwr,smoothing);
+    rpm=filterValues(rpm,smoothing);
+
+   
+    
+  //  torque = filterValues(torque, smoothing);
+   // power = filterValues(power, smoothing);
+    //engineRpm = filterValues(engineRpm, smoothing);
+
+    for (int i = 0; i < trq.size()-1; i++)
     {
-      angularacc[i] = diff[i] / (periodTimeMs / 1000.0);
+      series1.add(rpm.get(i), pwr.get(i));
+      series2.add(rpm.get(i), trq.get(i));
     }
 
-    for (int i = 0; i < length - 1; i++)
-    {
-      torque[i] = angularacc[i] * inertia;
-    }
 
-    for (int i = 0; i < length - 1; i++)
-    {
-      power[i] = (angularspeed[i] * torque[i]);
-      //System.out.println(i + " " + power[i]);
-    }
+    dataset1.removeSeries(seriesPower);
+    seriesPower = correctByFactor(series1, data.getCorrectionPower());
+    dataset1.addSeries(seriesPower);
 
-    data.setTorque(torque);
-    data.setPower(power);
+    dataset2.removeSeries(seriesTorque);
+    seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
+    dataset2.addSeries(seriesTorque);
+    seriesTorque.setKey("Drehmoment [Nm]");
 
-    data.setVmax(vmax);
+    chart.fireChartChanged();
+    updateChartLabels();
+
+    System.out.println("done calculating");
+
+//    series1.add(x,y);
+
+//    data.setTorque(torque);
+//    data.setPower(power);
+//
+//    data.setVmax(vmax);
   }
 
 

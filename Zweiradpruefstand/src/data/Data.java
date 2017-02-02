@@ -9,7 +9,7 @@ import measure.Datapoint;
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
-public class Data
+public final class Data
 {
 
   private static Data instance = null;
@@ -21,6 +21,7 @@ public class Data
    */
   public static Data getInstance ()
   {
+    System.out.println("damn");
     if (instance == null)
     {
       instance = new Data();
@@ -31,6 +32,9 @@ public class Data
 
   private Data ()
   {
+    System.out.println("lol1");
+    System.out.println(getMeasureList().toString());
+    System.out.println("lol2");
   }
 
 
@@ -61,7 +65,7 @@ public class Data
 
   private int[] wheelRpm;
   private int[] motorRpm;
-  private ArrayList<Datapoint> measureList = null;
+  public ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private boolean twoStroke = true;
 

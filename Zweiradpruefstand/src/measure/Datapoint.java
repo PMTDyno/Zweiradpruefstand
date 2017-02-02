@@ -8,8 +8,8 @@ package measure;
 public class Datapoint
 {
 
-  private final double wdz, mdz;
-  private final int time;
+  private final double wdz, mdz, time;
+  //private final int time;
 
 
   /**
@@ -18,7 +18,7 @@ public class Datapoint
    * @param mdz Motordrehzahl
    * @param time Zeitpunkt der Messung
    */
-  public Datapoint (double wdz, double mdz, int time)
+  public Datapoint (double wdz, double mdz, double time)
   {
     this.wdz = wdz;
     this.mdz = mdz;
@@ -38,7 +38,7 @@ public class Datapoint
   }
 
 
-  public int getTime ()
+  public double getTime ()
   {
     return time;
   }

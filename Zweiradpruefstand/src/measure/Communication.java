@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.swing.SwingWorker;
 import logging.Logger;
-
 
 /**
  *
@@ -27,7 +25,6 @@ public class Communication
 
   private static boolean connected = false;
 
-
   //The ASCII Control Bytes
   public static final byte SOT = 2; //0x02
   public static final byte EOT = 3; //0x03
@@ -36,18 +33,16 @@ public class Communication
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
 
-
   public enum Request
   {
     REFRESH, MEASURE, START
   }
 
-
-  public Communication ()
+  public Communication()
   {
     //false == port
     //true == simulation
-    if (true)
+    if(true)
     {
       port = new PortSim();
       //((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
@@ -59,8 +54,8 @@ public class Communication
 
   }
 
-
-  public void init (String serialPort) throws CommunicationException, TimeoutException
+  public void init(String serialPort) throws CommunicationException,
+                                             TimeoutException
   {
     try
     {
@@ -84,12 +79,10 @@ public class Communication
 
   }
 
-
-  public String getPort ()
+  public String getPort()
   {
     return port.getPort();
   }
-
 
   /**
    *
@@ -97,9 +90,9 @@ public class Communication
    * @throws CommunicationException
    * @throws TimeoutException
    */
-  public String[] getFrameData () throws CommunicationException, TimeoutException
+  public String[] getFrameData() throws CommunicationException, TimeoutException
   {
-    for (int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; i++)
     {
       try
       {
@@ -111,11 +104,7 @@ public class Communication
       }
       catch (TimeoutException ex)
       {
-        if (i == 2)
-        {
-          throw ex;
-        }
-        LOG.fine(String.format("%s. Timeout", i + 1));
+        throw ex;
       }
       catch (InterruptedException ex)
       {
@@ -123,7 +112,6 @@ public class Communication
     }
     throw new CommunicationException("received wrong frames");
   }
-
 
   /**
    *
@@ -134,23 +122,23 @@ public class Communication
    * @throws TimeoutException
    * @throws InterruptedException
    */
-  public Frame readFrame (long timeout, TimeUnit unit)
+  public Frame readFrame(long timeout, TimeUnit unit)
           throws CommunicationException, TimeoutException,
                  InterruptedException
   {
     synchronized (receivedFrameList)
     {
       long startTimeMillis = System.currentTimeMillis();
-      while (true)
+      while(true)
       {
-        if (!receivedFrameList.isEmpty())
+        if(!receivedFrameList.isEmpty())
         {
           return receivedFrameList.removeFirst();
         }
 
         long to = startTimeMillis + unit.toMillis(timeout)
                 - System.currentTimeMillis();
-        if (to <= 0)
+        if(to <= 0)
         {
           throw new TimeoutException();
         }
@@ -169,8 +157,7 @@ public class Communication
 
   }
 
-
-  public String[] getAvailablePorts ()
+  public String[] getAvailablePorts()
   {
 
     System.out.print("in getAvailablePorts()");
@@ -178,12 +165,11 @@ public class Communication
     return port.getPortList();
   }
 
-
-  public void disconnect () throws CommunicationException
+  public void disconnect() throws CommunicationException
   {
     try
     {
-      if (port != null)
+      if(port != null)
       {
         port.closePort();
         connected = false;
@@ -199,20 +185,18 @@ public class Communication
     }
   }
 
-
-  public boolean isConnected ()
+  public boolean isConnected()
   {
     return connected;
   }
 
-
-  public void refreshEco () throws CommunicationException, TimeoutException
+  public void refreshEco() throws CommunicationException, TimeoutException
   {
 
     try
     {
-      sendFrame(Request.REFRESH);
-      setEco(getFrameData());
+
+      setEco(getResponse(Request.REFRESH));
     }
     catch (Exception ex)
     {
@@ -220,12 +204,32 @@ public class Communication
     }
   }
 
-
-  public boolean isOpened ()
+  public boolean isOpened()
   {
     return port.isOpened();
   }
 
+  public String[] getResponse(Request request) throws
+          CommunicationException, TimeoutException
+  {
+    for(int i = 0; i < 3; i++)
+    {
+      try
+      {
+        sendFrame(request);
+        return getFrameData();
+      }
+      catch (TimeoutException ex)
+      {
+        LOG.warning((i + 1) + ". Timeout");
+      }
+      catch (Exception ex)
+      {
+        throw ex;
+      }
+    }
+    throw new TimeoutException("Timeout");
+  }
 
   /**
    * only accepts request, start and measure as parameter
@@ -235,20 +239,20 @@ public class Communication
    * @throws TimeoutException
    *
    */
-  public void sendFrame (Request request) throws CommunicationException,
-                                                 TimeoutException, IllegalArgumentException
+  public void sendFrame(Request request) throws CommunicationException,
+                                                TimeoutException,
+                                                IllegalArgumentException
   {
-    if (port == null)
+    if(port == null)
     {
       throw new CommunicationException("port not initialized!");
     }
-    if (!isOpened())
+    if(!isOpened())
     {
       throw new CommunicationException("port not opened!");
     }
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
 
     try
     {
@@ -270,12 +274,11 @@ public class Communication
       }
       baos.write(EOT);
 
-      //send frame max 3 times
-      for (int i = 0; i < 3; i++)
-      {
-        port.writeBytes(baos.toByteArray());
-        LOG.info("Frame written: %s", baos.toString());
-      }
+      Thread.sleep(5000);
+
+      port.writeBytes(baos.toByteArray());
+//      LOG.info("Frame written: %s", baos.toString());
+      System.out.println("Frame sent");
     }
     catch (NullPointerException ex)
     {
@@ -291,13 +294,13 @@ public class Communication
     }
   }
 
-
   /**
-   * converts the data string to 3 ecosystem variables and sets them in the data.data class
+   * converts the data string to 3 ecosystem variables and sets them in the
+   * data.data class
    *
    * @param data the string to be converted and set
    */
-  public void setEco (String[] data)
+  public void setEco(String[] data)
   {
 
     double temperature = Double.parseDouble(data[0]);
@@ -307,7 +310,7 @@ public class Communication
 //        System.out.println(temperature);
 //        System.out.println(humidity);
 //        System.out.println(pressure);
-    if (temperature < (-100) || temperature > 100
+    if(temperature < (-100) || temperature > 100
             || humidity < 0 || humidity > 100
             || pressure < 0 || pressure > 2000)
     {
@@ -326,12 +329,12 @@ public class Communication
   {
 
     @Override
-    public void run ()
+    public void run()
     {
       try
       {
         FrameBytes frame = null;
-        while (true)
+        while(true)
         {
           byte b = port.readByte();
           //System.out.println(b);
@@ -350,7 +353,7 @@ public class Communication
               break;
 
             case EOT:
-              if (frame != null)
+              if(frame != null)
               {
                 frame.update(b);
                 LOG.info(String.format("Frame received: %s", new String(frame.getFrameBytes(), "utf-8")));
@@ -368,7 +371,7 @@ public class Communication
               break;
 
             default:
-              if (frame != null)
+              if(frame != null)
               {
                 frame.update(b);
               }
@@ -392,26 +395,22 @@ public class Communication
 
   };
 
-
-  public void cancelWorker ()
+  public void cancelWorker()
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
-
-  public void stopWorker ()
+  public void stopWorker()
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
-
-  public void setWorker (Object object)
+  public void setWorker(Object object)
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
-
-  public void start (Object object)
+  public void start(Object object)
   {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }

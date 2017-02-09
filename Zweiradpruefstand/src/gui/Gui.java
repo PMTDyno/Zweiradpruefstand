@@ -17,6 +17,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import javax.swing.Icon;
 import logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -234,7 +235,7 @@ public class Gui extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
     jPanelInfo.add(jLabelInfo, gridBagConstraints);
 
-    jLabelWarning.setText("Die Nutzung der Anlage des Prüfstandes erfolgt auf eigene Gefahr!");
+    jLabelWarning.setText("Die Nutzung des Prüfstandes erfolgt auf eigene Gefahr!");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -710,16 +711,9 @@ public class Gui extends javax.swing.JFrame
       easterEgg++;
       if (easterEgg >= 6)
       {
-        System.out.println("TRIGGERED");
-        System.out.println("TRIGGERED");
-        System.out.println("TRIGGERED");
-        LOG.info("TRIGGERED");
-        LOG.info("TRIGGERED");
-        LOG.info("TRIGGERED");
-        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
-        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
-        this.showErrorMessage("TRIGGERED", "PRIMUS MESSING TINAUER");
-        this.easterEgg = 0;
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
+        JOptionPane.showMessageDialog(this, "Primus du Wurst!", "Easter Egg", JOptionPane.PLAIN_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
+        easterEgg = 0;
       }
     }//GEN-LAST:event_jLabelDateMouseClicked
 

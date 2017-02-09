@@ -104,7 +104,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabelWarning">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Die Nutzung der Anlage des Pr&#xfc;fstandes erfolgt auf eigene Gefahr!"/>
+                <Property name="text" type="java.lang.String" value="Die Nutzung des Pr&#xfc;fstandes erfolgt auf eigene Gefahr!"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

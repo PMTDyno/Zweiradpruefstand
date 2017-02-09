@@ -1018,7 +1018,8 @@ public class Gui extends javax.swing.JFrame
     try
     {
 
-      ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
+//      ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
+      ReadCSV fr = new ReadCSV("C:/Users/Levin/Desktop/VM-shared/measure.csv");
       list = fr.read();
       System.out.println("Daten eingelesen");
 
@@ -1517,7 +1518,7 @@ public class Gui extends javax.swing.JFrame
     //Drehmoment = Winkelbeschl. * J(kgm^2)
     //Leistung = 2*Pi*Drehmoment*Umdr.
     int length = list.size();
-    double smoothing = 0.07;
+    double smoothing =1;
     double angularspeed[] = new double[length];
     double diff[] = new double[length];
     double angularacc[] = new double[length];

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import logging.Logger;
 
 /**
@@ -40,9 +41,10 @@ public class Communication
 
   public Communication()
   {
+    LOG.setLevel(Level.ALL);
     //false == port
     //true == simulation
-    if(true)
+    if(false)
     {
       port = new PortSim();
       //((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
@@ -63,7 +65,7 @@ public class Communication
 
       receiveThread = new Thread(getFrame);
       receiveThread.start();
-
+      
       refreshEco();
       connected = true;
     }
@@ -195,7 +197,6 @@ public class Communication
 
     try
     {
-
       setEco(getResponse(Request.REFRESH));
     }
     catch (Exception ex)
@@ -273,11 +274,10 @@ public class Communication
           LOG.severe("FATAL ERROR");
       }
       baos.write(EOT);
-
-      Thread.sleep(5000);
-
+      
+      
       port.writeBytes(baos.toByteArray());
-//      LOG.info("Frame written: %s", baos.toString());
+      
       System.out.println("Frame sent");
     }
     catch (NullPointerException ex)

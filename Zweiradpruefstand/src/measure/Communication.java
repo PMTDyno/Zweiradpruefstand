@@ -46,7 +46,7 @@ public class Communication
     //true == simulation
     if(false)
     {
-      port = new PortSim();
+      //port = new PortSim();
       //((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
     }
     else

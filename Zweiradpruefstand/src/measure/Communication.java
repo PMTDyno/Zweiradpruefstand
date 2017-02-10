@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import logging.Logger;
 
 /**
@@ -41,18 +40,9 @@ public class Communication
 
   public Communication()
   {
-    LOG.setLevel(Level.ALL);
-    //false == port
-    //true == simulation
-    if(false)
-    {
-      //port = new PortSim();
-      //((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
-    }
-    else
-    {
+    //LOG.setLevel(Level.ALL);
+    
       port = new PortCom();
-    }
 
   }
 
@@ -161,9 +151,6 @@ public class Communication
 
   public String[] getAvailablePorts()
   {
-
-    System.out.print("in getAvailablePorts()");
-
     return port.getPortList();
   }
 
@@ -278,7 +265,9 @@ public class Communication
       
       port.writeBytes(baos.toByteArray());
       
-      System.out.println("Frame sent");
+      
+      
+      
     }
     catch (NullPointerException ex)
     {

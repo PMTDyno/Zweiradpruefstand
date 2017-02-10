@@ -21,7 +21,6 @@ public final class Data
    */
   public static Data getInstance ()
   {
-    System.out.println("damn");
     if (instance == null)
     {
       instance = new Data();
@@ -32,9 +31,6 @@ public final class Data
 
   private Data ()
   {
-    System.out.println("lol1");
-    System.out.println(getMeasureList().toString());
-    System.out.println("lol2");
   }
 
 

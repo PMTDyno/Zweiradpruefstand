@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import logging.Logger;
 
 /**
@@ -23,7 +24,7 @@ public class Communication
   private static final int TIMEOUT = 5;
   private static final TimeUnit TIMOUT_UNIT = TimeUnit.SECONDS;
 
-  private static boolean connected = false;
+  private boolean connected = false;
 
   //The ASCII Control Bytes
   public static final byte SOT = 2; //0x02
@@ -32,6 +33,7 @@ public class Communication
   private Port port;
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
+  private long refreshLock = 0;
 
   public enum Request
   {
@@ -40,10 +42,8 @@ public class Communication
 
   public Communication()
   {
-    //LOG.setLevel(Level.ALL);
-    
-      port = new PortCom();
-
+    LOG.setLevel(Level.ALL);
+    port = new PortCom();
   }
 
   public void init(String serialPort) throws CommunicationException,
@@ -55,7 +55,7 @@ public class Communication
 
       receiveThread = new Thread(getFrame);
       receiveThread.start();
-      
+
       refreshEco();
       connected = true;
     }
@@ -84,24 +84,22 @@ public class Communication
    */
   public String[] getFrameData() throws CommunicationException, TimeoutException
   {
-    for(int i = 0; i < 3; i++)
+    try
     {
-      try
-      {
-        return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split("-", 3);
-      }
-      catch (CommunicationException ex)
-      {
-        LOG.warning(ex);
-      }
-      catch (TimeoutException ex)
-      {
-        throw ex;
-      }
-      catch (InterruptedException ex)
-      {
-      }
+      return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split("-", 3);
     }
+    catch (CommunicationException ex)
+    {
+      LOG.warning(ex);
+    }
+    catch (TimeoutException ex)
+    {
+      throw ex;
+    }
+    catch (InterruptedException ex)
+    {
+    }
+
     throw new CommunicationException("received wrong frames");
   }
 
@@ -158,15 +156,13 @@ public class Communication
   {
     try
     {
-      if(port != null)
-      {
-        port.closePort();
-        connected = false;
-      }
-      else
-      {
-        throw new CommunicationException("closing Port failed");
-      }
+      if(!connected || port == null)
+        return;
+
+      port.closePort();
+      connected = false;
+      LOG.info("Port disconnected");
+
     }
     catch (Exception ex)
     {
@@ -179,12 +175,27 @@ public class Communication
     return connected;
   }
 
-  public void refreshEco() throws CommunicationException, TimeoutException
+  public void refreshEco() throws CommunicationException, TimeoutException,
+                                  IllegalStateException
   {
-
     try
     {
-      setEco(getResponse(Request.REFRESH));
+      //every 5 seconds max!
+      if(refreshLock + 10000 < System.currentTimeMillis())
+      {
+        setEco(getResponse(Request.REFRESH));
+        refreshLock = System.currentTimeMillis();
+      }
+      else
+        throw new IllegalStateException("refreshEco blocked");
+    }
+    catch (TimeoutException ex)
+    {
+      throw ex;
+    }
+    catch (IllegalStateException ex)
+    {
+      throw ex;
     }
     catch (Exception ex)
     {
@@ -249,7 +260,7 @@ public class Communication
       switch (request)
       {
         case REFRESH:
-          baos.write("refresh".getBytes("UTF-8"));
+          baos.write("r".getBytes("UTF-8"));
           break;
         case START:
           baos.write("start".getBytes("UTF-8"));
@@ -261,13 +272,11 @@ public class Communication
           LOG.severe("FATAL ERROR");
       }
       baos.write(EOT);
-      
-      
+
       port.writeBytes(baos.toByteArray());
-      
-      
-      
-      
+
+      LOG.fine("Frame written: " + baos.toString());
+
     }
     catch (NullPointerException ex)
     {

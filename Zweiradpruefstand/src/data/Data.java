@@ -46,8 +46,6 @@ public final class Data
   private double correctionTorque = 1.0;
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
-  private double[] power;
-  private double[] torque;
 
   private int pngWidth = 800;
   private int pngHeight = 600;
@@ -59,12 +57,9 @@ public final class Data
   private int maxMeasureTimeSec = 60;
   private int humidity;
 
-  private int[] wheelRpm;
-  private int[] motorRpm;
   public ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private boolean twoStroke = true;
-
 
   /*
    * ------------------------------------------------------------------------
@@ -201,31 +196,6 @@ public final class Data
     this.maxtorque = maxtorque;
   }
 
-
-  public double[] getPower ()
-  {
-    return power;
-  }
-
-
-  public void setPower (double[] power)
-  {
-    this.power = power;
-  }
-
-
-  public double[] getTorque ()
-  {
-    return torque;
-  }
-
-
-  public void setTorque (double[] torque)
-  {
-    this.torque = torque;
-  }
-
-
   public int getPngWidth ()
   {
     return pngWidth;
@@ -333,25 +303,6 @@ public final class Data
     this.humidity = humidity;
   }
 
-
-  public int[] getWheelRpm ()
-  {
-    return wheelRpm;
-  }
-
-
-  public void setWheelRpm (int[] wheelRpm)
-  {
-    this.wheelRpm = wheelRpm;
-  }
-
-
-  public int[] getMotorRpm ()
-  {
-    return motorRpm;
-  }
-
-
   public double getVmax ()
   {
     if (vmax == 0)
@@ -361,13 +312,6 @@ public final class Data
 
     return vmax;
   }
-
-
-  public void setMotorRpm (int[] motorRpm)
-  {
-    this.motorRpm = motorRpm;
-  }
-
 
   public boolean isTwoStroke ()
   {

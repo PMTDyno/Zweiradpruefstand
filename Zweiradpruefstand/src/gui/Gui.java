@@ -17,7 +17,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
-import javax.swing.Icon;
 import logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -41,7 +40,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.Layer;
 import org.jfree.ui.TextAnchor;
 
-
 /**
  * This shows the general user interface and also includes various functions
  *
@@ -56,7 +54,6 @@ public class Gui extends javax.swing.JFrame
   private Communication com = new Communication();
   private ChartPanel chartPanel;
   private final Data data = Data.getInstance();
-
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
@@ -77,11 +74,10 @@ public class Gui extends javax.swing.JFrame
 
   private JFreeChart chart;
 
-
   /**
    * Creates the GUI
    */
-  public Gui ()
+  public Gui()
   {
 
     initComponents();
@@ -120,7 +116,6 @@ public class Gui extends javax.swing.JFrame
     initChart();
 
   }
-
 
   @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -415,6 +410,8 @@ public class Gui extends javax.swing.JFrame
 
     jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
     jpanDevice.setLayout(new java.awt.GridBagLayout());
+
+    jComboBoxPort.setOpaque(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -661,7 +658,7 @@ public class Gui extends javax.swing.JFrame
 
     private void jCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jCancelActionPerformed
     {//GEN-HEADEREND:event_jCancelActionPerformed
-      if (JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
+      if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
       {
         com.cancelWorker();
         jStop.setEnabled(false);
@@ -709,7 +706,7 @@ public class Gui extends javax.swing.JFrame
     private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
     {//GEN-HEADEREND:event_jLabelDateMouseClicked
       easterEgg++;
-      if (easterEgg >= 6)
+      if(easterEgg >= 6)
       {
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
         JOptionPane.showMessageDialog(this, "Primus du Wurst!", "Easter Egg", JOptionPane.PLAIN_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
@@ -722,11 +719,10 @@ public class Gui extends javax.swing.JFrame
     readFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
-
   /**
    * @param args the command line arguments
    */
-  public static void main (String args[])
+  public static void main(String args[])
   {
     /*
      * Set the Nimbus look and feel
@@ -738,9 +734,9 @@ public class Gui extends javax.swing.JFrame
      */
     try
     {
-      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
       {
-        if ("Nimbus".equals(info.getName()))
+        if("Nimbus".equals(info.getName()))
         {
           javax.swing.UIManager.setLookAndFeel(info.getClassName());
           break;
@@ -763,7 +759,7 @@ public class Gui extends javax.swing.JFrame
     try
     {
       String opt = System.getProperty("DebugLevel");
-      if (opt != null)
+      if(opt != null)
       {
 
         LOG.setLevel(Level.parse(opt));
@@ -851,7 +847,7 @@ public class Gui extends javax.swing.JFrame
    * Saves the config. Then shuts down the program.
    */
   @Override
-  public void dispose ()
+  public void dispose()
   {
     data.setWindowWidth(getWidth());
     data.setWindowHeight(getHeight());
@@ -861,10 +857,11 @@ public class Gui extends javax.swing.JFrame
     try
     {
       Config.getInstance().save();
+      com.disconnect();
     }
     catch (Exception ex)
     {
-      LOG.warning("Error saving Config file");
+      LOG.severe(ex.getMessage());
       showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
     }
     finally
@@ -874,39 +871,36 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
-
   /**
    * Enables the Cancelling Buttons if the boolean is true
    *
    * @param b boolean
    */
-  public void setRunning (boolean b)
+  public void setRunning(boolean b)
   {
     jStop.setEnabled(b);
     jCancel.setEnabled(b);
   }
-
 
   /**
    * Sets the buttons available to start measurement if true
    *
    * @param b
    */
-  public void setReady (boolean b)
+  public void setReady(boolean b)
   {
     setRunning(!b);
     jStart.setEnabled(b);
     jRefresh.setEnabled(b);
   }
 
-
   /**
    * Shows an error message relative to the main GUI
    *
-   * @param title The Title of the Frame
+   * @param title   The Title of the Frame
    * @param message The displayed message
    */
-  public void showErrorMessage (String title, String message)
+  public void showErrorMessage(String title, String message)
   {
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
@@ -918,7 +912,7 @@ public class Gui extends javax.swing.JFrame
   /**
    * Creates the Chart and sets the datasets/series
    */
-  private void initChart ()
+  private void initChart()
   {
     chart = ChartFactory.createXYLineChart(data.getVehicle(),
                                            "Motordrehzahl [U/min]",
@@ -995,19 +989,17 @@ public class Gui extends javax.swing.JFrame
     //jchartframe.setVisible(true);
   }
 
-
   /**
    * Starts the measurement
    */
-  private void start ()
+  private void start()
   {
     com.start(this);
   }
 
   ArrayList<Datapoint> list;
 
-
-  private void readFile ()
+  private void readFile()
   {
     try
     {
@@ -1019,7 +1011,6 @@ public class Gui extends javax.swing.JFrame
 
       calculate();
 
-
     }
     catch (Exception ex)
     {
@@ -1028,22 +1019,20 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
-
   private class Measure extends MeasurementWorker
   {
 
-    public Measure (Communication com)
+    public Measure(Communication com)
     {
       super(com);
     }
 
-
     @Override
-    protected void done ()
+    protected void done()
     {
       try
       {
-        if (get() == null)
+        if(get() == null)
         {
           throw new CancellationException();
         }
@@ -1055,12 +1044,12 @@ public class Gui extends javax.swing.JFrame
       catch (ExecutionException ex)
       {
         Throwable cause = ex.getCause();
-        if (cause instanceof CommunicationException)
+        if(cause instanceof CommunicationException)
         {
           LOG.severe(cause.getMessage());
           showErrorMessage("Kommunikationsfehler", "Folgender Kommunikationsfehler ist aufgetreten: " + cause.getMessage());
         }
-        else if (cause instanceof TimeoutException)
+        else if(cause instanceof TimeoutException)
         {
           LOG.severe(cause.getMessage());
           showErrorMessage("Timeout", "µC antwortet nicht - Timeout");
@@ -1085,26 +1074,22 @@ public class Gui extends javax.swing.JFrame
         showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
       }
 
-
     }
 
-
   }
-
 
   /**
    * Prints the Chart Frame
    */
-  private void print ()
+  private void print()
   {
     chartPanel.createChartPrintJob();
   }
 
-
   /**
    * Saves the Chart as PNG file
    */
-  private void savePng ()
+  private void savePng()
   {
 
     File file;
@@ -1114,10 +1099,10 @@ public class Gui extends javax.swing.JFrame
             "Portable Network Graphic (*.png)", "png");
     chooser.setFileFilter(filter);
     int rv = chooser.showSaveDialog(this);
-    if (rv == JFileChooser.APPROVE_OPTION)
+    if(rv == JFileChooser.APPROVE_OPTION)
     {
       file = chooser.getSelectedFile();
-      if (!file.getName().endsWith(".png"))
+      if(!file.getName().endsWith(".png"))
       {
         file = new File(file.getPath() + ".png");
       }
@@ -1144,87 +1129,81 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
-
   /**
-   * Opens up the ProgSetDialog and saves the changes values. If the measurement is already done the datasets will be
-   * updated.
+   * Opens up the ProgSetDialog and saves the changes values. If the measurement
+   * is already done the datasets will be updated.
    */
-  private void startProgSet ()
+  private void startProgSet()
   {
     progset.setLocationRelativeTo(this);
     progset.setVisible(true);
 
     int updateLevel = 0;  //0-noUpdate 1-correct 2-convert 3-calculate
     //Einstellungen übernehmen
-    if (progset.isSettingsChanged())
+    if(progset.isSettingsChanged())
     {
 
       //CORRECTION  --OPTIMIZATION POSSIBLE
-      if (Double.compare(data.getCorrectionPower(), progset.getCorrectionPower()) != 0)
+      if(Double.compare(data.getCorrectionPower(), progset.getCorrectionPower()) != 0)
       {
         data.setCorrectionPower(progset.getCorrectionPower());
         updateLevel = 1;
       }
-      if (Double.compare(data.getCorrectionTorque(), progset.getCorrectionTorque()) != 0)
+      if(Double.compare(data.getCorrectionTorque(), progset.getCorrectionTorque()) != 0)
       {
         data.setCorrectionTorque(progset.getCorrectionTorque());
         updateLevel = 1;
       }
 
       //POWERUNIT
-      if (!data.getPowerunit().equals(progset.getPowerunit()))
+      if(!data.getPowerunit().equals(progset.getPowerunit()))
       {
         data.setPowerunit(progset.getPowerunit());
         updateLevel = 2;
       }
 
       //INERTIA
-      if (Double.compare(data.getInertia(), progset.getInertia()) != 0)
+      if(Double.compare(data.getInertia(), progset.getInertia()) != 0)
       {
         data.setInertia(progset.getInertia());
         updateLevel = 3;
       }
 
       //SERIALPORT
-      if (data.getPeriodTimeMs() != progset.getPeriodTimeMs())
+      if(data.getPeriodTimeMs() != progset.getPeriodTimeMs())
       {
         data.setPeriodTimeMs(progset.getPeriodTimeMs());
         updateLevel = 3;
       }
-      if (data.getMaxMeasureTimeSec() != progset.getMaxMeasureTimeSec())
+      if(data.getMaxMeasureTimeSec() != progset.getMaxMeasureTimeSec())
       {
         data.setMaxMeasureTimeSec(progset.getMaxMeasureTimeSec());
       }
 
       //update
-      if (data.getMeasureList() != null)
+      if(data.getMeasureList() != null)
       {
         switch (updateLevel) //don't insert break!
         {
           case 3:
             LOG.finest("entering level 3");
-            data.setPower(null);
-            data.setTorque(null);
+            //data.setPower(null);
+            //data.setTorque(null);
             calculate();
             series1.clear();
             series2.clear();
-            for (int i = 0; i < data.getPower().length; i++)
-            {
-              series1.add(data.getMotorRpm()[i], data.getPower()[i]);
-              series2.add(data.getMotorRpm()[i], data.getTorque()[i]);
-            }
 
           case 2:
             LOG.finest("entering level 2");
-            if (updateLevel == 3 && data.getPowerunit().equals("PS"))
+            if(updateLevel == 3 && data.getPowerunit().equals("PS"))
             {
               convertToPs(series1);
             }
-            else if (updateLevel == 2 && data.getPowerunit().equals("kW"))
+            else if(updateLevel == 2 && data.getPowerunit().equals("kW"))
             {
               convertToKw(series1);
             }
-            else if (data.getPowerunit().endsWith("PS"))
+            else if(data.getPowerunit().endsWith("PS"))
             {
               convertToPs(series1);
             }
@@ -1251,7 +1230,7 @@ public class Gui extends javax.swing.JFrame
             showErrorMessage("Fehler beim uebernehmen", "Unerwarteter Fehler beim uebernehmen der Daten aufgetreten");
         }
       }
-      else if (updateLevel == 2)
+      else if(updateLevel == 2)
       {
         updateChartLabels();
       }
@@ -1275,21 +1254,20 @@ public class Gui extends javax.swing.JFrame
 
   }
 
-
   /**
-   * Opens up the VehicleSetDialog and saves the values. If the measurement is already done the datasets will be
-   * updated.
+   * Opens up the VehicleSetDialog and saves the values. If the measurement is
+   * already done the datasets will be updated.
    */
-  private void startVehicleSet ()
+  private void startVehicleSet()
   {
     vehicleset.setLocationRelativeTo(this);
     vehicleset.setVisible(true);
 
     //Einstellungen übernehmen
-    if (vehicleset.isSettingsChanged())
+    if(vehicleset.isSettingsChanged())
     {
       //TAKT
-      if (data.isTwoStroke() != vehicleset.isTwoStroke())
+      if(data.isTwoStroke() != vehicleset.isTwoStroke())
       {
         data.setTwoStroke(vehicleset.isTwoStroke());
       }
@@ -1316,13 +1294,12 @@ public class Gui extends javax.swing.JFrame
 
   }
 
-
   /**
    * refreshes the availablePorts Array and puts them into the ComboBox
    */
-  private void refreshPorts ()
+  private void refreshPorts()
   {
-    if (com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
+    if(com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
     {
       jbutConnect.setEnabled(false);
     }
@@ -1332,60 +1309,58 @@ public class Gui extends javax.swing.JFrame
     }
 
     jComboBoxPort.removeAllItems();
-    for (String availablePort : com.getAvailablePorts())
+    for(String availablePort : com.getAvailablePorts())
     {
       jComboBoxPort.addItem(availablePort);
     }
   }
-
 
   /**
    * Converts the given series to PS
    *
    * @param series the series which should be converted
    */
-  private void convertToPs (XYSeries series)
+  private void convertToPs(XYSeries series)
   {
     int max = series.getItemCount();
 
-    for (int i = 0; i < max; i++)
+    for(int i = 0; i < max; i++)
     {
       double tmp = (double) series.getY(i);
       series.updateByIndex(i, tmp * 1.35962);
     }
   }
 
-
   /**
    * Converts the given series to kW
    *
    * @param series the series which should be converted
    */
-  private void convertToKw (XYSeries series)
+  private void convertToKw(XYSeries series)
   {
     int max = series.getItemCount();
 
-    for (int i = 0; i < max; i++)
+    for(int i = 0; i < max; i++)
     {
       double tmp = (double) series.getY(i);
       series.updateByIndex(i, tmp / 1.35962);
     }
   }
 
-
   /**
    * Corrects the series by the given factor and returns the result.
    *
-   * @param series The series that should be copied and converted, but not changed!
+   * @param series The series that should be copied and converted, but not
+   *               changed!
    * @param factor The factor the series should be converted with.
    * @return The changed series or <code>null</code> if an error occured.
    */
-  private XYSeries correctByFactor (XYSeries series, double factor)
+  private XYSeries correctByFactor(XYSeries series, double factor)
   {
 
     try
     {
-      if (factor <= 0)
+      if(factor <= 0)
       {
         LOG.severe(new InputMismatchException("factor smaller or equal to 0!"));
         showErrorMessage("Fehler bei Konvertierung", "Interner Fehler aufgetreten\n"
@@ -1396,7 +1371,7 @@ public class Gui extends javax.swing.JFrame
 
       int max = target.getItemCount();
 
-      for (int i = 0; i < max; i++)
+      for(int i = 0; i < max; i++)
       {
         double tmp = (double) series.getY(i);
         target.updateByIndex(i, tmp * factor);
@@ -1411,7 +1386,6 @@ public class Gui extends javax.swing.JFrame
     return null;
   }
 
-
   /**
    * <b>Updates:</b>
    * <ul>
@@ -1421,7 +1395,7 @@ public class Gui extends javax.swing.JFrame
    * <li>powerunit</li>
    * </ul>
    */
-  private void updateChartLabels ()
+  private void updateChartLabels()
   {
     data.setMaxpower(seriesPower.getMaxY());
     data.setMaxtorque(seriesTorque.getMaxY());
@@ -1447,41 +1421,43 @@ public class Gui extends javax.swing.JFrame
     seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
   }
 
-
   /**
    * converts motorRpm field to two stroke. divides by 2
    */
-  private void convertToTwoStroke ()
+  private void convertToTwoStroke()
   {
-    for (int i = 0; i < data.getMotorRpm().length; i++)
+    for(int i = 0; i < data.getMeasureList().size(); i++)
     {
-      data.getMotorRpm()[i] = data.getMotorRpm()[i] / 2;
+      data.getMeasureList().set(i,
+                                new Datapoint(data.getMeasureList().get(i).getWdz(),
+                                              data.getMeasureList().get(i).getMdz() / 2,
+                                              data.getMeasureList().get(i).getTime()));
     }
   }
-
 
   /**
    * converts motorRpm field to four stroke. multiplies with 2
    */
-  private void convertToFourStroke ()
+  private void convertToFourStroke()
   {
-    for (int i = 0; i < data.getMotorRpm().length; i++)
+    for(int i = 0; i < data.getMeasureList().size(); i++)
     {
-      data.getMotorRpm()[i] = data.getMotorRpm()[i] * 2;
+      data.getMeasureList().set(i,
+                                new Datapoint(data.getMeasureList().get(i).getWdz(),
+                                              data.getMeasureList().get(i).getMdz() * 2,
+                                              data.getMeasureList().get(i).getTime()));
     }
   }
 
-
   //Funktioniert nicht!!!
-  private double getMaxRPM ()
+  private double getMaxRPM()
   {
     System.out.println("getMAxRPMToDo!!");
     return 1;
   }
 
 // Filterung Funktioniert nicht!!
-
-  private ArrayList<Double> filterValues (ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
+  private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
   {/*
      * double[] smoothedValue=new double[values.length]; smoothedValue[0]=0; for(int i=0;i<values.length-1;i++) {
      * smoothedValue[i+1] = smoothedValue[i]+ (values[i+1] - smoothedValue[i]) /
@@ -1491,7 +1467,7 @@ public class Gui extends javax.swing.JFrame
      */
     ArrayList<Double> smoothedValues = new ArrayList<>();
     smoothedValues.add(aL.get(0));
-    for (int i = 0; i < aL.size()-1; i++)
+    for(int i = 0; i < aL.size() - 1; i++)
     {
       smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
     }
@@ -1500,11 +1476,10 @@ public class Gui extends javax.swing.JFrame
 
   }
 
-
   /**
    * calculates torque and power with wheelRpm
    */
-  private void calculate ()
+  private void calculate()
   {
     System.out.println("calculating...");
     //Winkelgeschw. = (Pi/180) * Umdr.
@@ -1512,7 +1487,7 @@ public class Gui extends javax.swing.JFrame
     //Drehmoment = Winkelbeschl. * J(kgm^2)
     //Leistung = 2*Pi*Drehmoment*Umdr.
     int length = list.size();
-    double smoothing =1;
+    double smoothing = 1;
     double angularspeed[] = new double[length];
     double diff[] = new double[length];
     double angularacc[] = new double[length];
@@ -1522,72 +1497,66 @@ public class Gui extends javax.swing.JFrame
     double vmax = 0;
     double[] engineRpm = new double[length];
 
-    
     ArrayList<Double> trq = new ArrayList<>();
     ArrayList<Double> pwr = new ArrayList<>();
     ArrayList<Double> rpm = new ArrayList<>();
-    
+
     ArrayList<Double> alpha = new ArrayList<>();
     ArrayList<Double> omega = new ArrayList<>();
-    
-    
 
 //    list.get(0).getTime()
+    for(int i = 0; i < list.size() - 1; i++)
+    {
+      omega.add(list.get(i).getWdz());
+      rpm.add((list.get(i + 1).getMdz() + list.get(i).getMdz()) / 2);
+    }
 
-    for (int i = 0; i < list.size() - 1; i++)
+    omega = filterValues(omega, smoothing);
+
+    for(int i = 0; i < omega.size() - 1; i++)
     {
-        omega.add(list.get(i).getWdz());
-        rpm.add((list.get(i + 1).getMdz() + list.get(i).getMdz()) / 2);
-    }    
-    
-    omega= filterValues(omega, smoothing);
-    
-    for (int i = 0; i < omega.size() - 1; i++)
-    {
-      double temp=((omega.get(i + 1) - omega.get(i)) / (list.get(i + 1).getTime()-list.get(i).getTime()));
-      if(temp>0)
+      double temp = ((omega.get(i + 1) - omega.get(i)) / (list.get(i + 1).getTime() - list.get(i).getTime()));
+      if(temp > 0)
       {
         alpha.add(temp);
       }
       else
       {
-        omega.remove(i+1);
-        rpm.remove(i+1);
+        omega.remove(i + 1);
+        rpm.remove(i + 1);
       }
-        
-    }    
+
+    }
     alpha = filterValues(alpha, smoothing);
-    
-    for (int i = 0; i < alpha.size()- 1; i++)
-    {   
+
+    for(int i = 0; i < alpha.size() - 1; i++)
+    {
       trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
-      pwr.add((trq.get(i) * ((omega.get(i + 1) + omega.get(i)) / 2))/1000*1.36 );
+      pwr.add((trq.get(i) * ((omega.get(i + 1) + omega.get(i)) / 2)) / 1000 * 1.36);
 //      System.out.println("pwr = " + pwr.get(i));
       //series1.add(engineRpm[i], power[i]);
       // series2.add(engineRpm[i], torque[i]);
 
     }
-    
-    trq= filterValues(trq,smoothing);
-    pwr= filterValues(pwr,smoothing);
-    rpm=filterValues(rpm,smoothing);
 
-   
-    
-  //  torque = filterValues(torque, smoothing);
-   // power = filterValues(power, smoothing);
+    trq = filterValues(trq, smoothing);
+    pwr = filterValues(pwr, smoothing);
+    rpm = filterValues(rpm, smoothing);
+
+    //  torque = filterValues(torque, smoothing);
+    // power = filterValues(power, smoothing);
     //engineRpm = filterValues(engineRpm, smoothing);
-
-    for (int i = 0; i < trq.size()-1; i++)
+    for(int i = 0; i < trq.size() - 1; i++)
     {
       series1.add(rpm.get(i), pwr.get(i));
       series2.add(rpm.get(i), trq.get(i));
     }
 
-
     dataset1.removeSeries(seriesPower);
     seriesPower = correctByFactor(series1, data.getCorrectionPower());
     dataset1.addSeries(seriesPower);
+    seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
+    chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
 
     dataset2.removeSeries(seriesTorque);
     seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
@@ -1600,65 +1569,17 @@ public class Gui extends javax.swing.JFrame
     System.out.println("done calculating");
 
 //    series1.add(x,y);
-
 //    data.setTorque(torque);
 //    data.setPower(power);
 //
 //    data.setVmax(vmax);
   }
 
-
-  /**
-   * Clears series1 <br>
-   * Writes series1 <br>
-   * Checks and converts to PS/kW Corrects by factor and refreshes diagram<br>
-   * Sets the seriesPower Key(for powerunit changes)
-   */
-  private void updateSeriesPower ()
-  {
-    series1.clear();
-    for (int i = 0; i < data.getPower().length; i++)
-    {
-      series1.add(data.getMotorRpm()[i], data.getPower()[i]);
-    }
-    if (data.getPowerunit().equals("PS"))
-    {
-      convertToPs(series1);
-    }
-
-    dataset1.removeSeries(seriesPower);
-    seriesPower = correctByFactor(series1, data.getCorrectionPower());
-    dataset1.addSeries(seriesPower);
-    seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
-    chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
-
-  }
-
-
-  /**
-   * Clears seriesTorque <br>
-   * Writes seriesTorque <br>
-   * Corrects by factor and refreshes diagram
-   */
-  private void updateSeriesTorque ()
-  {
-    series2.clear();
-    for (int i = 0; i < data.getTorque().length; i++)
-    {
-      series2.add(data.getMotorRpm()[i], data.getTorque()[i]);
-    }
-    dataset2.removeSeries(seriesTorque);
-    seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
-    seriesTorque.setKey("Drehmoment [Nm]");
-    dataset2.addSeries(seriesTorque);
-  }
-
-
   /**
    * Sets the Port and tries to connect to the Device.<br>
    * Then updates the Ecosystem.
    */
-  private void connectDevice ()
+  private void connectDevice()
   {
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     try
@@ -1702,50 +1623,66 @@ public class Gui extends javax.swing.JFrame
     jComboBoxPort.setEnabled(!com.isConnected());
     jStart.setEnabled(com.isConnected());
 
-    if (com.isConnected())
+    if(com.isConnected())
     {
       jLabelStatus.setText("verbunden");
       jLabelStatus.setForeground(new Color(0, 130, 0));
     }
   }
 
-
   /**
    * Communicates with the Device and refreshes the Ecosystem.
    */
-  private void refreshEco ()
+  private void refreshEco()
   {
-    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    try
+    Runnable runRefresh = () ->
     {
-      com.refreshEco();
+      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+      jRefresh.setEnabled(false);
 
-      LOG.fine("got ecosystem");
-      updateChartLabels();
-    }
-    catch (CommunicationException ex)
-    {
-      LOG.warning("could not refresh", ex);
-      showErrorMessage("Fehler beim aktualisieren",
-                       "Fehler beim aktualisieren.\n"
-                       + "Möglicherweise falsches Gerät. Erneut oder mit anderem Gerät versuchen.");
-    }
-    catch (TimeoutException ex)
-    {
-      LOG.warning("timeout");
-      showErrorMessage("Fehler beim aktualisieren",
-                       "Fehler beim aktualisieren.\n"
-                       + "Keine Antwort vom Gerät bekommen (Timeout)!");
-    }
-    catch (Exception ex)
-    {
-      LOG.severe("Unsupported Exception", ex);
-      showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-    }
-    finally
-    {
-      setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-    }
+      try
+      {
+        com.refreshEco();
+
+        LOG.fine("got ecosystem");
+        updateChartLabels();
+
+      }
+      catch (CommunicationException ex)
+      {
+        LOG.warning("could not refresh", ex);
+        showErrorMessage("Fehler beim aktualisieren",
+                         "Fehler beim aktualisieren.\n"
+                         + "Möglicherweise falsches Gerät. Erneut oder mit anderem Gerät versuchen.\n\n"
+                         + ex.getMessage());
+      }
+      catch (TimeoutException ex)
+      {
+        LOG.warning("Timeout");
+        showErrorMessage("Fehler beim aktualisieren",
+                         "Fehler beim aktualisieren.\n"
+                         + "Keine Antwort vom Gerät bekommen (Timeout)!");
+      }
+      catch (IllegalStateException ex)
+      {
+        LOG.info(ex.getMessage());
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unsupported Exception", ex);
+        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      }
+      finally
+      {
+        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        if(com.isConnected())
+          jRefresh.setEnabled(true);
+      }
+
+    };
+
+    new Thread(runRefresh).start();
+
   }
 
 }

@@ -9,13 +9,12 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import logging.Logger;
 
-
 /**
  * Several methods to communicate with the serial Port
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
-public class PortCom implements Port, SerialPortEventListener
+public class PortCom implements SerialPortEventListener
 {
 
   private static final Logger LOG = Logger.getLogger(MeasurementWorker.class.getName());
@@ -23,42 +22,34 @@ public class PortCom implements Port, SerialPortEventListener
   private SerialPort serialPort;
   private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
 
-
-  public PortCom ()
+  public PortCom()
   {
     LOG.setLevel(Level.ALL);
   }
 
-
   /**
    * @return the String array of available ports
    */
-  @Override
-  public String[] getPortList ()
+  public String[] getPortList()
   {
     return SerialPortList.getPortNames();
   }
 
-
   /**
    * @return the current port
    */
-  @Override
-  public String getPort ()
+  public String getPort()
   {
     return serialPort.getPortName();
   }
 
-
-  @Override
-  public void openPort (String port) throws CommunicationException
+  public void openPort(String port) throws CommunicationException
   {
     try
     {
       serialPort = new SerialPort(port);
 
-
-      if (!serialPort.openPort())
+      if(!serialPort.openPort())
       {
         throw new CommunicationException("open Port failed");
       }
@@ -79,13 +70,11 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-
-  @Override
-  public void closePort () throws CommunicationException
+  public void closePort() throws CommunicationException
   {
     try
     {
-      if (!serialPort.closePort())
+      if(!serialPort.closePort())
       {
         throw new CommunicationException("closing Port failed");
       }
@@ -102,16 +91,14 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-
-  @Override
-  public byte readByte () throws CommunicationException, InterruptedException
+  public byte readByte() throws CommunicationException, InterruptedException
   {
     synchronized (receivedChunks)
     {
       try
       {
 
-        while (receivedChunks.isEmpty())
+        while(receivedChunks.isEmpty())
         {
           receivedChunks.wait();
         }
@@ -119,7 +106,7 @@ public class PortCom implements Port, SerialPortEventListener
         final PortChunk ch = receivedChunks.getFirst();
 
         final byte rv = ch.next();
-        if (!ch.isByteAvailable())
+        if(!ch.isByteAvailable())
         {
           receivedChunks.removeFirst();
         }
@@ -142,18 +129,16 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-
-  @Override
-  public synchronized void writeBytes (byte[] s) throws CommunicationException
+  public synchronized void writeBytes(byte[] s) throws CommunicationException
   {
     try
     {
       if(serialPort == null)
         throw new CommunicationException("serialPort == null");
-      
+
       serialPort.writeBytes(s);
     }
-    catch(CommunicationException ex)
+    catch (CommunicationException ex)
     {
       throw ex;
     }
@@ -168,18 +153,21 @@ public class PortCom implements Port, SerialPortEventListener
 
   }
 
-
-  @Override
-  public void serialEvent (SerialPortEvent serialPortEvent)
+  public void serialEvent(SerialPortEvent serialPortEvent)
   {
-    if (serialPortEvent.getEventType() == SerialPortEvent.RXCHAR)
+    if(serialPortEvent.getEventType() == SerialPortEvent.RXCHAR)
     {
       try
       {
         byte[] ba = serialPort.readBytes();
         synchronized (receivedChunks)
         {
-          receivedChunks.add(new PortChunk(ba));
+          try
+          {
+            receivedChunks.add(new PortChunk(ba));
+          }
+          catch(NullPointerException ex)
+          {}
           receivedChunks.notifyAll();
         }
       }
@@ -191,8 +179,7 @@ public class PortCom implements Port, SerialPortEventListener
     }
   }
 
-  @Override
-  public boolean isOpened ()
+  public boolean isOpened()
   {
     return serialPort != null;
   }

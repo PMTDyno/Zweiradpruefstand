@@ -1190,8 +1190,8 @@ public class Gui extends javax.swing.JFrame
             //data.setPower(null);
             //data.setTorque(null);
             calculate();
-            series1.clear();
-            series2.clear();
+//            series1.clear();
+//            series2.clear();
 
           case 2:
             LOG.finest("entering level 2");
@@ -1314,7 +1314,7 @@ public class Gui extends javax.swing.JFrame
       jComboBoxPort.addItem(availablePort);
     }
   }
-
+  
   /**
    * Converts the given series to PS
    *
@@ -1449,14 +1449,13 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
-  //Funktioniert nicht!!!
-  private double getMaxRPM()
-  {
-    System.out.println("getMAxRPMToDo!!");
-    return 1;
-  }
+//  //Funktioniert nicht!!!
+//  private double getMaxRPM()
+//  {
+//    System.out.println("getMAxRPMToDo!!");
+//    return 1;
+//  }
 
-// Filterung Funktioniert nicht!!
   private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
   {/*
      * double[] smoothedValue=new double[values.length]; smoothedValue[0]=0; for(int i=0;i<values.length-1;i++) {
@@ -1592,7 +1591,7 @@ public class Gui extends javax.swing.JFrame
     }
     catch (CommunicationException ex)
     {
-      //ex.printStackTrace(System.err);
+      ex.printStackTrace(System.err);
       LOG.warning("could not connect", ex);
       showErrorMessage("Fehler beim verbinden",
                        "Fehler beim Verbinden.\n"

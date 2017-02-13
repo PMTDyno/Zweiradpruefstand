@@ -1,5 +1,6 @@
 package measure;
 
+import java.util.logging.Level;
 import logging.Logger;
 
 /**
@@ -18,6 +19,7 @@ public class Frame
 
   public Frame (FrameBytes bytes) throws CommunicationException
   {
+    LOG.setLevel(Level.ALL);
     this.bytes = bytes;
     checkFrame();
   }
@@ -65,7 +67,7 @@ public class Frame
         throw new CommunicationException("missing seperator '='");
       }
 
-      data = frame.substring(2, index);
+      data = frame.substring(1, index);
       if (data == null || data.isEmpty())
       {
         throw new CommunicationException("no data available");

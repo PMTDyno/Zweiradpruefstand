@@ -60,7 +60,7 @@ public final class Data
   public ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private boolean twoStroke = true;
-
+  private boolean currentTwoStroke = true;
   /*
    * ------------------------------------------------------------------------
    */
@@ -74,6 +74,16 @@ public final class Data
   public void setMeasureList (ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;
+  }
+
+  public boolean isCurrentTwoStroke()
+  {
+    return currentTwoStroke;
+  }
+
+  public void setCurrentTwoStroke(boolean currentTwoStroke)
+  {
+    this.currentTwoStroke = currentTwoStroke;
   }
 
 

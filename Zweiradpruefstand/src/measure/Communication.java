@@ -30,7 +30,7 @@ public class Communication
   public static final byte SOT = 2; //0x02
   public static final byte EOT = 3; //0x03
 
-  private Port port;
+  private PortCom port;
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
   private long refreshLock = 0;
@@ -180,8 +180,8 @@ public class Communication
   {
     try
     {
-      //every 5 seconds max!
-      if(refreshLock + 10000 < System.currentTimeMillis())
+      //every 4 seconds max!
+      if(refreshLock + 4000 < System.currentTimeMillis())
       {
         setEco(getResponse(Request.REFRESH));
         refreshLock = System.currentTimeMillis();

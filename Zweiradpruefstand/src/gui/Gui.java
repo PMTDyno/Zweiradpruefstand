@@ -1005,7 +1005,7 @@ public class Gui extends javax.swing.JFrame
     {
 
 //      ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
-      ReadCSV fr = new ReadCSV("C:/Users/Levin/Desktop/VM-shared/measure.csv");
+      ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
       list = fr.read();
       System.out.println("Daten eingelesen");
 
@@ -1455,18 +1455,31 @@ public class Gui extends javax.swing.JFrame
 //    System.out.println("getMAxRPMToDo!!");
 //    return 1;
 //  }
-
+  private int getMaxRPM (ArrayList<Double> aL)
+  {
+    int valMax=0;
+    int i;
+    for(i=0; i<aL.size();i++)
+    {
+      if(aL.get(i)>aL.get(valMax))
+        valMax=i;
+    }
+    return valMax;
+  }
+  
+  private ArrayList<Double> filterValuesOrder(ArrayList<Double> aL, double smoothing, int order)
+  {
+    for(int i=0;i<order;i++)
+      aL= filterValues(aL,smoothing);
+    
+    return aL;
+  }
+  
   private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
-  {/*
-     * double[] smoothedValue=new double[values.length]; smoothedValue[0]=0; for(int i=0;i<values.length-1;i++) {
-     * smoothedValue[i+1] = smoothedValue[i]+ (values[i+1] - smoothedValue[i]) /
-     * (smoothing/(list.get(i+1).getTime()-list.get(i).getTime())); }
-     *
-     * return smoothedValue;
-     */
+  {
     ArrayList<Double> smoothedValues = new ArrayList<>();
     smoothedValues.add(aL.get(0));
-    for(int i = 0; i < aL.size() - 1; i++)
+    for(int i = 0; i < aL.size()-1; i++)
     {
       smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
     }
@@ -1478,100 +1491,108 @@ public class Gui extends javax.swing.JFrame
   /**
    * calculates torque and power with wheelRpm
    */
-  private void calculate()
+  private void calculate ()
   {
     System.out.println("calculating...");
     //Winkelgeschw. = (Pi/180) * Umdr.
     //Winkelbeschl. = Winkelgeschw. / Zeit
     //Drehmoment = Winkelbeschl. * J(kgm^2)
     //Leistung = 2*Pi*Drehmoment*Umdr.
-    int length = list.size();
-    double smoothing = 1;
-    double angularspeed[] = new double[length];
-    double diff[] = new double[length];
-    double angularacc[] = new double[length];
     double inertia = data.getInertia();
-    double[] torque = new double[length];
-    double[] power = new double[length];
-    double vmax = 0;
-    double[] engineRpm = new double[length];
-
+    double vmax = 0; //in kmh
+    double n;
+    
     ArrayList<Double> trq = new ArrayList<>();
+    ArrayList<Double> trqSchl = new ArrayList<>();
     ArrayList<Double> pwr = new ArrayList<>();
     ArrayList<Double> rpm = new ArrayList<>();
-
+    ArrayList<Double> time = new ArrayList<>();
+    
     ArrayList<Double> alpha = new ArrayList<>();
     ArrayList<Double> omega = new ArrayList<>();
+    
+    
 
-//    list.get(0).getTime()
-    for(int i = 0; i < list.size() - 1; i++)
+
+    for (int i = 0; i < list.size() - 1; i++)
     {
-      omega.add(list.get(i).getWdz());
-      rpm.add((list.get(i + 1).getMdz() + list.get(i).getMdz()) / 2);
+        omega.add(list.get(i).getWdz());
+        rpm.add(list.get(i).getMdz());
+        time.add(list.get(i).getTime());
+    }    
+    
+    rpm=filterValuesOrder(rpm,0.09,3); //passt!
+    omega= filterValuesOrder(omega, 0.09,3); //passt!
+    
+    for (int i = 0; i < omega.size(); i++)
+    {
+       if (omega.get(i)>vmax)
+          vmax=(omega.get(i))*0.175*3.6; //richtiges Pi!!
     }
-
-    omega = filterValues(omega, smoothing);
-
-    for(int i = 0; i < omega.size() - 1; i++)
+    
+    n= ((omega.get(30)/(rpm.get(30)/60*2*3.14))+(omega.get(200)/(rpm.get(200)/60*2*3.14)))/2; //richtiges PI ergänzen!
+    
+    for (int i = 0; i < omega.size() - 1; i++)
     {
-      double temp = ((omega.get(i + 1) - omega.get(i)) / (list.get(i + 1).getTime() - list.get(i).getTime()));
-      if(temp > 0)
-      {
-        alpha.add(temp);
+      alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i+1)-time.get(i)));
+    }    
+    alpha = filterValuesOrder(alpha,0.09 ,3); //passt!
+    
+    double factor;
+    if(data.getPowerunit().equals("PS"))
+      factor = 1.36;
+    else
+      factor = 1;
+    
+    for (int i = 0; i < alpha.size(); i++)
+    {   
+      trq.add(alpha.get(i) * inertia*n);  //M=dOmega/dt * J
+      
+      pwr.add((trq.get(i)*((rpm.get(i)/60)*6.28)/1000*factor));//richtiges PI!!    
+    }  
+    
+   trqSchl=new ArrayList<Double> (trq.subList(getMaxRPM(rpm),trq.size())); //Schleppleistung zu Radleistung addieren!! Ist bisher nicht gemacht!
+    //Dass i Drehzahlabfall und ka negative Beschleunigung hab kann wegn Auskuppln sein und weil ma weniger Beschleunigungswerte hat als Drehzahl!
+    for (int i = 0; i < trq.size()-1; i++)
+    {
+      if(i==getMaxRPM(rpm)) 
+        break;
+      boolean roller = false; //Achsenbeschriftung richtig machen, Grafisch einstellen ob Rolle
+      if(!roller)    //einstellmöglichkeit!!    
+      { 
+        series1.add(rpm.get(i), pwr.get(i));
+        series2.add(rpm.get(i), trq.get(i));
       }
       else
       {
-        omega.remove(i + 1);
-        rpm.remove(i + 1);
+        series1.add(omega.get(i)*0.175*3.6, pwr.get(i));
+        series2.add(omega.get(i)*0.175*3.6, trq.get(i));      
+              
       }
-
-    }
-    alpha = filterValues(alpha, smoothing);
-
-    for(int i = 0; i < alpha.size() - 1; i++)
-    {
-      trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
-      pwr.add((trq.get(i) * ((omega.get(i + 1) + omega.get(i)) / 2)) / 1000 * 1.36);
-//      System.out.println("pwr = " + pwr.get(i));
-      //series1.add(engineRpm[i], power[i]);
-      // series2.add(engineRpm[i], torque[i]);
-
+      
     }
 
-    trq = filterValues(trq, smoothing);
-    pwr = filterValues(pwr, smoothing);
-    rpm = filterValues(rpm, smoothing);
-
-    //  torque = filterValues(torque, smoothing);
-    // power = filterValues(power, smoothing);
-    //engineRpm = filterValues(engineRpm, smoothing);
-    for(int i = 0; i < trq.size() - 1; i++)
-    {
-      series1.add(rpm.get(i), pwr.get(i));
-      series2.add(rpm.get(i), trq.get(i));
-    }
 
     dataset1.removeSeries(seriesPower);
     seriesPower = correctByFactor(series1, data.getCorrectionPower());
     dataset1.addSeries(seriesPower);
-    seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
-    chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
 
     dataset2.removeSeries(seriesTorque);
     seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
-
+     data.setVmax(vmax);
     chart.fireChartChanged();
     updateChartLabels();
 
     System.out.println("done calculating");
 
 //    series1.add(x,y);
+
 //    data.setTorque(torque);
 //    data.setPower(power);
 //
-//    data.setVmax(vmax);
+    
   }
 
   /**

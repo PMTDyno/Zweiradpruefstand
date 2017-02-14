@@ -77,6 +77,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
 
         com.sendFrame(Communication.Request.MEASURE);
         list.add(getNextDatapoint());
+        
+        
 
         if(isCancelled())
         {
@@ -88,7 +90,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
           LOG.finest("Stop Request triggered!");
           return list;
         }
-
+        
+        Thread.sleep(data.getPeriodTimeMs());
+        
       }
 
     }

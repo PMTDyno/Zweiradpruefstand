@@ -1068,8 +1068,6 @@ public class Gui extends javax.swing.JFrame
     worker.execute();
   }
 
-  ArrayList<Datapoint> list;
-
   private void readFile()
   {
     try
@@ -1094,7 +1092,7 @@ public class Gui extends javax.swing.JFrame
         //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
         ReadCSV fr = new ReadCSV(file);
         
-        list = fr.read();
+        data.setMeasureList(fr.read());
         System.out.println("Daten eingelesen");
         
         series1.clear();
@@ -1165,6 +1163,7 @@ public class Gui extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
+        ex.printStackTrace();
         LOG.severe("Unknown Exception: " + ex);
         showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
       }
@@ -1514,6 +1513,7 @@ public class Gui extends javax.swing.JFrame
     maxTorqueMarker.setLabel(strMaxTorque);
     chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
     seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
+    chart.fireChartChanged();
   }
 
   /**
@@ -1590,6 +1590,9 @@ public class Gui extends javax.swing.JFrame
    */
   private void calculate()
   {
+    
+    ArrayList<Datapoint> list = data.getMeasureList();
+    
     System.out.println("calculating...");
     //Winkelgeschw. = (Pi/180) * Umdr.
     //Winkelbeschl. = Winkelgeschw. / Zeit
@@ -1677,7 +1680,7 @@ public class Gui extends javax.swing.JFrame
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
     data.setVmax(vmax);
-    chart.fireChartChanged();
+    
     updateChartLabels();
 
     System.out.println("done calculating");

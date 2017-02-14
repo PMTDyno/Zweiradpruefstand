@@ -11,7 +11,7 @@ import logging.Logger;
 
 /**
  *
- * @author Levin Messing <meslem12@htl-kaindorf.ac.at>
+ * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
 public class Communication
 {
@@ -392,25 +392,5 @@ public class Communication
     }
 
   };
-
-  public void cancelWorker()
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  public void stopWorker()
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  public void setWorker(Object object)
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  public void start(Object object)
-  {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
 
 }

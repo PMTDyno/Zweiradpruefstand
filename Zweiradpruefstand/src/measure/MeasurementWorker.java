@@ -2,14 +2,10 @@ package measure;
 
 import data.Data;
 import java.util.ArrayList;
-import java.util.List;
 import logging.Logger;
 import javax.swing.SwingWorker;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 
 /**
  * starts the measurement and collects all the data
@@ -26,40 +22,45 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
 
   private int wheelRpm[];
   private int motorRpm[];
-  private boolean error = true;
   private final ArrayList<Datapoint> list = new ArrayList<>();
   private final AtomicBoolean stopRequest = new AtomicBoolean(false);
 
-  public MeasurementWorker (Communication com)
+  public MeasurementWorker(Communication com)
   {
     this.com = com;
   }
 
-  private Datapoint getNextDatapoint() throws CommunicationException, TimeoutException
+  public void stop()
+  {
+    stopRequest.set(true);
+  }
+
+  private Datapoint getNextDatapoint() throws CommunicationException,
+                                              TimeoutException
   {
     double wdz, mdz;
     int time;
-    
+
     String[] tmp = com.getFrameData();
     wdz = Double.parseDouble(tmp[0].replace(',', '.'));
     mdz = Double.parseDouble(tmp[1].replace(',', '.'));
     time = Integer.parseInt(tmp[2]);
-    
+
 //    //if mdz < last measured mdz
 //    if(mdz < list.get(list.size()-1).getMdz())
 //    {
 //      LOG.warning("OVERWRITING MDZ! last: " + mdz + " new: " + list.get(list.size()-1).getMdz());
 //      mdz = list.get(list.size()-1).getMdz();
 //    }
-    
     return new Datapoint(wdz, mdz, time);
   }
 
   @Override
-  protected ArrayList<Datapoint> doInBackground () throws CommunicationException, TimeoutException, Exception
+  protected ArrayList<Datapoint> doInBackground() throws CommunicationException,
+                                                         TimeoutException,
+                                                         Exception
   {
     //WDZ - MDZ - TIME
-    error = true;
 
     try
     {
@@ -68,33 +69,32 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
       LOG.finest("sent start");
 
       list.add(getNextDatapoint());
-      
-      
-      while (true)
+
+      while(true)
       {
 
         Thread.sleep(data.getPeriodTimeMs());
-        
+
         com.sendFrame(Communication.Request.MEASURE);
         list.add(getNextDatapoint());
-        
-        if (isCancelled())
+
+        if(isCancelled())
         {
           LOG.finest("Cancel triggered!");
           return null;
         }
         if(stopRequest.get())
         {
-          LOG.finest("Stop Request triggered!"); 
+          LOG.finest("Stop Request triggered!");
           return list;
         }
 
       }
-      
+
     }
     catch (CommunicationException ex)
     {
-      LOG.severe("Error sending/receiving data", ex);
+      LOG.severe("Error sending/receiving data: " + ex.getMessage(), ex);
       throw ex;
     }
     catch (TimeoutException ex)

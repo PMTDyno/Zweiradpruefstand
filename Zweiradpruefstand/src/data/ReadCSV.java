@@ -15,6 +15,24 @@ public class ReadCSV
 
   private final File file;
 
+  public ReadCSV (File file) throws Exception
+  {    
+    this.file = file;
+    if (!file.exists())
+    {
+      throw new IllegalArgumentException("File does not exist");
+    }
+    if (!file.isFile())
+    {
+      throw new IllegalArgumentException("Path is not a file");
+    }
+    if (!file.canRead())
+    {
+      throw new IllegalArgumentException("File is not able to be read.");
+    }
+
+  }
+  
   public ReadCSV (String path) throws Exception
   {    
     file = new File(path);

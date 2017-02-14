@@ -3,7 +3,6 @@ package data;
 import java.util.ArrayList;
 import measure.Datapoint;
 
-
 /**
  * Stores the main data variables
  *
@@ -14,25 +13,22 @@ public final class Data
 
   private static Data instance = null;
 
-
   /**
    *
    * @return The Data Instance
    */
-  public static Data getInstance ()
+  public static Data getInstance()
   {
-    if (instance == null)
+    if(instance == null)
     {
       instance = new Data();
     }
     return instance;
   }
 
-
-  private Data ()
+  private Data()
   {
   }
-
 
   private String filePath = "Error im Benutzerpfad beheben";
   private String vehicle = "Honda CWF 125";
@@ -60,262 +56,214 @@ public final class Data
   public ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private boolean twoStroke = true;
-  private boolean currentTwoStroke = true;
+
   /*
    * ------------------------------------------------------------------------
    */
 
-  public ArrayList<Datapoint> getMeasureList ()
+  public ArrayList<Datapoint> getMeasureList()
   {
     return measureList;
   }
 
-
-  public void setMeasureList (ArrayList<Datapoint> measureList)
+  public void setMeasureList(ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;
   }
 
-  public boolean isCurrentTwoStroke()
-  {
-    return currentTwoStroke;
-  }
-
-  public void setCurrentTwoStroke(boolean currentTwoStroke)
-  {
-    this.currentTwoStroke = currentTwoStroke;
-  }
-
-
-  public String getFilePath ()
+  public String getFilePath()
   {
     return filePath;
   }
 
-
-  public void setFilePath (String filePath)
+  public void setFilePath(String filePath)
   {
     this.filePath = filePath;
   }
 
-
-  public String getVehicle ()
+  public String getVehicle()
   {
     return vehicle;
   }
 
-
-  public void setVehicle (String vehicle)
+  public void setVehicle(String vehicle)
   {
     this.vehicle = vehicle;
   }
 
-
-  public String getPowerunit ()
+  public String getPowerunit()
   {
     return powerunit;
   }
 
-
-  public void setPowerunit (String powerunit)
+  public void setPowerunit(String powerunit)
   {
     this.powerunit = powerunit;
   }
 
-
-  public double getInertia ()
+  public double getInertia()
   {
     return inertia;
   }
 
-
-  public void setInertia (double inertia)
+  public void setInertia(double inertia)
   {
     this.inertia = inertia;
   }
 
-
-  public double getTemperature ()
+  public double getTemperature()
   {
     return temperature;
   }
 
-
-  public void setTemperature (double temperature)
+  public void setTemperature(double temperature)
   {
     this.temperature = temperature;
   }
 
-
-  public double getPressure ()
+  public double getPressure()
   {
     return pressure;
   }
 
-
-  public void setPressure (double pressure)
+  public void setPressure(double pressure)
   {
     this.pressure = pressure;
   }
 
-
-  public double getCorrectionPower ()
+  public double getCorrectionPower()
   {
     return correctionPower;
   }
 
-
-  public void setCorrectionPower (double correctionPower)
+  public void setCorrectionPower(double correctionPower)
   {
     this.correctionPower = correctionPower;
   }
 
-
-  public double getCorrectionTorque ()
+  public double getCorrectionTorque()
   {
     return correctionTorque;
   }
 
-
-  public void setCorrectionTorque (double correctionTorque)
+  public void setCorrectionTorque(double correctionTorque)
   {
     this.correctionTorque = correctionTorque;
   }
 
-
-  public double getMaxpower ()
+  public double getMaxpower()
   {
     return maxpower;
   }
 
-
-  public void setMaxpower (double maxpower)
+  public void setMaxpower(double maxpower)
   {
     this.maxpower = maxpower;
   }
 
-
-  public double getMaxtorque ()
+  public double getMaxtorque()
   {
     return maxtorque;
   }
 
-
-  public void setMaxtorque (double maxtorque)
+  public void setMaxtorque(double maxtorque)
   {
     this.maxtorque = maxtorque;
   }
 
-  public int getPngWidth ()
+  public int getPngWidth()
   {
     return pngWidth;
   }
 
-
-  public void setPngWidth (int pngWidth)
+  public void setPngWidth(int pngWidth)
   {
     this.pngWidth = pngWidth;
   }
 
-
-  public int getPngHeight ()
+  public int getPngHeight()
   {
     return pngHeight;
   }
 
-
-  public void setPngHeight (int pngHeight)
+  public void setPngHeight(int pngHeight)
   {
     this.pngHeight = pngHeight;
   }
 
-
-  public int getWindowWidth ()
+  public int getWindowWidth()
   {
     return windowWidth;
   }
 
-
-  public void setWindowWidth (int windowWidth)
+  public void setWindowWidth(int windowWidth)
   {
     this.windowWidth = windowWidth;
   }
 
-
-  public int getWindowHeight ()
+  public int getWindowHeight()
   {
     return windowHeight;
   }
 
-
-  public void setWindowHeight (int windowHeight)
+  public void setWindowHeight(int windowHeight)
   {
     this.windowHeight = windowHeight;
   }
 
-
-  public int getWindowRelativeX ()
+  public int getWindowRelativeX()
   {
     return windowRelativeX;
   }
 
-
-  public void setWindowRelativeX (int windowRelativeX)
+  public void setWindowRelativeX(int windowRelativeX)
   {
     this.windowRelativeX = windowRelativeX;
   }
 
-
-  public int getWindowRelativeY ()
+  public int getWindowRelativeY()
   {
     return windowRelativeY;
   }
 
-
-  public void setWindowRelativeY (int windowRelativeY)
+  public void setWindowRelativeY(int windowRelativeY)
   {
     this.windowRelativeY = windowRelativeY;
   }
 
-
-  public int getPeriodTimeMs ()
+  public int getPeriodTimeMs()
   {
     return periodTimeMs;
   }
 
-
-  public void setPeriodTimeMs (int periodTimeMs)
+  public void setPeriodTimeMs(int periodTimeMs)
   {
     this.periodTimeMs = periodTimeMs;
   }
 
-
-  public int getMaxMeasureTimeSec ()
+  public int getMaxMeasureTimeSec()
   {
     return maxMeasureTimeSec;
   }
 
-
-  public void setMaxMeasureTimeSec (int maxMeasureTimeSec)
+  public void setMaxMeasureTimeSec(int maxMeasureTimeSec)
   {
     this.maxMeasureTimeSec = maxMeasureTimeSec;
   }
 
-
-  public int getHumidity ()
+  public int getHumidity()
   {
     return humidity;
   }
 
-
-  public void setHumidity (int humidity)
+  public void setHumidity(int humidity)
   {
     this.humidity = humidity;
   }
 
-  public double getVmax ()
+  public double getVmax()
   {
-    if (vmax == 0)
+    if(vmax == 0)
     {
       return -1;
     }
@@ -323,20 +271,19 @@ public final class Data
     return vmax;
   }
 
-  public boolean isTwoStroke ()
+  public boolean isTwoStroke()
   {
     return twoStroke;
   }
 
-
-  public void setTwoStroke (boolean twoStroke)
+  public void setTwoStroke(boolean twoStroke)
   {
     this.twoStroke = twoStroke;
   }
 
-
-  public void setVmax (double vmax)
+  public void setVmax(double vmax)
   {
     this.vmax = vmax;
   }
+
 }

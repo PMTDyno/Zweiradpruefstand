@@ -5,7 +5,7 @@ import logging.Logger;
 
 /**
  *
- * @author Levin Messing <meslem12@htl-kaindorf.ac.at>
+ * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
 public class Frame
 {

@@ -73,6 +73,7 @@ public class Gui extends javax.swing.JFrame
   private XYSeriesCollection dataset2 = new XYSeriesCollection();
 
   private JFreeChart chart;
+  private Measure worker;
 
   /**
    * Creates the GUI
@@ -140,6 +141,13 @@ public class Gui extends javax.swing.JFrame
     jLabelGuideMeasure = new javax.swing.JLabel();
     jPanelSettings = new javax.swing.JPanel();
     jLabelGuideSettings = new javax.swing.JLabel();
+    jFrameLoading = new javax.swing.JFrame();
+    jPanel1 = new javax.swing.JPanel();
+    jProgressBar1 = new javax.swing.JProgressBar();
+    jPanel2 = new javax.swing.JPanel();
+    jButton1 = new javax.swing.JButton();
+    jButton3 = new javax.swing.JButton();
+    jButton2 = new javax.swing.JButton();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
     jStop = new javax.swing.JButton();
@@ -279,6 +287,24 @@ public class Gui extends javax.swing.JFrame
 
     jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
+    jPanel1.setLayout(new java.awt.GridBagLayout());
+
+    jProgressBar1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+    jProgressBar1.setPreferredSize(new java.awt.Dimension(150, 25));
+    jPanel1.add(jProgressBar1, new java.awt.GridBagConstraints());
+
+    jFrameLoading.getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+    jButton1.setText("jButton1");
+    jPanel2.add(jButton1);
+
+    jButton3.setText("jButton3");
+    jPanel2.add(jButton3);
+
+    jFrameLoading.getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+
+    jButton2.setText("jButton2");
+
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
 
@@ -410,8 +436,6 @@ public class Gui extends javax.swing.JFrame
 
     jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
     jpanDevice.setLayout(new java.awt.GridBagLayout());
-
-    jComboBoxPort.setOpaque(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -588,11 +612,6 @@ public class Gui extends javax.swing.JFrame
     private void jStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStartActionPerformed
     {//GEN-HEADEREND:event_jStartActionPerformed
       start();
-      jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/loading48.gif")));
-      jStart.setEnabled(false);
-      jStop.setEnabled(true);
-      jCancel.setEnabled(true);
-      jRefresh.setEnabled(false);
     }//GEN-LAST:event_jStartActionPerformed
 
     private void jPrintActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jPrintActionPerformed
@@ -651,18 +670,16 @@ public class Gui extends javax.swing.JFrame
 
     private void jStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStopActionPerformed
     {//GEN-HEADEREND:event_jStopActionPerformed
-      jStop.setEnabled(false);
-      jCancel.setEnabled(false);
-      com.stopWorker();
+      disableMeasureButtons();
+      worker.stop();
     }//GEN-LAST:event_jStopActionPerformed
 
     private void jCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jCancelActionPerformed
     {//GEN-HEADEREND:event_jCancelActionPerformed
       if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
       {
-        com.cancelWorker();
-        jStop.setEnabled(false);
-        jCancel.setEnabled(false);
+        disableMeasureButtons();
+        worker.cancel(true);
       }
     }//GEN-LAST:event_jCancelActionPerformed
 
@@ -784,12 +801,16 @@ public class Gui extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton jButton1;
+  private javax.swing.JButton jButton2;
+  private javax.swing.JButton jButton3;
   private javax.swing.JButton jCancel;
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
   private javax.swing.JMenu jFile;
   private javax.swing.JFrame jFrameAbout;
   private javax.swing.JFrame jFrameGuide;
+  private javax.swing.JFrame jFrameLoading;
   private javax.swing.JMenu jHelp;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabelAuthor;
@@ -811,6 +832,8 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuSettings;
   private javax.swing.JMenuItem jMenuVehicle;
   private javax.swing.JPanel jPanSerial;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanelInfo;
   private javax.swing.JPanel jPanelInfo2;
   private javax.swing.JPanel jPanelLogo;
@@ -818,6 +841,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPanel jPanelSettings;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
+  private javax.swing.JProgressBar jProgressBar1;
   private javax.swing.JButton jRefresh;
   private javax.swing.JButton jSave;
   private javax.swing.JToolBar.Separator jSeparator1;
@@ -872,26 +896,67 @@ public class Gui extends javax.swing.JFrame
   }
 
   /**
-   * Enables the Cancelling Buttons if the boolean is true
    *
-   * @param b boolean
+   * enables:
+   * <ul>
+   * <li>jStop
+   * <li>jCancel
+   * </ul>
+   *
+   * disables:
+   * <ul>
+   * <li>jStart
+   * <li>jRefresh
+   * </ul>
+   *
    */
-  public void setRunning(boolean b)
+  public void enableCancelling()
   {
-    jStop.setEnabled(b);
-    jCancel.setEnabled(b);
+    jStop.setEnabled(true);
+    jCancel.setEnabled(true);
+
+    jStart.setEnabled(false);
+    jRefresh.setEnabled(false);
   }
 
   /**
-   * Sets the buttons available to start measurement if true
-   *
-   * @param b
+   * disables:
+   * <ul>
+   * <li>jStart
+   * <li>jRefresh
+   * <li>jStop
+   * <li>jCancel
+   * </ul>
    */
-  public void setReady(boolean b)
+  public void disableMeasureButtons()
   {
-    setRunning(!b);
-    jStart.setEnabled(b);
-    jRefresh.setEnabled(b);
+    jStop.setEnabled(false);
+    jCancel.setEnabled(false);
+    jStart.setEnabled(false);
+    jRefresh.setEnabled(false);
+  }
+
+  /**
+   * enables:
+   * <ul>
+   * <li>jStart
+   * <li>jRefresh
+   * </ul>
+   *
+   * disables:
+   * <ul>
+   * <li>jStop
+   * <li>jCancel
+   * </ul>
+   *
+   */
+  public void enableStarting()
+  {
+    jStart.setEnabled(true);
+    jRefresh.setEnabled(true);
+
+    jStop.setEnabled(false);
+    jCancel.setEnabled(false);
   }
 
   /**
@@ -994,7 +1059,13 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
-    com.start(this);
+    startVehicleSet();
+
+    jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/loading48.gif")));
+    enableCancelling();
+
+    worker = new Measure(com);
+    worker.execute();
   }
 
   ArrayList<Datapoint> list;
@@ -1004,13 +1075,33 @@ public class Gui extends javax.swing.JFrame
     try
     {
 
-//      ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
-      ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
-      list = fr.read();
-      System.out.println("Daten eingelesen");
+      File file;
 
-      calculate();
-
+      JFileChooser chooser = new JFileChooser();
+      FileNameExtensionFilter filter = new FileNameExtensionFilter(
+              "Comma Seperated Value (*.csv)", "csv");
+      chooser.setFileFilter(filter);
+      int rv = chooser.showSaveDialog(this);
+      if(rv == JFileChooser.APPROVE_OPTION)
+      {
+        file = chooser.getSelectedFile();
+        if(!file.getName().endsWith(".csv"))
+        {
+          file = new File(file.getPath() + ".png");
+        }
+        
+        //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
+        //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
+        ReadCSV fr = new ReadCSV(file);
+        
+        list = fr.read();
+        System.out.println("Daten eingelesen");
+        
+        series1.clear();
+        series2.clear();
+        
+        calculate();
+      }
     }
     catch (Exception ex)
     {
@@ -1019,6 +1110,9 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
+  /**
+   * starts the MeasurementWorker
+   */
   private class Measure extends MeasurementWorker
   {
 
@@ -1030,16 +1124,18 @@ public class Gui extends javax.swing.JFrame
     @Override
     protected void done()
     {
+
       try
       {
+        disableMeasureButtons();
         if(get() == null)
         {
           throw new CancellationException();
         }
-        setReady(false);
+
         data.setMeasureList(get());
         calculate();
-        setReady(true);
+        enableStarting();
       }
       catch (ExecutionException ex)
       {
@@ -1066,7 +1162,6 @@ public class Gui extends javax.swing.JFrame
       catch (CancellationException ex)
       {
         LOG.info("Measurement aborted");
-
       }
       catch (Exception ex)
       {
@@ -1187,11 +1282,11 @@ public class Gui extends javax.swing.JFrame
         {
           case 3:
             LOG.finest("entering level 3");
-            //data.setPower(null);
-            //data.setTorque(null);
+
+            series1.clear();
+            series2.clear();
+
             calculate();
-//            series1.clear();
-//            series2.clear();
 
           case 2:
             LOG.finest("entering level 2");
@@ -1264,7 +1359,7 @@ public class Gui extends javax.swing.JFrame
     vehicleset.setVisible(true);
 
     //Einstellungen übernehmen
-    if(vehicleset.isSettingsChanged())
+    if(vehicleset.isConfirmed())
     {
       //TAKT
       if(data.isTwoStroke() != vehicleset.isTwoStroke())
@@ -1314,7 +1409,7 @@ public class Gui extends javax.swing.JFrame
       jComboBoxPort.addItem(availablePort);
     }
   }
-  
+
   /**
    * Converts the given series to PS
    *
@@ -1422,7 +1517,7 @@ public class Gui extends javax.swing.JFrame
   }
 
   /**
-   * converts motorRpm field to two stroke. divides by 2
+   * converts measureList to two stroke. divides by 2
    */
   private void convertToTwoStroke()
   {
@@ -1436,7 +1531,7 @@ public class Gui extends javax.swing.JFrame
   }
 
   /**
-   * converts motorRpm field to four stroke. multiplies with 2
+   * converts MeasureList to four stroke. multiplies with 2
    */
   private void convertToFourStroke()
   {
@@ -1455,31 +1550,33 @@ public class Gui extends javax.swing.JFrame
 //    System.out.println("getMAxRPMToDo!!");
 //    return 1;
 //  }
-  private int getMaxRPM (ArrayList<Double> aL)
+  private int getMaxRPM(ArrayList<Double> aL)
   {
-    int valMax=0;
+    int valMax = 0;
     int i;
-    for(i=0; i<aL.size();i++)
+    for(i = 0; i < aL.size(); i++)
     {
-      if(aL.get(i)>aL.get(valMax))
-        valMax=i;
+      if(aL.get(i) > aL.get(valMax))
+        valMax = i;
     }
     return valMax;
   }
-  
+
   private ArrayList<Double> filterValuesOrder(ArrayList<Double> aL, double smoothing, int order)
   {
-    for(int i=0;i<order;i++)
-      aL= filterValues(aL,smoothing);
-    
+    for(int i = 0; i < order; i++)
+    {
+      aL = filterValues(aL, smoothing);
+    }
+
     return aL;
   }
-  
+
   private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
   {
     ArrayList<Double> smoothedValues = new ArrayList<>();
     smoothedValues.add(aL.get(0));
-    for(int i = 0; i < aL.size()-1; i++)
+    for(int i = 0; i < aL.size() - 1; i++)
     {
       smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
     }
@@ -1491,7 +1588,7 @@ public class Gui extends javax.swing.JFrame
   /**
    * calculates torque and power with wheelRpm
    */
-  private void calculate ()
+  private void calculate()
   {
     System.out.println("calculating...");
     //Winkelgeschw. = (Pi/180) * Umdr.
@@ -1501,77 +1598,75 @@ public class Gui extends javax.swing.JFrame
     double inertia = data.getInertia();
     double vmax = 0; //in kmh
     double n;
-    
+
     ArrayList<Double> trq = new ArrayList<>();
     ArrayList<Double> trqSchl = new ArrayList<>();
     ArrayList<Double> pwr = new ArrayList<>();
     ArrayList<Double> rpm = new ArrayList<>();
     ArrayList<Double> time = new ArrayList<>();
-    
+
     ArrayList<Double> alpha = new ArrayList<>();
     ArrayList<Double> omega = new ArrayList<>();
-    
-    
 
-
-    for (int i = 0; i < list.size() - 1; i++)
+    for(int i = 0; i < list.size() - 1; i++)
     {
-        omega.add(list.get(i).getWdz());
-        rpm.add(list.get(i).getMdz());
-        time.add(list.get(i).getTime());
-    }    
-    
-    rpm=filterValuesOrder(rpm,0.09,3); //passt!
-    omega= filterValuesOrder(omega, 0.09,3); //passt!
-    
-    for (int i = 0; i < omega.size(); i++)
-    {
-       if (omega.get(i)>vmax)
-          vmax=(omega.get(i))*0.175*3.6; //richtiges Pi!!
+      omega.add(list.get(i).getWdz());
+      rpm.add(list.get(i).getMdz());
+      time.add(list.get(i).getTime());
     }
-    
-    n= ((omega.get(30)/(rpm.get(30)/60*2*3.14))+(omega.get(200)/(rpm.get(200)/60*2*3.14)))/2; //richtiges PI ergänzen!
-    
-    for (int i = 0; i < omega.size() - 1; i++)
+
+    rpm = filterValuesOrder(rpm, 0.09, 3); //passt!
+    omega = filterValuesOrder(omega, 0.09, 3); //passt!
+
+    for(int i = 0; i < omega.size(); i++)
     {
-      alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i+1)-time.get(i)));
-    }    
-    alpha = filterValuesOrder(alpha,0.09 ,3); //passt!
-    
+      if(omega.get(i) > vmax)
+        vmax = (omega.get(i)) * 0.175 * 3.6; //richtiges Pi!!
+    }
+
+    n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(200) / (rpm.get(200) / 60 * 2 * 3.14))) / 2; //richtiges PI ergänzen!
+
+    for(int i = 0; i < omega.size() - 1; i++)
+    {
+      alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
+    }
+    alpha = filterValuesOrder(alpha, 0.09, 3); //passt!
+
     double factor;
     if(data.getPowerunit().equals("PS"))
       factor = 1.36;
     else
       factor = 1;
-    
-    for (int i = 0; i < alpha.size(); i++)
-    {   
-      trq.add(alpha.get(i) * inertia*n);  //M=dOmega/dt * J
-      
-      pwr.add((trq.get(i)*((rpm.get(i)/60)*6.28)/1000*factor));//richtiges PI!!    
-    }  
-    
-   trqSchl=new ArrayList<Double> (trq.subList(getMaxRPM(rpm),trq.size())); //Schleppleistung zu Radleistung addieren!! Ist bisher nicht gemacht!
-    //Dass i Drehzahlabfall und ka negative Beschleunigung hab kann wegn Auskuppln sein und weil ma weniger Beschleunigungswerte hat als Drehzahl!
-    for (int i = 0; i < trq.size()-1; i++)
+
+    for(int i = 0; i < alpha.size(); i++)
     {
-      if(i==getMaxRPM(rpm)) 
+      trq.add(alpha.get(i) * inertia * n);  //M=dOmega/dt * J
+
+      pwr.add((trq.get(i) * ((rpm.get(i) / 60) * 6.28) / 1000 * factor));//richtiges PI!!    
+    }
+
+    trqSchl = new ArrayList<Double>(trq.subList(getMaxRPM(rpm), trq.size())); //Schleppleistung zu Radleistung addieren!! Ist bisher nicht gemacht!
+    //Dass i Drehzahlabfall und ka negative Beschleunigung hab kann wegn Auskuppln sein und weil ma weniger Beschleunigungswerte hat als Drehzahl!
+    for(int i = 0; i < trq.size() - 1; i++)
+    {
+      if(i == getMaxRPM(rpm))
         break;
+      
+      
       boolean roller = false; //Achsenbeschriftung richtig machen, Grafisch einstellen ob Rolle
       if(!roller)    //einstellmöglichkeit!!    
-      { 
+      {
         series1.add(rpm.get(i), pwr.get(i));
         series2.add(rpm.get(i), trq.get(i));
       }
       else
       {
-        series1.add(omega.get(i)*0.175*3.6, pwr.get(i));
-        series2.add(omega.get(i)*0.175*3.6, trq.get(i));      
-              
-      }
-      
-    }
+        series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
+        series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
 
+      }
+
+    }
 
     dataset1.removeSeries(seriesPower);
     seriesPower = correctByFactor(series1, data.getCorrectionPower());
@@ -1581,18 +1676,16 @@ public class Gui extends javax.swing.JFrame
     seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
-     data.setVmax(vmax);
+    data.setVmax(vmax);
     chart.fireChartChanged();
     updateChartLabels();
 
     System.out.println("done calculating");
 
 //    series1.add(x,y);
-
 //    data.setTorque(torque);
 //    data.setPower(power);
 //
-    
   }
 
   /**

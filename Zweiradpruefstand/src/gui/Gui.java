@@ -867,6 +867,7 @@ public class Gui extends javax.swing.JFrame
   /*
    * ---PUBLIC METHODS------------------------------------------
    */
+  
   /**
    * Saves the config. Then shuts down the program.
    */
@@ -895,6 +896,10 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
+  /*
+   * ---PRIVATE METHODS------------------------------------------
+   */
+  
   /**
    *
    * enables:
@@ -910,7 +915,7 @@ public class Gui extends javax.swing.JFrame
    * </ul>
    *
    */
-  public void enableCancelling()
+  private void enableCancelling()
   {
     jStop.setEnabled(true);
     jCancel.setEnabled(true);
@@ -928,7 +933,7 @@ public class Gui extends javax.swing.JFrame
    * <li>jCancel
    * </ul>
    */
-  public void disableMeasureButtons()
+  private void disableMeasureButtons()
   {
     jStop.setEnabled(false);
     jCancel.setEnabled(false);
@@ -950,7 +955,7 @@ public class Gui extends javax.swing.JFrame
    * </ul>
    *
    */
-  public void enableStarting()
+  private void enableStarting()
   {
     jStart.setEnabled(true);
     jRefresh.setEnabled(true);
@@ -965,7 +970,7 @@ public class Gui extends javax.swing.JFrame
    * @param title   The Title of the Frame
    * @param message The displayed message
    */
-  public void showErrorMessage(String title, String message)
+  private void showErrorMessage(String title, String message)
   {
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
@@ -1586,7 +1591,9 @@ public class Gui extends javax.swing.JFrame
   }
 
   /**
-   * calculates torque and power with wheelRpm
+   * calculates Power and Torque and updates the Chart
+   * 
+   * @author Robert Tinauer
    */
   private void calculate()
   {
@@ -1627,7 +1634,7 @@ public class Gui extends javax.swing.JFrame
         vmax = (omega.get(i)) * 0.175 * 3.6; //richtiges Pi!!
     }
 
-    n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(200) / (rpm.get(200) / 60 * 2 * 3.14))) / 2; //richtiges PI ergänzen!
+    n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * Math.PI)) + (omega.get(200) / (rpm.get(200) / 60 * 2 * 3.14))) / 2; //richtiges PI ergänzen!
 
     for(int i = 0; i < omega.size() - 1; i++)
     {

@@ -79,8 +79,8 @@ public class Communication
   /**
    *
    * @return The captured and already checked Frame Data
-   * @throws CommunicationException
-   * @throws TimeoutException
+   * @throws CommunicationException if an error occured
+   * @throws TimeoutException if a Timeout occured
    */
   public String[] getFrameData() throws CommunicationException, TimeoutException
   {
@@ -105,7 +105,7 @@ public class Communication
 
   /**
    *
-   * @param timeout
+   * @param timeout 
    * @param unit
    * @return
    * @throws CommunicationException

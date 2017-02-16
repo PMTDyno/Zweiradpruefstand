@@ -1691,10 +1691,12 @@ private int getValMaxIndex (ArrayList<Double> aL)
         }
       }
     }
-    catch (Exception ex)
+    catch (IndexOutOfBoundsException ex)
     {
-      System.out.println("keine Schleppleistung");
       schleppEnable = false;
+       LOG.severe(ex.getMessage());
+          showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
+      
     }
    
     //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist

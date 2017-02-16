@@ -70,15 +70,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
 
       list.add(getNextDatapoint());
 
+      Thread.sleep(data.getPeriodTimeMs());
+
       while(true)
       {
 
-        Thread.sleep(data.getPeriodTimeMs());
-
         com.sendFrame(Communication.Request.MEASURE);
         list.add(getNextDatapoint());
-        
-        
 
         if(isCancelled())
         {
@@ -88,11 +86,31 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
         if(stopRequest.get())
         {
           LOG.finest("Stop Request triggered!");
+
+          //converting time
+          for(Datapoint datapoint : list)
+          {
+            //in seconds
+            datapoint.setWdz(datapoint.getWdz() / 1000000);
+            datapoint.setMdz(datapoint.getMdz() / 1000000);
+            datapoint.setTime(datapoint.getTime() / 1000000);
+
+            //seconds to rad/s
+            datapoint.setWdz(1 / (datapoint.getWdz() * 26) * 2 * Math.PI);
+
+            //seconds to U/min
+            if(data.isTwoStroke())
+              datapoint.setMdz(1 / datapoint.getWdz() * 60);
+            else
+              datapoint.setMdz((1 / datapoint.getWdz() * 60) * 2);
+
+          }
+
           return list;
         }
-        
+
         Thread.sleep(data.getPeriodTimeMs());
-        
+
       }
 
     }

@@ -867,7 +867,6 @@ public class Gui extends javax.swing.JFrame
   /*
    * ---PUBLIC METHODS------------------------------------------
    */
-  
   /**
    * Saves the config. Then shuts down the program.
    */
@@ -899,7 +898,6 @@ public class Gui extends javax.swing.JFrame
   /*
    * ---PRIVATE METHODS------------------------------------------
    */
-  
   /**
    *
    * enables:
@@ -1079,7 +1077,7 @@ public class Gui extends javax.swing.JFrame
     {
 
       startVehicleSet();
-      
+
       File file;
 
       JFileChooser chooser = new JFileChooser();
@@ -1094,17 +1092,17 @@ public class Gui extends javax.swing.JFrame
         {
           file = new File(file.getPath() + ".png");
         }
-        
+
         //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
         //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
         ReadCSV fr = new ReadCSV(file);
-        
+
         data.setMeasureList(fr.read());
         System.out.println("Daten eingelesen");
-        
+
         series1.clear();
         series2.clear();
-        
+
         calculate();
       }
     }
@@ -1376,7 +1374,7 @@ public class Gui extends javax.swing.JFrame
       //MEASMDZ
       if(data.isMeasMDZ() != vehicleset.isMeasMDZ())
         data.setMeasMDZ(vehicleset.isMeasMDZ());
-      
+
       //VEHICLENAME
       data.setVehicle(vehicleset.getVehicleName());
 
@@ -1527,89 +1525,59 @@ public class Gui extends javax.swing.JFrame
     chart.fireChartChanged();
   }
 
-  /**
-   * converts measureList to two stroke. divides by 2
-   */
-  private void convertToTwoStroke()
-  {
-    for(int i = 0; i < data.getMeasureList().size(); i++)
-    {
-      data.getMeasureList().set(i,
-                                new Datapoint(data.getMeasureList().get(i).getWdz(),
-                                              data.getMeasureList().get(i).getMdz() / 2,
-                                              data.getMeasureList().get(i).getTime()));
-    }
-  }
-
-  /**
-   * converts MeasureList to four stroke. multiplies with 2
-   */
-  private void convertToFourStroke()
-  {
-    for(int i = 0; i < data.getMeasureList().size(); i++)
-    {
-      data.getMeasureList().set(i,
-                                new Datapoint(data.getMeasureList().get(i).getWdz(),
-                                              data.getMeasureList().get(i).getMdz() * 2,
-                                              data.getMeasureList().get(i).getTime()));
-    }
-  }
-
-private int getValMaxIndex (ArrayList<Double> aL)
+  private int getValMaxIndex(ArrayList<Double> aL)
   {
     int valMax = 0;
     int i;
-    for (i = 0; i < aL.size(); i++)
+    for(i = 0; i < aL.size(); i++)
     {
-      if (aL.get(i) > aL.get(valMax))
+      if(aL.get(i) > aL.get(valMax))
       {
         valMax = i;
       }
     }
     return valMax;
   }
- 
- 
-  private ArrayList<Double> filterValuesOrder (ArrayList<Double> aL, double smoothing, int order)
+
+  private ArrayList<Double> filterValuesOrder(ArrayList<Double> aL, double smoothing, int order)
   {
-    for (int i = 0; i < order; i++)
+    for(int i = 0; i < order; i++)
     {
       aL = filterValues(aL, smoothing);
     }
- 
+
     return aL;
   }
- 
- 
-  private ArrayList<Double> filterValues (ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
+
+  private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
   {
     ArrayList<Double> smoothedValues = new ArrayList<>();
     smoothedValues.add(aL.get(0));
-    for (int i = 0; i < aL.size() - 1; i++)
+    for(int i = 0; i < aL.size() - 1; i++)
     {
 //      System.out.println(i);
       smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
     }
- 
+
     return smoothedValues;
- 
+
   }
 
   /**
    * calculates Power and Torque and updates the Chart
-   * 
+   *
    * @author Robert Tinauer
    */
-  private void calculate ()
+  private void calculate()
   {
     //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
     //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
-   
+
     System.out.println("calculating...");
- 
+
     double inertia = data.getInertia();
     double n; //uebersetzungsverhaeltnis rolle zu motor
-   
+
     ArrayList<Double> trq = new ArrayList<>();
     ArrayList<Double> trqSchl = new ArrayList<>(); //schleppmoment
     ArrayList<Double> pwr = new ArrayList<>();
@@ -1618,36 +1586,34 @@ private int getValMaxIndex (ArrayList<Double> aL)
     ArrayList<Double> alpha = new ArrayList<>();
     ArrayList<Double> omega = new ArrayList<>();
     ArrayList<Double> omegaSchl = new ArrayList<>();
-   
+
     boolean schleppEnable = true;
-    
-   
- 
-    double tempFactor=(1013/data.getPressure())*(((273+data.getTemperature())/293)); //Korrekturfaktor temp
- 
-    for (int i = 0; i < data.measureList.size() - 1; i++)
+
+    double tempFactor = (1013 / data.getPressure()) * (((273 + data.getTemperature()) / 293)); //Korrekturfaktor temp
+
+    for(int i = 0; i < data.measureList.size() - 1; i++)
     {
       omega.add(data.measureList.get(i).getWdz());
       rpm.add(data.measureList.get(i).getMdz());
       time.add(data.measureList.get(i).getTime());
     }
     omega = filterValuesOrder(omega, 0.09, 3);
-   
+
     //VMAX ermitteln
-     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
- 
+    data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
+
     //alpha berechnen
-    for (int i = 0; i < omega.size() - 1; i++)
+    for(int i = 0; i < omega.size() - 1; i++)
     {
       alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
     }
     alpha = filterValuesOrder(alpha, 0.09, 3); //passt!
- 
+
     //faktor fuer berechnungseinheit
     double factor;
-    
+
     System.out.println(data.getPowerunit());
-    if (data.getPowerunit().contains("PS"))
+    if(data.getPowerunit().contains("PS"))
     {
       System.out.println("PS");
       factor = 1.36;
@@ -1657,13 +1623,13 @@ private int getValMaxIndex (ArrayList<Double> aL)
       System.out.println("kW");
       factor = 1;
     }
- 
+
     //drehmoment roller
-    if (!data.isMeasMDZ())
+    if(!data.isMeasMDZ())
     {
-      for (int i = 0; i < alpha.size(); i++)
+      for(int i = 0; i < alpha.size(); i++)
       {
-        trq.add(alpha.get(i) * inertia*tempFactor);  //M=dOmega/dt * J
+        trq.add(alpha.get(i) * inertia * tempFactor);  //M=dOmega/dt * J
       }
     }
     else//drehmoment kein roller
@@ -1674,26 +1640,26 @@ private int getValMaxIndex (ArrayList<Double> aL)
       {
         n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(10) / (rpm.get(10) / 60 * 2 * Math.PI))) / 2;
       }
-      catch(IndexOutOfBoundsException ex)
+      catch (IndexOutOfBoundsException ex)
       {
         showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
         return;
       }
-    
-      for (int i = 0; i < alpha.size(); i++)
+
+      for(int i = 0; i < alpha.size(); i++)
       {
-         //moment
-        trq.add(alpha.get(i) * inertia *n*tempFactor);  //M=dOmega/dt * J
+        //moment
+        trq.add(alpha.get(i) * inertia * n * tempFactor);  //M=dOmega/dt * J
       }
     }
-   
+
     //index ermitteln, ab dem moment negativ ist und somit schleppmoment vorhanden ist
     int limitSchl = 0;
     try
     {
-      for (limitSchl = getValMaxIndex(rpm); true; limitSchl++)
+      for(limitSchl = getValMaxIndex(rpm); true; limitSchl++)
       {
-        if (trq.get(limitSchl) < 0)
+        if(trq.get(limitSchl) < 0)
         {
           break;
         }
@@ -1702,25 +1668,25 @@ private int getValMaxIndex (ArrayList<Double> aL)
     catch (IndexOutOfBoundsException ex)
     {
       schleppEnable = false;
-       LOG.severe(ex.getMessage());
-          showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
-      
+      LOG.severe(ex.getMessage());
+      showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
+
     }
-   
+
     //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
-    if (schleppEnable)
+    if(schleppEnable)
     {
       trqSchl = new ArrayList<Double>(trq.subList(limitSchl, trq.size()));
       omegaSchl = new ArrayList<Double>(omega.subList(limitSchl, omega.size()));
       ArrayList<Double> timeSchl = new ArrayList<Double>(time.subList(limitSchl, time.size()));
- 
-      for (int i2 = 0; i2 < limitSchl; i2++)
+
+      for(int i2 = 0; i2 < limitSchl; i2++)
       {
-        for (int i = 0; i < trqSchl.size(); i++)
+        for(int i = 0; i < trqSchl.size(); i++)
         {
-          if (omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
+          if(omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
           {
-            if (trqSchl.get(i) > 0)
+            if(trqSchl.get(i) > 0)
             {
               break;
             }
@@ -1729,35 +1695,34 @@ private int getValMaxIndex (ArrayList<Double> aL)
           }
         }
       }
- 
+
       trq = filterValuesOrder(trq, 0.1, 2);
     }
-   
+
     //leistung berechnen
- 
-    if (!data.isMeasMDZ())
+    if(!data.isMeasMDZ())
     {
-      for (int i = 0; i < trq.size(); i++)
+      for(int i = 0; i < trq.size(); i++)
       {
         pwr.add((trq.get(i) * omega.get(i) / 1000) * factor);
       }
     }
     else
     {
-      for (int i = 0; i < trq.size(); i++)
+      for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000 )* factor);
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor);
       }
     }
- 
+
     series1.clear();
     series2.clear();
- 
-    if (!data.isMeasMDZ())
+
+    if(!data.isMeasMDZ())
     {
-      for (int i = 0; i < trq.size(); i++)
+      for(int i = 0; i < trq.size(); i++)
       {
-        if (i == getValMaxIndex(omega))
+        if(i == getValMaxIndex(omega))
         {
           break;
         }
@@ -1767,43 +1732,39 @@ private int getValMaxIndex (ArrayList<Double> aL)
     }
     else
     {
-      for (int i = 0; i < trq.size(); i++)
+      for(int i = 0; i < trq.size(); i++)
       {
-        if (i == getValMaxIndex(rpm))
+        if(i == getValMaxIndex(rpm))
         {
           break;
         }
- 
+
         series1.add(rpm.get(i), pwr.get(i));
         series2.add(rpm.get(i), trq.get(i));
- 
- 
+
       }
     }
- 
- 
+
     dataset1.removeSeries(seriesPower);
     seriesPower = correctByFactor(series1, data.getCorrectionPower());
     dataset1.addSeries(seriesPower);
- 
+
     dataset2.removeSeries(seriesTorque);
     seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
-    
+
     if(!data.isMeasMDZ())
       chart.getXYPlot().getDomainAxis().setLabel("Geschwindigkeit [km/h]");
     else
       chart.getXYPlot().getDomainAxis().setLabel("Motordrehzahl [U/m]");
-    
-    
+
     chart.fireChartChanged();
     updateChartLabels();
     System.out.println(pwr.get(getValMaxIndex(pwr)));
     System.out.println("done calculating");
- 
-  }
 
+  }
 
   /**
    * Sets the Port and tries to connect to the Device.<br>

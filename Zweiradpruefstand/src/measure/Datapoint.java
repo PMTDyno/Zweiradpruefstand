@@ -1,6 +1,5 @@
 package measure;
 
-
 /**
  *
  * @author levin
@@ -8,42 +7,53 @@ package measure;
 public class Datapoint
 {
 
-  private final double wdz, mdz, time;
+  private double wdz;
+  private double mdz;
+  private double time;
   //private final int time;
-
 
   /**
    *
-   * @param wdz Wellendrehzahl
-   * @param mdz Motordrehzahl
+   * @param wdz  Wellendrehzahl
+   * @param mdz  Motordrehzahl
    * @param time Zeitpunkt der Messung
    */
-  public Datapoint (double wdz, double mdz, double time)
+  public Datapoint(double wdz, double mdz, double time)
   {
     this.wdz = wdz;
     this.mdz = mdz;
     this.time = time;
   }
 
-
-  public double getWdz ()
+  public double getWdz()
   {
     return wdz;
   }
 
-
-  public double getMdz ()
+  public double getMdz()
   {
     return mdz;
   }
 
-
-  public double getTime ()
+  public double getTime()
   {
     return time;
   }
 
-  
+  public void setTime(double time)
+  {
+    this.time = time;
+  }
+
+  public void setWdz(double wdz)
+  {
+    this.wdz = wdz;
+  }
+
+  public void setMdz(double mdz)
+  {
+    this.mdz = mdz;
+  }
   
   
 

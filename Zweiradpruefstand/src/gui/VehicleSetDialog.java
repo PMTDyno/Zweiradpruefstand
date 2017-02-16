@@ -16,6 +16,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(VehicleSetDialog.class.getName());
 
+  private boolean measMDZ = false;
   private boolean confirmed = false;
   private boolean twoStroke;
   private String vehicleName;
@@ -327,6 +328,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
     return twoStroke;
   }
 
+  public boolean isMeasMDZ()
+  {
+    return measMDZ;
+  }
+
   /**
    * @return true if the settings have changed
    */
@@ -345,6 +351,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     //TAKT
     twoStroke = j2Takt.isSelected();
+
+    //MEASMDZ
+    measMDZ = jMeasMDZ.isSelected();
 
     //VEHICLENAME
     if(jVehicleName.getText().length() >= 25)

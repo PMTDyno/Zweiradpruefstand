@@ -36,8 +36,8 @@ public final class Data
 
   private double inertia = 3.7017;
   private double vmax;
-  private double temperature;
-  private double pressure;
+  private double temperature = 20;
+  private double pressure = 1013;
   private double correctionPower = 1.0;
   private double correctionTorque = 1.0;
   private double maxpower = 0.0;
@@ -56,6 +56,7 @@ public final class Data
   public ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private boolean twoStroke = true;
+  private boolean measMDZ = true;
 
   /*
    * ------------------------------------------------------------------------
@@ -71,6 +72,16 @@ public final class Data
     this.measureList = measureList;
   }
 
+  public boolean isMeasMDZ()
+  {
+    return measMDZ;
+  }
+
+  public void setMeasMDZ(boolean measMDZ)
+  {
+    this.measMDZ = measMDZ;
+  }
+  
   public String getFilePath()
   {
     return filePath;

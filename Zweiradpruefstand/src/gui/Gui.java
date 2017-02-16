@@ -1670,8 +1670,16 @@ private int getValMaxIndex (ArrayList<Double> aL)
     {
       rpm = filterValuesOrder(rpm, 0.09, 3);
       //uebersetzungsverhaeltnis:
-       n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(200) / (rpm.get(200) / 60 * 2 * Math.PI))) / 2;
-       
+      try
+      {
+        n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(10) / (rpm.get(10) / 60 * 2 * Math.PI))) / 2;
+      }
+      catch(IndexOutOfBoundsException ex)
+      {
+        showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
+        return;
+      }
+    
       for (int i = 0; i < alpha.size(); i++)
       {
          //moment

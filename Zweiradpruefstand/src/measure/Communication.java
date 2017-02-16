@@ -303,7 +303,7 @@ public class Communication
 
     double temperature = Double.parseDouble(data[0]);
     int humidity = Integer.parseInt(data[1]);
-    double pressure = Double.parseDouble(data[2]);
+    double pressure = Double.parseDouble(data[2]) / 100;
 
 //        System.out.println(temperature);
 //        System.out.println(humidity);

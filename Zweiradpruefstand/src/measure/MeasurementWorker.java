@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
-public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
+public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer>
 {
 
   private final Data data = Data.getInstance();
@@ -66,6 +66,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
     {
       Datapoint dp;
       double mdz;
+      int count = 0;
+      
       do
       {
 
@@ -88,7 +90,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
       LOG.fine("collecting data...");
       while(true)
       {
-
+        count++;
+        publish(count);
+        
         com.sendFrame(Communication.Request.MEASURE);
         list.add(getNextDatapoint());
 

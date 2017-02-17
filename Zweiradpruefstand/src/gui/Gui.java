@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -48,17 +49,19 @@ import org.jfree.ui.TextAnchor;
 public class Gui extends javax.swing.JFrame
 {
 
+  private static final String VERSION = "0.9";
+
+  private final LoadingFrame loading = new LoadingFrame();
+
   private final ProgSetDialog progset;
   private final VehicleSetDialog vehicleset;
-  private Communication com = new Communication();
+  private final Communication com = new Communication();
   private ChartPanel chartPanel;
   private final Data data = Data.getInstance();
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
-
-  private static final String VERSION = "0.9";
 
   private final Font font = new Font("sansserif", Font.BOLD, 15);
   private final ValueMarker maxPowerMarker = new ValueMarker(data.getMaxpower());
@@ -110,7 +113,7 @@ public class Gui extends javax.swing.JFrame
 
     progset = new ProgSetDialog(this, true);
     vehicleset = new VehicleSetDialog(this, true);
-
+    loading.init(this);
     refreshPorts();
 
     initChart();
@@ -658,17 +661,12 @@ public class Gui extends javax.swing.JFrame
 
     private void jStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStopActionPerformed
     {//GEN-HEADEREND:event_jStopActionPerformed
-      disableMeasureButtons();
-      worker.stop();
+      finishMeasurement();
     }//GEN-LAST:event_jStopActionPerformed
 
     private void jCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jCancelActionPerformed
     {//GEN-HEADEREND:event_jCancelActionPerformed
-      if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
-      {
-        disableMeasureButtons();
-        worker.cancel(true);
-      }
+      abortMeasurement();
     }//GEN-LAST:event_jCancelActionPerformed
 
     private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
@@ -707,7 +705,7 @@ public class Gui extends javax.swing.JFrame
       dispose();
     }//GEN-LAST:event_jMenuCloseActionPerformed
 
-  int easterEgg = 0;
+  private int easterEgg = 0;
     private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
     {//GEN-HEADEREND:event_jLabelDateMouseClicked
       easterEgg++;
@@ -726,10 +724,35 @@ public class Gui extends javax.swing.JFrame
 
   private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
   {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
-    LoadingFrame loading = new LoadingFrame();
     loading.setLoading(true);
+
+    new Thread(new Runnable()
+    {
+
+      @Override
+      public void run()
+      {
+        int tmp = 0;
+        while(tmp < 1000)
+        {
+          System.out.println(tmp);
+          tmp++;
+          loading.setStatus(String.valueOf(tmp));
+          try
+          {
+            Thread.sleep(data.getPeriodTimeMs());
+          }
+          catch (InterruptedException ex)
+          {
+            java.util.logging.Logger.getLogger(Gui.class.getName()).log(Level.SEVERE, null, ex);
+          }
+        }
+      }
+
+    }).start();
+
     loading.setVisible(true);
-    
+
   }//GEN-LAST:event_jMenuItem1ActionPerformed
 
   /**
@@ -884,6 +907,18 @@ public class Gui extends javax.swing.JFrame
       LOG.info("End of Application");
       System.exit(0);
     }
+  }
+
+  public void abortMeasurement()
+  {
+    disableMeasureButtons();
+//    worker.cancel(true);
+  }
+
+  public void finishMeasurement()
+  {
+    disableMeasureButtons();
+    worker.stop();
   }
 
   /*
@@ -1042,7 +1077,7 @@ public class Gui extends javax.swing.JFrame
     chart.addSubtitle(eco);
 
     jChartPanel.add(chartPanel);
-    
+
     chart.fireChartChanged();
 
     //jchartframe.setContentPane(chartPanel);
@@ -1055,13 +1090,18 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
+    worker = new Measure(com);
+    LoadingFrame loading = new LoadingFrame();
+    loading.init(this);
+
     startVehicleSet();
 
-    jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/loading48.gif")));
     enableCancelling();
 
-    worker = new Measure(com);
+    loading.setVisible(true);
+
     worker.execute();
+    loading.setLoading(true);
   }
 
   private void openMeasureFile()
@@ -1115,6 +1155,15 @@ public class Gui extends javax.swing.JFrame
     public Measure(Communication com)
     {
       super(com);
+    }
+
+    @Override
+    protected void process(List<Integer> chunks)
+    {
+      for(Integer chunk : chunks)
+      {
+        loading.setStatus(String.valueOf(chunk));
+      }
     }
 
     @Override
@@ -1510,7 +1559,7 @@ public class Gui extends javax.swing.JFrame
     maxTorqueMarker.setLabel(strMaxTorque);
     chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
     seriesPower.setKey("Leistung");
-    
+
     chart.fireChartChanged();
   }
 

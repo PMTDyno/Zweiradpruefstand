@@ -6,14 +6,16 @@
 package gui;
 
 import java.awt.Dimension;
+import javax.swing.JOptionPane;
 
 /**
  *
- * @author Messing Levin <meslem12@htl-kaindorf.ac.at>
+ * @author Messing Levin (meslem12@htl-kaindorf.ac.at)
  */
 public class LoadingFrame extends javax.swing.JFrame
 {
 
+  Gui gui;
   /**
    * Creates new form LoadingFrame
    */
@@ -26,6 +28,11 @@ public class LoadingFrame extends javax.swing.JFrame
     setLocationRelativeTo(null);
     initComponents();
   }
+  
+  public void init(Gui gui)
+  {
+    this.gui = gui;
+  }
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -36,12 +43,15 @@ public class LoadingFrame extends javax.swing.JFrame
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
+    java.awt.GridBagConstraints gridBagConstraints;
 
     jPanel2 = new javax.swing.JPanel();
     jButton1 = new javax.swing.JButton();
     jButton3 = new javax.swing.JButton();
     jPanel1 = new javax.swing.JPanel();
     jProgressBar = new javax.swing.JProgressBar();
+    jLabelStatus = new javax.swing.JLabel();
+    jLabel = new javax.swing.JLabel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setResizable(false);
@@ -72,7 +82,23 @@ public class LoadingFrame extends javax.swing.JFrame
 
     jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
     jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
-    jPanel1.add(jProgressBar, new java.awt.GridBagConstraints());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridwidth = 2;
+    jPanel1.add(jProgressBar, gridBagConstraints);
+
+    jLabelStatus.setText("0");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    jPanel1.add(jLabelStatus, gridBagConstraints);
+
+    jLabel.setText("Anzahl der Messpunkte: ");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    jPanel1.add(jLabel, gridBagConstraints);
 
     getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -143,6 +169,8 @@ public class LoadingFrame extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton3;
+  private javax.swing.JLabel jLabel;
+  private javax.swing.JLabel jLabelStatus;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JProgressBar jProgressBar;
@@ -150,20 +178,27 @@ public class LoadingFrame extends javax.swing.JFrame
 
   private void abort()
   {
-    
-    dispose();
+    if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
+    {
+      gui.abortMeasurement();
+      dispose();
+    }
   }
 
   private void finish()
   {
-
+    gui.finishMeasurement();
+    dispose();
   }
 
   public void setLoading(boolean b)
   {
-
     jProgressBar.setIndeterminate(b);
-
+  }
+  
+  public void setStatus(String status)
+  {
+    jLabelStatus.setText(status);
   }
 
 }

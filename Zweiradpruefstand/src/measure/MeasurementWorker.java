@@ -118,9 +118,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
             //seconds to U/min
             if(data.isTwoStroke())
-              datapoint.setMdz(1 / datapoint.getWdz() * 60);
+              datapoint.setMdz(1 / datapoint.getMdz()* 60);
             else
-              datapoint.setMdz((1 / datapoint.getWdz() * 60) * 2);
+              datapoint.setMdz((1 / datapoint.getMdz()* 60) * 2);
 
           }
 

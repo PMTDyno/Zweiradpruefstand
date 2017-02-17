@@ -73,7 +73,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
         com.sendFrame(Communication.Request.START);
         dp = getNextDatapoint();
-        list.add(getNextDatapoint());
 
         //converting to U/min
         mdz = dp.getMdz() / 1000000;

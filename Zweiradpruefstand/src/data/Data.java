@@ -35,14 +35,15 @@ public final class Data
   private String powerunit = "PS";
 
   private double inertia = 3.7017;
-  private double vmax;
+  private double vmax = 0;
   private double temperature = 20;
   private double pressure = 1013;
   private double correctionPower = 1.0;
   private double correctionTorque = 1.0;
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
-
+  
+  private int startMdz = 2000;
   private int pngWidth = 800;
   private int pngHeight = 600;
   private int windowWidth = 1200;
@@ -50,7 +51,6 @@ public final class Data
   private int windowRelativeX = 0;
   private int windowRelativeY = 0;
   private int periodTimeMs = 40;
-  private int maxMeasureTimeSec = 60;
   private int humidity;
 
   public ArrayList<Datapoint> measureList = new ArrayList<>();
@@ -72,6 +72,16 @@ public final class Data
     this.measureList = measureList;
   }
 
+  public int getStartMdz()
+  {
+    return startMdz;
+  }
+
+  public void setStartMdz(int startMdz)
+  {
+    this.startMdz = startMdz;
+  }
+  
   public boolean isMeasMDZ()
   {
     return measMDZ;
@@ -250,16 +260,6 @@ public final class Data
   public void setPeriodTimeMs(int periodTimeMs)
   {
     this.periodTimeMs = periodTimeMs;
-  }
-
-  public int getMaxMeasureTimeSec()
-  {
-    return maxMeasureTimeSec;
-  }
-
-  public void setMaxMeasureTimeSec(int maxMeasureTimeSec)
-  {
-    this.maxMeasureTimeSec = maxMeasureTimeSec;
   }
 
   public int getHumidity()

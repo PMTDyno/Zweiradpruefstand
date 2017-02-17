@@ -28,7 +28,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     private double correctionTorque = 1.0;
     private double inertia = 3.7017;
     private int periodTimeMs = 40;
-    private int maxMeasureTimeSec = 60;
+    private int startMdz = 2000;
 
     /**
      * Creates the frame with the given values
@@ -55,8 +55,8 @@ public class ProgSetDialog extends javax.swing.JDialog
         this.correctionPower = data.getCorrectionPower();
         this.correctionTorque = data.getCorrectionTorque();
         this.periodTimeMs = data.getPeriodTimeMs();
-        this.maxMeasureTimeSec = data.getMaxMeasureTimeSec();
-
+        this.startMdz = data.getStartMdz();
+        
         switch (data.getPngWidth())
         {
             case 640:
@@ -155,11 +155,11 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanel8 = new javax.swing.JPanel();
     jPanel6 = new javax.swing.JPanel();
     jLabel9 = new javax.swing.JLabel();
-    jLabel10 = new javax.swing.JLabel();
     jLabel11 = new javax.swing.JLabel();
     jSpinPeriod = new javax.swing.JSpinner();
-    jSpinMaxMeasureTime = new javax.swing.JSpinner();
-    jLabel12 = new javax.swing.JLabel();
+    jLabel14 = new javax.swing.JLabel();
+    jLabel10 = new javax.swing.JLabel();
+    jSpinMdz = new javax.swing.JSpinner();
     jLabel13 = new javax.swing.JLabel();
     jPanel3 = new javax.swing.JPanel();
     jPanel2 = new javax.swing.JPanel();
@@ -347,7 +347,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 3);
     jPanel7.add(jTextInertia, gridBagConstraints);
 
-    jLabel8.setText("kgm2");
+    jLabel8.setText("kgm²");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 3;
@@ -370,17 +370,10 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
     jPanel6.add(jLabel9, gridBagConstraints);
 
-    jLabel10.setText("Zeitintervall");
+    jLabel11.setText("Zeitintervall");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    jPanel6.add(jLabel10, gridBagConstraints);
-
-    jLabel11.setText("maximale Messdauer");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanel6.add(jLabel11, gridBagConstraints);
 
@@ -390,30 +383,37 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
+    gridBagConstraints.insets = new java.awt.Insets(4, 5, 6, 0);
     jPanel6.add(jSpinPeriod, gridBagConstraints);
 
-    jSpinMaxMeasureTime.setModel(new javax.swing.SpinnerNumberModel(60, 1, 300, 1));
-    jSpinMaxMeasureTime.setToolTipText("setzt die maximal zulässige Messdauer");
+    jLabel14.setText("ms");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanel6.add(jLabel14, gridBagConstraints);
+
+    jLabel10.setText("Startmotordrehzahl");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel6.add(jLabel10, gridBagConstraints);
+
+    jSpinMdz.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
+    jSpinMdz.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-    jPanel6.add(jSpinMaxMeasureTime, gridBagConstraints);
+    gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
+    jPanel6.add(jSpinMdz, gridBagConstraints);
 
-    jLabel12.setText("sek");
+    jLabel13.setText("U/min");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(2, 3, 0, 0);
-    jPanel6.add(jLabel12, gridBagConstraints);
-
-    jLabel13.setText("ms");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanel6.add(jLabel13, gridBagConstraints);
@@ -572,7 +572,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
             //SERIALPORT
             jSpinPeriod.setValue(periodTimeMs);
-            jSpinMaxMeasureTime.setValue(maxMeasureTimeSec);
+            jSpinMdz.setValue(startMdz);
 
         }
 
@@ -665,21 +665,14 @@ public class ProgSetDialog extends javax.swing.JDialog
     }
 
     /**
-     * @return the period between single measurement datas
+     * @return the period between datapoint captures
      */
     public int getPeriodTimeMs()
     {
         return periodTimeMs;
     }
 
-    /**
-     * @return The maximum measurement time in seconds
-     */
-    public int getMaxMeasureTimeSec()
-    {
-        return maxMeasureTimeSec;
-    }
-
+    
     
     /*---PRIVATE METHODS-------------------------------------*/
     /**
@@ -793,8 +786,8 @@ public class ProgSetDialog extends javax.swing.JDialog
 
         //SERIALPORT
         periodTimeMs = (int) jSpinPeriod.getValue();
-        maxMeasureTimeSec = (int) jSpinMaxMeasureTime.getValue();
-
+        startMdz = (int) jSpinMdz.getValue();
+        
         if(!error)
         {
             settingsChanged = true;
@@ -814,8 +807,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
   private javax.swing.JLabel jLabel11;
-  private javax.swing.JLabel jLabel12;
   private javax.swing.JLabel jLabel13;
+  private javax.swing.JLabel jLabel14;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
   private javax.swing.JLabel jLabel4;
@@ -837,7 +830,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanel9;
   private javax.swing.JSpinner jSpinCorrectPower;
   private javax.swing.JSpinner jSpinCorrectTorque;
-  private javax.swing.JSpinner jSpinMaxMeasureTime;
+  private javax.swing.JSpinner jSpinMdz;
   private javax.swing.JSpinner jSpinPeriod;
   private javax.swing.JTextField jTextInertia;
   private javax.swing.JTextField jWidth;

@@ -24,7 +24,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import measure.Communication;
 import measure.CommunicationException;
-import measure.Datapoint;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -65,8 +64,8 @@ public class Gui extends javax.swing.JFrame
   private final ValueMarker maxPowerMarker = new ValueMarker(data.getMaxpower());
   private final ValueMarker maxTorqueMarker = new ValueMarker(data.getMaxtorque());
 
-  private XYSeries seriesTorque = new XYSeries("Drehmoment [Nm]");
-  private XYSeries seriesPower = new XYSeries("Leistung [PS]");
+  private XYSeries seriesTorque = new XYSeries("Drehmoment");
+  private XYSeries seriesPower = new XYSeries("Leistung");
   private XYSeries series1 = new XYSeries("temp1 series");
   private XYSeries series2 = new XYSeries("temp2 series");
   private XYSeriesCollection dataset1 = new XYSeriesCollection();
@@ -141,12 +140,6 @@ public class Gui extends javax.swing.JFrame
     jLabelGuideMeasure = new javax.swing.JLabel();
     jPanelSettings = new javax.swing.JPanel();
     jLabelGuideSettings = new javax.swing.JLabel();
-    jFrameLoading = new javax.swing.JFrame();
-    jPanel1 = new javax.swing.JPanel();
-    jProgressBar1 = new javax.swing.JProgressBar();
-    jPanel2 = new javax.swing.JPanel();
-    jButton1 = new javax.swing.JButton();
-    jButton3 = new javax.swing.JButton();
     jButton2 = new javax.swing.JButton();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
@@ -184,6 +177,7 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
 
     jFrameAbout.setTitle("Über...");
     jFrameAbout.setLocation(new java.awt.Point(0, 0));
@@ -220,7 +214,7 @@ public class Gui extends javax.swing.JFrame
 
     jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelDevelopers.setText("<html> \n<center> <b>Diplomanten: </b> <br>\n Primus Christoph - Elektrotechnik<br>\n Messing Levin - Programm<br> \nTinauer Robert - Mechanik<br> \n</center>");
+    jLabelDevelopers.setText("<html>  <center> <b>Diplomanden: </b> <br>  Primus Christoph - Elektrotechnik<br>  Messing Levin - Programm<br>  Tinauer Robert - Mechanik<br>  </center>");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -272,7 +266,7 @@ public class Gui extends javax.swing.JFrame
     jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
 
     jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelGuideMeasure.setText("<html> <h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
+    jLabelGuideMeasure.setText("<html> TODO!!!<h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
     jPanelMeasure.add(jLabelGuideMeasure);
 
     jTabbedPane1.addTab("Messung", jPanelMeasure);
@@ -286,22 +280,6 @@ public class Gui extends javax.swing.JFrame
     jTabbedPane1.addTab("Einstellungen", jPanelSettings);
 
     jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
-
-    jPanel1.setLayout(new java.awt.GridBagLayout());
-
-    jProgressBar1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-    jProgressBar1.setPreferredSize(new java.awt.Dimension(150, 25));
-    jPanel1.add(jProgressBar1, new java.awt.GridBagConstraints());
-
-    jFrameLoading.getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
-
-    jButton1.setText("jButton1");
-    jPanel2.add(jButton1);
-
-    jButton3.setText("jButton3");
-    jPanel2.add(jButton3);
-
-    jFrameLoading.getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
     jButton2.setText("jButton2");
 
@@ -598,6 +576,16 @@ public class Gui extends javax.swing.JFrame
     });
     jHelp.add(jMenuAbout);
 
+    jMenuItem1.setText("Test");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuItem1);
+
     jMenuBar.add(jHelp);
 
     setJMenuBar(jMenuBar);
@@ -736,6 +724,14 @@ public class Gui extends javax.swing.JFrame
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
+    LoadingFrame loading = new LoadingFrame();
+    loading.setLoading(true);
+    loading.setVisible(true);
+    
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -801,16 +797,13 @@ public class Gui extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton2;
-  private javax.swing.JButton jButton3;
   private javax.swing.JButton jCancel;
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
   private javax.swing.JMenu jFile;
   private javax.swing.JFrame jFrameAbout;
   private javax.swing.JFrame jFrameGuide;
-  private javax.swing.JFrame jFrameLoading;
   private javax.swing.JMenu jHelp;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabelAuthor;
@@ -826,14 +819,13 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuBar jMenuBar;
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuGuide;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
   private javax.swing.JMenuItem jMenuVehicle;
   private javax.swing.JPanel jPanSerial;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanelInfo;
   private javax.swing.JPanel jPanelInfo2;
   private javax.swing.JPanel jPanelLogo;
@@ -841,7 +833,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPanel jPanelSettings;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
-  private javax.swing.JProgressBar jProgressBar1;
   private javax.swing.JButton jRefresh;
   private javax.swing.JButton jSave;
   private javax.swing.JToolBar.Separator jSeparator1;
@@ -994,7 +985,7 @@ public class Gui extends javax.swing.JFrame
     ValueAxis torqueAxis = new NumberAxis("Drehmoment [Nm]");
     torqueAxis.setLabelFont(chart.getXYPlot().getDomainAxis().getLabelFont());
 
-    seriesPower.setKey("Leistung " + "[" + data.getPowerunit() + "]");
+    seriesPower.setKey("Leistung");
 
     chart.getXYPlot().setDataset(1, dataset2);
     chart.getXYPlot().setRangeAxis(1, torqueAxis);
@@ -1051,6 +1042,8 @@ public class Gui extends javax.swing.JFrame
     chart.addSubtitle(eco);
 
     jChartPanel.add(chartPanel);
+    
+    chart.fireChartChanged();
 
     //jchartframe.setContentPane(chartPanel);
     //jchartframe.pack();
@@ -1274,10 +1267,6 @@ public class Gui extends javax.swing.JFrame
         data.setPeriodTimeMs(progset.getPeriodTimeMs());
         updateLevel = 3;
       }
-      if(data.getMaxMeasureTimeSec() != progset.getMaxMeasureTimeSec())
-      {
-        data.setMaxMeasureTimeSec(progset.getMaxMeasureTimeSec());
-      }
 
       //update
       if(data.getMeasureList() != null)
@@ -1310,11 +1299,11 @@ public class Gui extends javax.swing.JFrame
           case 1:
             LOG.finest("entering level 1");
             dataset1.removeSeries(seriesPower);
-            seriesPower = correctByFactor(series1, data.getCorrectionPower());
+            seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
             dataset1.addSeries(seriesPower);
 
             dataset2.removeSeries(seriesTorque);
-            seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
+            seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
             dataset2.addSeries(seriesTorque);
 
             updateChartLabels();
@@ -1458,7 +1447,7 @@ public class Gui extends javax.swing.JFrame
    * @param factor The factor the series should be converted with.
    * @return The changed series or <code>null</code> if an error occured.
    */
-  private XYSeries correctByFactor(XYSeries series, double factor)
+  private XYSeries correctByFactor(XYSeries series, String key, double factor)
   {
 
     try
@@ -1467,18 +1456,17 @@ public class Gui extends javax.swing.JFrame
       {
         LOG.severe(new InputMismatchException("factor smaller or equal to 0!"));
         showErrorMessage("Fehler bei Konvertierung", "Interner Fehler aufgetreten\n"
-                         + "Bitte sicherstellen dass ein Korrekturfaktor zwischen 0,5 und 2,0 eingestellt ist.\n"
-                         + "Ist dies der Fall bitte Kontakt mit dem Programmierer(Levin Messing) aufnehmen.");
+                         + "Bitte sicherstellen dass ein Korrekturfaktor zwischen 0,5 und 2,0 eingestellt ist.\n");
       }
-      XYSeries target = series;
+      XYSeries target = new XYSeries(key);
 
-      int max = target.getItemCount();
-
-      for(int i = 0; i < max; i++)
+      for(int i = 0; i < series.getItemCount(); i++)
       {
-        double tmp = (double) series.getY(i);
-        target.updateByIndex(i, tmp * factor);
+        double x = (double) series.getX(i);
+        double y = (double) series.getY(i) * factor;
+        target.add(x, y);
       }
+
       return target;
     }
     catch (Exception ex)
@@ -1521,7 +1509,8 @@ public class Gui extends javax.swing.JFrame
     maxPowerMarker.setLabel(strMaxPower);
     maxTorqueMarker.setLabel(strMaxTorque);
     chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
-    seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
+    seriesPower.setKey("Leistung");
+    
     chart.fireChartChanged();
   }
 
@@ -1746,11 +1735,11 @@ public class Gui extends javax.swing.JFrame
     }
 
     dataset1.removeSeries(seriesPower);
-    seriesPower = correctByFactor(series1, data.getCorrectionPower());
+    seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
     dataset1.addSeries(seriesPower);
 
     dataset2.removeSeries(seriesTorque);
-    seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
+    seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
 

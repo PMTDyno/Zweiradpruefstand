@@ -64,14 +64,28 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Object>
 
     try
     {
+      Datapoint dp;
+      double mdz;
+      do
+      {
 
-      com.sendFrame(Communication.Request.START);
-      LOG.finest("sent start");
+        com.sendFrame(Communication.Request.START);
+        dp = getNextDatapoint();
+        list.add(getNextDatapoint());
 
-      list.add(getNextDatapoint());
+        //converting to U/min
+        mdz = dp.getMdz() / 1000000;
+        if(data.isTwoStroke())
+          mdz = 1 / mdz * 60;
+        else
+          mdz = (1 / mdz * 60) * 2;
 
-      Thread.sleep(data.getPeriodTimeMs());
+        Thread.sleep(data.getPeriodTimeMs());
+        
+      } while(mdz < data.getStartMdz());
 
+      list.add(dp);
+      LOG.fine("collecting data...");
       while(true)
       {
 

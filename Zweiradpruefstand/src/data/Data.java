@@ -1,7 +1,6 @@
 package data;
 
 import java.util.ArrayList;
-import measure.Datapoint;
 
 /**
  * Stores the main data variables
@@ -53,8 +52,9 @@ public final class Data
   private int periodTimeMs = 40;
   private int humidity;
 
-  public ArrayList<Datapoint> measureList = new ArrayList<>();
-
+  private ArrayList<Datapoint> measureList = new ArrayList<>();
+  private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
+  
   private boolean twoStroke = true;
   private boolean measMDZ = true;
 
@@ -72,6 +72,18 @@ public final class Data
     this.measureList = measureList;
   }
 
+  public ArrayList<RawDatapoint> getRawDataList()
+  {
+    return rawDataList;
+  }
+
+  public void setRawDataList(ArrayList<RawDatapoint> rawDataList)
+  {
+    this.rawDataList = rawDataList;
+  }
+
+  
+  
   public int getStartMdz()
   {
     return startMdz;

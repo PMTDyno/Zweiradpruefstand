@@ -2,7 +2,8 @@ package gui;
 
 import data.Config;
 import data.Data;
-import data.ReadCSV;
+import data.RawDatapoint;
+import data.ReadPMT;
 import measure.MeasurementWorker;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -10,6 +11,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -18,6 +20,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import javafx.stage.FileChooser;
 import logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -44,29 +47,29 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9
+ * @version 0.9.5
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9";
-
-  private final LoadingFrame loading = new LoadingFrame();
-
-  private final ProgSetDialog progset;
-  private final VehicleSetDialog vehicleset;
-  private final Communication com = new Communication();
-  private ChartPanel chartPanel;
-  private final Data data = Data.getInstance();
-
+  private static final String VERSION = "0.9.5";
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
+
+  private final LoadingFrame loading = new LoadingFrame();
+  private final Communication com = new Communication();
+
+  private final ProgSetDialog progset;
+  private final VehicleSetDialog vehicleset;
+
+  private final Data data = Data.getInstance();
 
   private final Font font = new Font("sansserif", Font.BOLD, 15);
   private final ValueMarker maxPowerMarker = new ValueMarker(data.getMaxpower());
   private final ValueMarker maxTorqueMarker = new ValueMarker(data.getMaxtorque());
 
+  private ChartPanel chartPanel;
   private XYSeries seriesTorque = new XYSeries("Drehmoment");
   private XYSeries seriesPower = new XYSeries("Leistung");
   private XYSeries series1 = new XYSeries("temp1 series");
@@ -146,8 +149,6 @@ public class Gui extends javax.swing.JFrame
     jButton2 = new javax.swing.JButton();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
-    jStop = new javax.swing.JButton();
-    jCancel = new javax.swing.JButton();
     jRefresh = new javax.swing.JButton();
     jSeparator1 = new javax.swing.JToolBar.Separator();
     jProgSet = new javax.swing.JButton();
@@ -157,9 +158,8 @@ public class Gui extends javax.swing.JFrame
     jSave = new javax.swing.JButton();
     jSeparator3 = new javax.swing.JToolBar.Separator();
     jPanSerial = new javax.swing.JPanel();
-    jpanDevice = new javax.swing.JPanel();
-    jComboBoxPort = new javax.swing.JComboBox<>();
     jpanEast = new javax.swing.JPanel();
+    jComboBoxPort = new javax.swing.JComboBox<>();
     jpanSerialButtons = new javax.swing.JPanel();
     jbutConnect = new javax.swing.JButton();
     jbutDisconnect = new javax.swing.JButton();
@@ -171,6 +171,7 @@ public class Gui extends javax.swing.JFrame
     jMenuOpen = new javax.swing.JMenuItem();
     jSeparator6 = new javax.swing.JPopupMenu.Separator();
     jMenuSave = new javax.swing.JMenuItem();
+    jMenuItem2 = new javax.swing.JMenuItem();
     jMenuPrint = new javax.swing.JMenuItem();
     jSeparator4 = new javax.swing.JPopupMenu.Separator();
     jMenuSettings = new javax.swing.JMenuItem();
@@ -292,7 +293,6 @@ public class Gui extends javax.swing.JFrame
     jToolBar.setRollover(true);
 
     jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png"))); // NOI18N
-    jStart.setMnemonic('s');
     jStart.setToolTipText("Messung starten");
     jStart.setEnabled(false);
     jStart.setFocusable(false);
@@ -306,36 +306,6 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jToolBar.add(jStart);
-
-    jStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/stop48.png"))); // NOI18N
-    jStop.setToolTipText("Messung stoppen");
-    jStop.setEnabled(false);
-    jStop.setFocusable(false);
-    jStop.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jStop.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jStop.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jStopActionPerformed(evt);
-      }
-    });
-    jToolBar.add(jStop);
-
-    jCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cancel48.png"))); // NOI18N
-    jCancel.setToolTipText("Messung abbrechen");
-    jCancel.setEnabled(false);
-    jCancel.setFocusable(false);
-    jCancel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jCancel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jCancel.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jCancelActionPerformed(evt);
-      }
-    });
-    jToolBar.add(jCancel);
 
     jRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/refresh48.png"))); // NOI18N
     jRefresh.setToolTipText("Umgebungswerte aktualisieren");
@@ -415,18 +385,13 @@ public class Gui extends javax.swing.JFrame
 
     jPanSerial.setLayout(new java.awt.BorderLayout());
 
-    jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
-    jpanDevice.setLayout(new java.awt.GridBagLayout());
+    jpanEast.setLayout(new java.awt.GridBagLayout());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.ipadx = 20;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-    jpanDevice.add(jComboBoxPort, gridBagConstraints);
-
-    jPanSerial.add(jpanDevice, java.awt.BorderLayout.CENTER);
-
-    jpanEast.setLayout(new java.awt.GridBagLayout());
+    jpanEast.add(jComboBoxPort, gridBagConstraints);
 
     jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
@@ -471,7 +436,7 @@ public class Gui extends javax.swing.JFrame
     gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
     jpanEast.add(jLabelStatus, gridBagConstraints);
 
-    jPanSerial.add(jpanEast, java.awt.BorderLayout.EAST);
+    jPanSerial.add(jpanEast, java.awt.BorderLayout.WEST);
 
     jToolBar.add(jPanSerial);
 
@@ -482,6 +447,8 @@ public class Gui extends javax.swing.JFrame
 
     jFile.setText("Datei");
 
+    jMenuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/open16.png"))); // NOI18N
     jMenuOpen.setText("Öffnen...");
     jMenuOpen.addActionListener(new java.awt.event.ActionListener()
     {
@@ -504,6 +471,18 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jFile.add(jMenuSave);
+
+    jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export16.png"))); // NOI18N
+    jMenuItem2.setText("Exportieren...");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuItem2);
 
     jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
     jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
@@ -644,8 +623,6 @@ public class Gui extends javax.swing.JFrame
       finally
       {
         jStart.setEnabled(com.isConnected());
-        jStop.setEnabled(false);
-        jCancel.setEnabled(false);
         jRefresh.setEnabled(com.isConnected());
         jbutConnect.setEnabled(!com.isConnected());
         jbutDisconnect.setEnabled(com.isConnected());
@@ -658,16 +635,6 @@ public class Gui extends javax.swing.JFrame
     {//GEN-HEADEREND:event_jbutRefreshDeviceActionPerformed
       refreshPorts();
     }//GEN-LAST:event_jbutRefreshDeviceActionPerformed
-
-    private void jStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStopActionPerformed
-    {//GEN-HEADEREND:event_jStopActionPerformed
-      finishMeasurement();
-    }//GEN-LAST:event_jStopActionPerformed
-
-    private void jCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jCancelActionPerformed
-    {//GEN-HEADEREND:event_jCancelActionPerformed
-      abortMeasurement();
-    }//GEN-LAST:event_jCancelActionPerformed
 
     private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
     {//GEN-HEADEREND:event_jMenuSettingsActionPerformed
@@ -755,6 +722,11 @@ public class Gui extends javax.swing.JFrame
 
   }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
+    exportFile();
+  }//GEN-LAST:event_jMenuItem2ActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -774,7 +746,8 @@ public class Gui extends javax.swing.JFrame
       {
         if("Nimbus".equals(info.getName()))
         {
-          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
           break;
         }
       }
@@ -791,7 +764,7 @@ public class Gui extends javax.swing.JFrame
      */
     LOGP.addHandler(new logging.LogOutputStreamHandler(System.out));
     LOG.setLevel(DEBUGLEVEL);
-    LOGP.setLevel(Level.ALL);
+    LOGP.setLevel(DEBUGLEVEL);
     try
     {
       String opt = System.getProperty("DebugLevel");
@@ -821,7 +794,6 @@ public class Gui extends javax.swing.JFrame
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton jButton2;
-  private javax.swing.JButton jCancel;
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
   private javax.swing.JMenu jFile;
@@ -843,6 +815,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuGuide;
   private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
@@ -865,14 +838,12 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPopupMenu.Separator jSeparator5;
   private javax.swing.JPopupMenu.Separator jSeparator6;
   private javax.swing.JButton jStart;
-  private javax.swing.JButton jStop;
   private javax.swing.JTabbedPane jTabbedPane1;
   private javax.swing.JToolBar jToolBar;
   private javax.swing.JButton jVehicleSet;
   private javax.swing.JButton jbutConnect;
   private javax.swing.JButton jbutDisconnect;
   private javax.swing.JButton jbutRefreshDevice;
-  private javax.swing.JPanel jpanDevice;
   private javax.swing.JPanel jpanEast;
   private javax.swing.JPanel jpanSerialButtons;
   // End of variables declaration//GEN-END:variables
@@ -925,13 +896,6 @@ public class Gui extends javax.swing.JFrame
    * ---PRIVATE METHODS------------------------------------------
    */
   /**
-   *
-   * enables:
-   * <ul>
-   * <li>jStop
-   * <li>jCancel
-   * </ul>
-   *
    * disables:
    * <ul>
    * <li>jStart
@@ -941,9 +905,6 @@ public class Gui extends javax.swing.JFrame
    */
   private void enableCancelling()
   {
-    jStop.setEnabled(true);
-    jCancel.setEnabled(true);
-
     jStart.setEnabled(false);
     jRefresh.setEnabled(false);
   }
@@ -953,14 +914,10 @@ public class Gui extends javax.swing.JFrame
    * <ul>
    * <li>jStart
    * <li>jRefresh
-   * <li>jStop
-   * <li>jCancel
    * </ul>
    */
   private void disableMeasureButtons()
   {
-    jStop.setEnabled(false);
-    jCancel.setEnabled(false);
     jStart.setEnabled(false);
     jRefresh.setEnabled(false);
   }
@@ -972,20 +929,12 @@ public class Gui extends javax.swing.JFrame
    * <li>jRefresh
    * </ul>
    *
-   * disables:
-   * <ul>
-   * <li>jStop
-   * <li>jCancel
-   * </ul>
-   *
    */
   private void enableStarting()
   {
     jStart.setEnabled(true);
     jRefresh.setEnabled(true);
 
-    jStop.setEnabled(false);
-    jCancel.setEnabled(false);
   }
 
   /**
@@ -1091,6 +1040,7 @@ public class Gui extends javax.swing.JFrame
   private void start()
   {
     worker = new Measure(com);
+
     LoadingFrame loading = new LoadingFrame();
     loading.init(this);
 
@@ -1109,26 +1059,23 @@ public class Gui extends javax.swing.JFrame
     try
     {
 
-      startVehicleSet();
+      if(!startVehicleSet())
+        return;
 
       File file;
 
       JFileChooser chooser = new JFileChooser();
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
-              "Comma Seperated Value (*.csv)", "csv");
+              "PMTDyno (*.pmt)", "pmt");
       chooser.setFileFilter(filter);
       int rv = chooser.showSaveDialog(this);
       if(rv == JFileChooser.APPROVE_OPTION)
       {
         file = chooser.getSelectedFile();
-        if(!file.getName().endsWith(".csv"))
-        {
-          file = new File(file.getPath() + ".png");
-        }
 
         //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
         //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
-        ReadCSV fr = new ReadCSV(file);
+        ReadPMT fr = new ReadPMT(file);
 
         data.setMeasureList(fr.read());
         System.out.println("Daten eingelesen");
@@ -1143,6 +1090,62 @@ public class Gui extends javax.swing.JFrame
     {
       ex.printStackTrace(System.err);
       showErrorMessage("Error", ex.getMessage());
+    }
+  }
+
+  private void exportFile()
+  {
+    if(data.getRawDataList().size() < 1)
+    {
+      showErrorMessage("Keine Messung vorhanden", "Keine Messdaten vorhanden. Bitte zuerst Messung durchführen");
+      return;
+    }
+
+    File file;
+
+    JFileChooser chooser = new JFileChooser();
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "PMTDyno (*.pmt)", "pmt");
+    chooser.setFileFilter(filter);
+    int rv = chooser.showSaveDialog(this);
+    if(rv == JFileChooser.APPROVE_OPTION)
+    {
+      file = chooser.getSelectedFile();
+
+      if(!file.getName().endsWith(".pmt") && !file.getName().contains("."))
+      {
+        file = new File(file.getPath() + ".pmt");
+      }
+
+      try (FileWriter writer = new FileWriter(file);)
+      {
+        //time - mdz - wdz
+        for(RawDatapoint rawDatapoint : data.getRawDataList())
+        {
+          String time = String.valueOf(rawDatapoint.getTime());
+          String mdz = String.valueOf(rawDatapoint.getMdz());
+          String wdz = String.valueOf(rawDatapoint.getWdz());
+
+          String line = time + ':' + mdz + ':' + wdz + '\n';
+          writer.write(line);
+        }
+        writer.close();
+      }
+      catch (IOException ex) //Fehler beim Speichern
+      {
+        LOG.warning("Error saving .pmt", ex);
+        showErrorMessage("Fehler beim Exportieren", "Fehler beim Exportieren aufgetreten");
+      }
+      catch (NullPointerException ex)//Fehler beim Pfad
+      {
+        LOG.warning("Error with path", ex);
+        showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unsupported Exception", ex);
+        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      }
     }
   }
 
@@ -1394,8 +1397,10 @@ public class Gui extends javax.swing.JFrame
   /**
    * Opens up the VehicleSetDialog and saves the values. If the measurement is
    * already done the datasets will be updated.
+   *
+   * @return true if the dialog is confirmed
    */
-  private void startVehicleSet()
+  private boolean startVehicleSet()
   {
     vehicleset.setLocationRelativeTo(this);
     vehicleset.setVisible(true);
@@ -1430,9 +1435,9 @@ public class Gui extends javax.swing.JFrame
         LOG.warning("Error saving Config file");
         showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
       }
-
+      return true;
     }
-
+    return false;
   }
 
   /**
@@ -1629,11 +1634,11 @@ public class Gui extends javax.swing.JFrame
 
     double tempFactor = (1013 / data.getPressure()) * (((273 + data.getTemperature()) / 293)); //Korrekturfaktor temp
 
-    for(int i = 0; i < data.measureList.size() - 1; i++)
+    for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
-      omega.add(data.measureList.get(i).getWdz());
-      rpm.add(data.measureList.get(i).getMdz());
-      time.add(data.measureList.get(i).getTime());
+      omega.add(data.getMeasureList().get(i).getWdz());
+      rpm.add(data.getMeasureList().get(i).getMdz());
+      time.add(data.getMeasureList().get(i).getTime());
     }
     omega = filterValuesOrder(omega, 0.09, 3);
 
@@ -1706,7 +1711,7 @@ public class Gui extends javax.swing.JFrame
     catch (IndexOutOfBoundsException ex)
     {
       schleppEnable = false;
-      LOG.severe(ex.getMessage());
+      LOG.info(ex.getMessage());
       showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
 
     }

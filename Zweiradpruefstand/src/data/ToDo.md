@@ -52,11 +52,18 @@
 * ![d] ChartPanel directly into panel without internal frame  
 * ![d] gui elements description  
 
-####v1.0
-* Complete new communication!
+####v0.9.5
+* ![d] Complete new communication reloaded!  
+* ![d] Remove ACK and Package
 * ![d] Cleaning
 * ![d] Performance  
-  
+* ![d] Calculation and filtering
+* Loading Screen
+* ![d] New Design
+* ![d] Export .pmt File
+
+####v1.0
+* Measurement working!
   
   
 

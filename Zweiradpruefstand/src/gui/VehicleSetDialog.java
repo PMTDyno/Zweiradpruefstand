@@ -235,7 +235,8 @@ public class VehicleSetDialog extends javax.swing.JDialog
       {
         if("Nimbus".equals(info.getName()))
         {
-          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
           break;
         }
       }

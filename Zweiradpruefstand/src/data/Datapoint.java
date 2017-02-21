@@ -1,4 +1,4 @@
-package measure;
+package data;
 
 /**
  *
@@ -7,10 +7,9 @@ package measure;
 public class Datapoint
 {
 
-  private double wdz;
-  private double mdz;
-  private double time;
-  //private final int time;
+  private double wdz;  // rad/s
+  private double mdz;  // U/min
+  private double time; // 
 
   /**
    *

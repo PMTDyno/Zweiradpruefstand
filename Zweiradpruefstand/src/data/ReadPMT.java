@@ -3,20 +3,20 @@ package data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.util.ArrayList;
-import measure.Datapoint;
 
 
 /**
  *
  * @author levin
  */
-public class ReadCSV
+public class ReadPMT
 {
 
   private final File file;
 
-  public ReadCSV (File file) throws Exception
+  public ReadPMT (File file) throws Exception
   {    
+    System.out.println(file);
     this.file = file;
     if (!file.exists())
     {
@@ -33,7 +33,7 @@ public class ReadCSV
 
   }
   
-  public ReadCSV (String path) throws Exception
+  public ReadPMT (String path) throws Exception
   {    
     file = new File(path);
     if (!file.exists())

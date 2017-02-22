@@ -42,11 +42,19 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
     int time;
 
     String[] tmp = com.getFrameData();
-    wdz = Double.parseDouble(tmp[0].replace(',', '.'));
-    rpm = Double.parseDouble(tmp[1].replace(',', '.'));
-    time = Integer.parseInt(tmp[2]);
 
-    return new RawDatapoint(wdz, rpm, time);
+    wdz = Double.parseDouble(tmp[0].replace(',', '.'));
+    if(data.isMeasRPM())
+    {
+      rpm = Double.parseDouble(tmp[1].replace(',', '.'));
+      time = Integer.parseInt(tmp[2]);
+    }
+    else
+    {
+      time = Integer.parseInt(tmp[1]);
+    }
+
+    return new RawDatapoint(wdz, 0, time);
   }
 
   @Override
@@ -64,29 +72,45 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
       do
       {
+        if(data.isMeasRPM())
+          com.sendFrame(Communication.Request.START);
+        else
+          com.sendFrame(Communication.Request.STARTNORPM);
 
-        com.sendFrame(Communication.Request.START);
         dp = getNextDatapoint();
 
-        //converting to U/min
-        rpm = dp.getRpm() / 1000000;
-        if(data.isTwoStroke())
-          rpm = 1 / rpm * 60;
+        if(data.isMeasRPM())
+        {
+          //converting to U/min 
+          rpm = dp.getRpm() / 1000000;
+          if(data.isTwoStroke())
+            rpm = 1 / rpm * 60;
+          else
+            rpm = (1 / rpm * 60) * 2;
+        }
         else
-          rpm = (1 / rpm * 60) * 2;
-
+        {
+          //todo
+          break;
+        }
         Thread.sleep(data.getPeriodTimeMs());
 
+        //automatic starting of measurement when rpm is higher than...
+        //todo start measurement when speed is higher than...
       } while(rpm < data.getStartRPM());
 
       list.add(dp);
-      LOG.fine("collecting data...");
+      LOG.fine("Collecting data...");
       while(true)
       {
         count++;
         publish(count);
 
-        com.sendFrame(Communication.Request.MEASURE);
+        if(data.isMeasRPM())
+          com.sendFrame(Communication.Request.MEASURE);
+        else
+          com.sendFrame(Communication.Request.MEASURENORPM);
+
         list.add(getNextDatapoint());
 
         if(isCancelled())
@@ -102,25 +126,43 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
           ArrayList<Datapoint> measureList = new ArrayList<>();
 
-          //converting time
-          for(RawDatapoint datapoint : list)
+          if(data.isMeasRPM())
           {
-            //in seconds
-            Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
-                                          datapoint.getRpm() / 1000000,
-                                          datapoint.getTime() / 1000000);
+            //converting time
+            for(RawDatapoint datapoint : list)
+            {
+              //in seconds
+              Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
+                                            datapoint.getRpm() / 1000000,
+                                            datapoint.getTime() / 1000000);
 
-            //seconds to rad/s
-            tmp.setWdz(1 / (tmp.getWdz() * 26) * 2 * Math.PI);
+              //seconds to rad/s
+              tmp.setWdz(1 / (tmp.getWdz() * 26) * 2 * Math.PI);
 
-            //seconds to U/min
-            if(data.isTwoStroke())
-              tmp.setRpm(1 / tmp.getRpm() * 60);
-            else
-              tmp.setRpm((1 / tmp.getRpm() * 60) * 2);
+              //seconds to U/min
+              if(data.isTwoStroke())
+                tmp.setRpm(1 / tmp.getRpm() * 60);
+              else
+                tmp.setRpm((1 / tmp.getRpm() * 60) * 2);
 
-            measureList.add(tmp);
+              measureList.add(tmp);
+            }
+          }
+          else
+          {
+            //converting time
+            for(RawDatapoint datapoint : list)
+            {
+              //in seconds
+              Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
+                                            0,
+                                            datapoint.getTime() / 1000000);
 
+              //seconds to rad/s
+              tmp.setWdz(1 / (tmp.getWdz() * 26) * 2 * Math.PI);
+
+              measureList.add(tmp);
+            }
           }
 
           return measureList;

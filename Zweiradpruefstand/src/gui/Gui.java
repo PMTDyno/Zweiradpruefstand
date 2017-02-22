@@ -151,7 +151,6 @@ public class Gui extends javax.swing.JFrame
     jRefresh = new javax.swing.JButton();
     jSeparator1 = new javax.swing.JToolBar.Separator();
     jProgSet = new javax.swing.JButton();
-    jVehicleSet = new javax.swing.JButton();
     jSeparator2 = new javax.swing.JToolBar.Separator();
     jPrint = new javax.swing.JButton();
     jSave = new javax.swing.JButton();
@@ -335,20 +334,6 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jToolBar.add(jProgSet);
-
-    jVehicleSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike48.png"))); // NOI18N
-    jVehicleSet.setToolTipText("Fahrzeugeinstellungen");
-    jVehicleSet.setFocusable(false);
-    jVehicleSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jVehicleSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jVehicleSet.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jVehicleSetActionPerformed(evt);
-      }
-    });
-    jToolBar.add(jVehicleSet);
     jToolBar.add(jSeparator2);
 
     jPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer48.png"))); // NOI18N
@@ -597,11 +582,6 @@ public class Gui extends javax.swing.JFrame
       startProgSet();
     }//GEN-LAST:event_jProgSetActionPerformed
 
-    private void jVehicleSetActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jVehicleSetActionPerformed
-    {//GEN-HEADEREND:event_jVehicleSetActionPerformed
-      startVehicleSet();
-    }//GEN-LAST:event_jVehicleSetActionPerformed
-
     private void jbutConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutConnectActionPerformed
     {//GEN-HEADEREND:event_jbutConnectActionPerformed
       connectDevice();
@@ -839,7 +819,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JButton jStart;
   private javax.swing.JTabbedPane jTabbedPane1;
   private javax.swing.JToolBar jToolBar;
-  private javax.swing.JButton jVehicleSet;
   private javax.swing.JButton jbutConnect;
   private javax.swing.JButton jbutDisconnect;
   private javax.swing.JButton jbutRefreshDevice;

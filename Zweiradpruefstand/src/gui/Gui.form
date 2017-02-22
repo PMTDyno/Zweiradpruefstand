@@ -451,20 +451,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jProgSetActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jVehicleSet">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/icons/motorbike48.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Fahrzeugeinstellungen"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="horizontalTextPosition" type="int" value="0"/>
-            <Property name="verticalTextPosition" type="int" value="3"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jVehicleSetActionPerformed"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JToolBar$Separator" name="jSeparator2">
         </Component>
         <Component class="javax.swing.JButton" name="jPrint">

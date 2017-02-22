@@ -20,7 +20,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
-import javafx.stage.FileChooser;
 import logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -1118,14 +1117,14 @@ public class Gui extends javax.swing.JFrame
 
       try (FileWriter writer = new FileWriter(file);)
       {
-        //time - mdz - wdz
+        //time - rpm - wdz
         for(RawDatapoint rawDatapoint : data.getRawDataList())
         {
           String time = String.valueOf(rawDatapoint.getTime());
-          String mdz = String.valueOf(rawDatapoint.getMdz());
+          String rpm = String.valueOf(rawDatapoint.getRpm());
           String wdz = String.valueOf(rawDatapoint.getWdz());
 
-          String line = time + ':' + mdz + ':' + wdz + '\n';
+          String line = time + ':' + rpm + ':' + wdz + '\n';
           writer.write(line);
         }
         writer.close();
@@ -1413,9 +1412,9 @@ public class Gui extends javax.swing.JFrame
         data.setTwoStroke(vehicleset.isTwoStroke());
       }
 
-      //MEASMDZ
-      if(data.isMeasMDZ() != vehicleset.isMeasMDZ())
-        data.setMeasMDZ(vehicleset.isMeasMDZ());
+      //MEASrpm
+      if(data.isMeasRPM() != vehicleset.isMeasRpm())
+        data.setMeasRPM(vehicleset.isMeasRpm());
 
       //VEHICLENAME
       data.setVehicle(vehicleset.getVehicleName());
@@ -1636,7 +1635,7 @@ public class Gui extends javax.swing.JFrame
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
       omega.add(data.getMeasureList().get(i).getWdz());
-      rpm.add(data.getMeasureList().get(i).getMdz());
+      rpm.add(data.getMeasureList().get(i).getRpm());
       time.add(data.getMeasureList().get(i).getTime());
     }
     omega = filterValuesOrder(omega, 0.09, 3);
@@ -1664,7 +1663,7 @@ public class Gui extends javax.swing.JFrame
     }
 
     //drehmoment roller
-    if(!data.isMeasMDZ())
+    if(!data.isMeasRPM())
     {
       for(int i = 0; i < alpha.size(); i++)
       {
@@ -1696,7 +1695,7 @@ public class Gui extends javax.swing.JFrame
     int limitSchl = 0;
     try
     {
-      for(limitSchl = getValMaxIndex(rpm); true; limitSchl++)
+      for(limitSchl = getValMaxIndex(omega); true; limitSchl++)
       {
         if(trq.get(limitSchl) < 0)
         {
@@ -1708,8 +1707,7 @@ public class Gui extends javax.swing.JFrame
     {
       schleppEnable = false;
       LOG.info("No Towing Torque");
-      showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
-
+      JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Messdatenfehler", JOptionPane.INFORMATION_MESSAGE);
     }
 
     //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
@@ -1739,7 +1737,7 @@ public class Gui extends javax.swing.JFrame
     }
 
     //leistung berechnen
-    if(!data.isMeasMDZ())
+    if(!data.isMeasRPM())
     {
       for(int i = 0; i < trq.size(); i++)
       {
@@ -1757,7 +1755,7 @@ public class Gui extends javax.swing.JFrame
     series1.clear();
     series2.clear();
 
-    if(!data.isMeasMDZ())
+    if(!data.isMeasRPM())
     {
       for(int i = 0; i < trq.size(); i++)
       {
@@ -1793,7 +1791,7 @@ public class Gui extends javax.swing.JFrame
     dataset2.addSeries(seriesTorque);
     seriesTorque.setKey("Drehmoment [Nm]");
 
-    if(!data.isMeasMDZ())
+    if(!data.isMeasRPM())
       chart.getXYPlot().getDomainAxis().setLabel("Geschwindigkeit [km/h]");
     else
       chart.getXYPlot().getDomainAxis().setLabel("Motordrehzahl [U/m]");

@@ -28,7 +28,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     private double correctionTorque = 1.0;
     private double inertia = 3.7017;
     private int periodTimeMs = 40;
-    private int startMdz = 2000;
+    private int startRpm = 2000;
 
     /**
      * Creates the frame with the given values
@@ -55,7 +55,7 @@ public class ProgSetDialog extends javax.swing.JDialog
         this.correctionPower = data.getCorrectionPower();
         this.correctionTorque = data.getCorrectionTorque();
         this.periodTimeMs = data.getPeriodTimeMs();
-        this.startMdz = data.getStartMdz();
+        this.startRpm = data.getStartRPM();
         
         switch (data.getPngWidth())
         {
@@ -157,7 +157,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jSpinPeriod = new javax.swing.JSpinner();
     jLabel14 = new javax.swing.JLabel();
     jLabel10 = new javax.swing.JLabel();
-    jSpinMdz = new javax.swing.JSpinner();
+    jSpinRpm = new javax.swing.JSpinner();
     jLabel13 = new javax.swing.JLabel();
     jPanel3 = new javax.swing.JPanel();
     jLabelInfo = new javax.swing.JLabel();
@@ -396,14 +396,14 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanel6.add(jLabel10, gridBagConstraints);
 
-    jSpinMdz.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
-    jSpinMdz.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
+    jSpinRpm.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
+    jSpinRpm.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
-    jPanel6.add(jSpinMdz, gridBagConstraints);
+    jPanel6.add(jSpinRpm, gridBagConstraints);
 
     jLabel13.setText("U/min");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -578,7 +578,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
             //SERIALPORT
             jSpinPeriod.setValue(periodTimeMs);
-            jSpinMdz.setValue(startMdz);
+            jSpinRpm.setValue(startRpm);
 
         }
 
@@ -792,7 +792,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
         //SERIALPORT
         periodTimeMs = (int) jSpinPeriod.getValue();
-        startMdz = (int) jSpinMdz.getValue();
+        startRpm = (int) jSpinRpm.getValue();
         
         if(!error)
         {
@@ -835,8 +835,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanelSerial;
   private javax.swing.JSpinner jSpinCorrectPower;
   private javax.swing.JSpinner jSpinCorrectTorque;
-  private javax.swing.JSpinner jSpinMdz;
   private javax.swing.JSpinner jSpinPeriod;
+  private javax.swing.JSpinner jSpinRpm;
   private javax.swing.JTextField jTextInertia;
   private javax.swing.JTextField jWidth;
   private javax.swing.ButtonGroup powerunitGroup;

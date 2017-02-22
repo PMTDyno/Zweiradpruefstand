@@ -16,7 +16,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(VehicleSetDialog.class.getName());
 
-  private boolean measMDZ = false;
+  private boolean measRpm = false;
   private boolean confirmed = false;
   private boolean twoStroke;
   private String vehicleName;
@@ -61,7 +61,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
     jVehicleName = new javax.swing.JTextField();
     jLabel1 = new javax.swing.JLabel();
     jPanel3 = new javax.swing.JPanel();
-    jMeasMDZ = new javax.swing.JCheckBox();
+    jMeasRpm = new javax.swing.JCheckBox();
     jPanel4 = new javax.swing.JPanel();
     j2Takt = new javax.swing.JRadioButton();
     j4Takt = new javax.swing.JRadioButton();
@@ -96,17 +96,17 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     jPanel5.add(jPanel6, new java.awt.GridBagConstraints());
 
-    jMeasMDZ.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-    jMeasMDZ.setSelected(true);
-    jMeasMDZ.setText("Motordrehzahl messen");
-    jMeasMDZ.addActionListener(new java.awt.event.ActionListener()
+    jMeasRpm.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jMeasRpm.setSelected(true);
+    jMeasRpm.setText("Motordrehzahl messen");
+    jMeasRpm.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jMeasMDZActionPerformed(evt);
+        jMeasRpmActionPerformed(evt);
       }
     });
-    jPanel3.add(jMeasMDZ);
+    jPanel3.add(jMeasRpm);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -205,9 +205,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
     // TODO add your handling code here:
   }//GEN-LAST:event_j4TaktActionPerformed
 
-  private void jMeasMDZActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMeasMDZActionPerformed
-  {//GEN-HEADEREND:event_jMeasMDZActionPerformed
-    if(jMeasMDZ.isSelected())
+  private void jMeasRpmActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMeasrpmActionPerformed
+  {//GEN-HEADEREND:event_jMeasrpmActionPerformed
+    if(jMeasRpm.isSelected())
     {
       j2Takt.setEnabled(true);
       j4Takt.setEnabled(true);
@@ -217,7 +217,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
       j2Takt.setEnabled(false);
       j4Takt.setEnabled(false);
     }
-  }//GEN-LAST:event_jMeasMDZActionPerformed
+  }//GEN-LAST:event_jMeasrpmActionPerformed
 
   /**
    * @param args the command line arguments
@@ -276,7 +276,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private javax.swing.JButton jButCancel;
   private javax.swing.JButton jButConfirm;
   private javax.swing.JLabel jLabel1;
-  private javax.swing.JCheckBox jMeasMDZ;
+  private javax.swing.JCheckBox jMeasRpm;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;
@@ -329,9 +329,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
     return twoStroke;
   }
 
-  public boolean isMeasMDZ()
+  public boolean isMeasRpm()
   {
-    return measMDZ;
+    return measRpm;
   }
 
   /**
@@ -353,8 +353,8 @@ public class VehicleSetDialog extends javax.swing.JDialog
     //TAKT
     twoStroke = j2Takt.isSelected();
 
-    //MEASMDZ
-    measMDZ = jMeasMDZ.isSelected();
+    //MEASRPM
+    measRpm = jMeasRpm.isSelected();
 
     //VEHICLENAME
     if(jVehicleName.getText().length() >= 25)

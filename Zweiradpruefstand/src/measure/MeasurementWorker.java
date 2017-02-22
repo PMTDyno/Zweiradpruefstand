@@ -22,8 +22,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
   private final Communication com;
 
-  private int wheelRpm[];
-  private int motorRpm[];
   private final ArrayList<RawDatapoint> list = new ArrayList<>();
   private final AtomicBoolean stopRequest = new AtomicBoolean(false);
 
@@ -40,15 +38,15 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
   private RawDatapoint getNextDatapoint() throws CommunicationException,
                                                  TimeoutException
   {
-    double wdz, mdz;
+    double wdz, rpm;
     int time;
 
     String[] tmp = com.getFrameData();
     wdz = Double.parseDouble(tmp[0].replace(',', '.'));
-    mdz = Double.parseDouble(tmp[1].replace(',', '.'));
+    rpm = Double.parseDouble(tmp[1].replace(',', '.'));
     time = Integer.parseInt(tmp[2]);
 
-    return new RawDatapoint(wdz, mdz, time);
+    return new RawDatapoint(wdz, rpm, time);
   }
 
   @Override
@@ -56,12 +54,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
                                                          TimeoutException,
                                                          Exception
   {
-    //WDZ - MDZ - TIME
+    //WDZ - rpm - TIME
 
     try
     {
       RawDatapoint dp;
-      double mdz;
+      double rpm;
       int count = 0;
 
       do
@@ -71,15 +69,15 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
         dp = getNextDatapoint();
 
         //converting to U/min
-        mdz = dp.getMdz() / 1000000;
+        rpm = dp.getRpm() / 1000000;
         if(data.isTwoStroke())
-          mdz = 1 / mdz * 60;
+          rpm = 1 / rpm * 60;
         else
-          mdz = (1 / mdz * 60) * 2;
+          rpm = (1 / rpm * 60) * 2;
 
         Thread.sleep(data.getPeriodTimeMs());
 
-      } while(mdz < data.getStartMdz());
+      } while(rpm < data.getStartRPM());
 
       list.add(dp);
       LOG.fine("collecting data...");
@@ -109,7 +107,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
           {
             //in seconds
             Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
-                                          datapoint.getMdz() / 1000000,
+                                          datapoint.getRpm() / 1000000,
                                           datapoint.getTime() / 1000000);
 
             //seconds to rad/s
@@ -117,9 +115,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
             //seconds to U/min
             if(data.isTwoStroke())
-              tmp.setMdz(1 / tmp.getMdz() * 60);
+              tmp.setRpm(1 / tmp.getRpm() * 60);
             else
-              tmp.setMdz((1 / tmp.getMdz() * 60) * 2);
+              tmp.setRpm((1 / tmp.getRpm() * 60) * 2);
 
             measureList.add(tmp);
 

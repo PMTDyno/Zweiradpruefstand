@@ -8,19 +8,19 @@ public class RawDatapoint
 {
 
   private double wdz;  // µs
-  private double mdz;  // µs
+  private double rpm;  // µs
   private double time; // µs
 
   /**
    *
    * @param wdz  Wellendrehzahl in us
-   * @param mdz  Motordrehzahl in us
+   * @param rpm  Motordrehzahl in us
    * @param time Zeitpunkt der Messung in us
    */
-  public RawDatapoint(double wdz, double mdz, double time)
+  public RawDatapoint(double wdz, double rpm, double time)
   {
     this.wdz = wdz;
-    this.mdz = mdz;
+    this.rpm = rpm;
     this.time = time;
   }
 
@@ -29,9 +29,9 @@ public class RawDatapoint
     return wdz;
   }
 
-  public double getMdz()
+  public double getRpm()
   {
-    return mdz;
+    return rpm;
   }
 
   public double getTime()
@@ -49,9 +49,9 @@ public class RawDatapoint
     this.wdz = wdz;
   }
 
-  public void setMdz(double mdz)
+  public void setRpm(double rpm)
   {
-    this.mdz = mdz;
+    this.rpm = rpm;
   }
   
   

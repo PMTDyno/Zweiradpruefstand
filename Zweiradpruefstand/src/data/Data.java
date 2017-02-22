@@ -42,7 +42,7 @@ public final class Data
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
   
-  private int startMdz = 2000;
+  private int startRPM = 2000;
   private int pngWidth = 800;
   private int pngHeight = 600;
   private int windowWidth = 1200;
@@ -56,7 +56,7 @@ public final class Data
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   
   private boolean twoStroke = true;
-  private boolean measMDZ = true;
+  private boolean measRPM = true;
 
   /*
    * ------------------------------------------------------------------------
@@ -84,24 +84,24 @@ public final class Data
 
   
   
-  public int getStartMdz()
+  public int getStartRPM()
   {
-    return startMdz;
+    return startRPM;
   }
 
-  public void setStartMdz(int startMdz)
+  public void setStartRPM(int startRPM)
   {
-    this.startMdz = startMdz;
+    this.startRPM = startRPM;
   }
   
-  public boolean isMeasMDZ()
+  public boolean isMeasRPM()
   {
-    return measMDZ;
+    return measRPM;
   }
 
-  public void setMeasMDZ(boolean measMDZ)
+  public void setMeasRPM(boolean measRPM)
   {
-    this.measMDZ = measMDZ;
+    this.measRPM = measRPM;
   }
   
   public String getFilePath()

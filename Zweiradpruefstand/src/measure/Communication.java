@@ -37,7 +37,11 @@ public class Communication
 
   public enum Request
   {
-    REFRESH, MEASURE, START
+    REFRESH,
+    MEASURE,
+    START,
+    MEASURENORPM,
+    STARTNORPM
   }
 
   public Communication()
@@ -80,7 +84,7 @@ public class Communication
    *
    * @return The captured and already checked Frame Data
    * @throws CommunicationException if an error occured
-   * @throws TimeoutException if a Timeout occured
+   * @throws TimeoutException       if a Timeout occured
    */
   public String[] getFrameData() throws CommunicationException, TimeoutException
   {
@@ -105,7 +109,7 @@ public class Communication
 
   /**
    *
-   * @param timeout 
+   * @param timeout
    * @param unit
    * @return
    * @throws CommunicationException
@@ -260,13 +264,19 @@ public class Communication
       switch (request)
       {
         case REFRESH:
-          baos.write("r".getBytes("UTF-8"));
+          baos.write("e".getBytes("UTF-8"));
           break;
         case START:
-          baos.write("start".getBytes("UTF-8"));
+          baos.write("s".getBytes("UTF-8"));
           break;
         case MEASURE:
-          baos.write("measure".getBytes("UTF-8"));
+          baos.write("m".getBytes("UTF-8"));
+          break;
+        case STARTNORPM:
+          baos.write("g".getBytes("UTF-8"));
+          break;
+        case MEASURENORPM:
+          baos.write("r".getBytes("UTF-8"));
           break;
         default:
           LOG.severe("FATAL ERROR");

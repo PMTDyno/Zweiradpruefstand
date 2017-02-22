@@ -1632,7 +1632,7 @@ public class Gui extends javax.swing.JFrame
 
     boolean schleppEnable = true;
 
-    double tempFactor = (1013 / data.getPressure()) * (((273 + data.getTemperature()) / 293)); //Korrekturfaktor temp
+    double tempFactor = (1013 / data.getPressure()) * Math.sqrt((((273 + data.getTemperature()) / 293))); //Korrekturfaktor temp
 
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
@@ -1672,7 +1672,7 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < alpha.size(); i++)
       {
-        trq.add(alpha.get(i) * inertia * tempFactor);  //M=dOmega/dt * J
+        trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
       }
     }
     else//drehmoment kein roller
@@ -1692,7 +1692,7 @@ public class Gui extends javax.swing.JFrame
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
-        trq.add(alpha.get(i) * inertia * n * tempFactor);  //M=dOmega/dt * J
+        trq.add(alpha.get(i) * inertia * n );  //M=dOmega/dt * J
       }
     }
 
@@ -1747,14 +1747,14 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor);
+        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor*tempFactor);
       }
     }
     else
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor);
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor*tempFactor);
       }
     }
 

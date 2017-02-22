@@ -167,11 +167,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
           return measureList;
         }
-
         Thread.sleep(data.getPeriodTimeMs());
-
       }
-
     }
     catch (CommunicationException ex)
     {

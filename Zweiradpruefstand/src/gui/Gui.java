@@ -1078,7 +1078,6 @@ public class Gui extends javax.swing.JFrame
         ReadPMT fr = new ReadPMT(file);
 
         data.setMeasureList(fr.read());
-        System.out.println("Daten eingelesen");
 
         series1.clear();
         series2.clear();
@@ -1616,7 +1615,7 @@ public class Gui extends javax.swing.JFrame
     //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
     //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
 
-    System.out.println("calculating...");
+    LOG.fine("calculating...");
 
     double inertia = data.getInertia();
     double n; //uebersetzungsverhaeltnis rolle zu motor
@@ -1632,7 +1631,7 @@ public class Gui extends javax.swing.JFrame
 
     boolean schleppEnable = true;
 
-    double tempFactor = (1013 / data.getPressure()) * Math.sqrt((((273 + data.getTemperature()) / 293))); //Korrekturfaktor temp
+    double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
 
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
@@ -1655,15 +1654,12 @@ public class Gui extends javax.swing.JFrame
     //faktor fuer berechnungseinheit
     double factor;
 
-    System.out.println(data.getPowerunit());
     if(data.getPowerunit().contains("PS"))
     {
-      System.out.println("PS");
       factor = 1.36;
     }
     else
     {
-      System.out.println("kW");
       factor = 1;
     }
 
@@ -1711,7 +1707,7 @@ public class Gui extends javax.swing.JFrame
     catch (IndexOutOfBoundsException ex)
     {
       schleppEnable = false;
-      LOG.info(ex.getMessage());
+      LOG.info("No Towing Torque");
       showErrorMessage("Messdatenfehler", "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments");
 
     }
@@ -1804,8 +1800,7 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
     updateChartLabels();
-    System.out.println(pwr.get(getValMaxIndex(pwr)));
-    System.out.println("done calculating");
+    LOG.fine("done calculating");
 
   }
 

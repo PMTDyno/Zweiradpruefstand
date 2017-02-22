@@ -16,7 +16,7 @@ public class ReadPMT
 
   public ReadPMT (File file) throws Exception
   {    
-    System.out.println(file);
+//    System.out.println(file);
     this.file = file;
     if (!file.exists())
     {

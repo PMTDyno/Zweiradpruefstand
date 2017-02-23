@@ -73,7 +73,7 @@ public class Frame
         throw new CommunicationException("no data available");
       }
 
-      if (data.split("-").length != 3 || data.split("-").length != 2)
+      if (data.split("-").length != 3 && data.split("-").length != 2)
       {
         throw new CommunicationException("wrong format! Wrong number of '-'");
       }

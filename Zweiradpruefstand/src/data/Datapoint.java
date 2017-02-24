@@ -7,26 +7,26 @@ package data;
 public class Datapoint
 {
 
-  private double wdz;  // rad/s
+  private double wss;  // rad/s
   private double rpm;  // U/min
   private double time; // 
 
   /**
    *
-   * @param wdz  Wellendrehzahl
+   * @param wss  Wellendrehzahl
    * @param rpm  Motordrehzahl
    * @param time Zeitpunkt der Messung
    */
-  public Datapoint(double wdz, double rpm, double time)
+  public Datapoint(double wss, double rpm, double time)
   {
-    this.wdz = wdz;
+    this.wss = wss;
     this.rpm = rpm;
     this.time = time;
   }
 
-  public double getWdz()
+  public double getWss()
   {
-    return wdz;
+    return wss;
   }
 
   public double getRpm()
@@ -44,9 +44,9 @@ public class Datapoint
     this.time = time;
   }
 
-  public void setWdz(double wdz)
+  public void setWss(double wss)
   {
-    this.wdz = wdz;
+    this.wss = wss;
   }
 
   public void setRpm(double rpm)

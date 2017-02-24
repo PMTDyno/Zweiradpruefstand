@@ -38,12 +38,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
   private RawDatapoint getNextDatapoint() throws CommunicationException,
                                                  TimeoutException
   {
-    double wdz, rpm;
+    double wss, rpm;
     int time;
 
     String[] tmp = com.getFrameData();
 
-    wdz = Double.parseDouble(tmp[0].replace(',', '.'));
+    wss = Double.parseDouble(tmp[0].replace(',', '.'));
     if(data.isMeasRPM())
     {
       rpm = Double.parseDouble(tmp[1].replace(',', '.'));
@@ -54,7 +54,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
       time = Integer.parseInt(tmp[1]);
     }
 
-    return new RawDatapoint(wdz, 0, time);
+    return new RawDatapoint(wss, 0, time);
   }
 
   @Override
@@ -62,7 +62,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
                                                          TimeoutException,
                                                          Exception
   {
-    //WDZ - rpm - TIME
+    //WSS - rpm - TIME
 
     try
     {
@@ -132,12 +132,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
             for(RawDatapoint datapoint : list)
             {
               //in seconds
-              Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
+              Datapoint tmp = new Datapoint(datapoint.getWss() / 1000000,
                                             datapoint.getRpm() / 1000000,
                                             datapoint.getTime() / 1000000);
 
               //seconds to rad/s
-              tmp.setWdz(1 / (tmp.getWdz() * 26) * 2 * Math.PI);
+              tmp.setWss(1 / (tmp.getWss() * 26) * 2 * Math.PI);
 
               //seconds to U/min
               if(data.isTwoStroke())
@@ -154,12 +154,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
             for(RawDatapoint datapoint : list)
             {
               //in seconds
-              Datapoint tmp = new Datapoint(datapoint.getWdz() / 1000000,
+              Datapoint tmp = new Datapoint(datapoint.getWss() / 1000000,
                                             0,
                                             datapoint.getTime() / 1000000);
 
               //seconds to rad/s
-              tmp.setWdz(1 / (tmp.getWdz() * 26) * 2 * Math.PI);
+              tmp.setWss(1 / (tmp.getWss() * 26) * 2 * Math.PI);
 
               measureList.add(tmp);
             }

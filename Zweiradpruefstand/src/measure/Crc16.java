@@ -1,6 +1,5 @@
 package measure;
 
-import java.io.UnsupportedEncodingException;
 import logging.*;
 
 /**
@@ -19,35 +18,36 @@ public class Crc16
     {
     }
 
-    public static void main(String[] args) throws Exception
-    {
-        byte[] bits = new byte[30];
-        bits = "1cmVhZHk=".getBytes();
-        //System.out.println(Integer.toBinaryString(bits[2]));
-        
-        String str = new String(bits);
-        System.out.println(str + " = " + getCRC(str));
-        //System.out.println(checkCRC("req", getCRC("req")));
-    }
+//    public static void main(String[] args) throws Exception
+//    {
+//        byte[] bits = new byte[30];
+//        bits = "0,0226:0,0061=".getBytes();
+//        //System.out.println(Integer.toBinaryString(bits[2]));
+//        
+//        String str = new String(bits);
+//        System.out.println('"' + str + '"' + " = " + '"' + getCRC(str) + '"');
+//        //System.out.println(checkCRC("req", getCRC("req")));
+//    }
 
     /**
      * Calculates the checksum of the source and compares it with the given
      * checksum <br>
-     * The CRC16-CCITT 0xFFFF is used
-     *
+     * The CRC-CCITT 0xFFFF is used
+     * https://www.lammertbies.nl/comm/info/crc-calculation.html
+     * 
      * @param source
      * @param checksum
      * @return true if the checksum matches <br>
      * false if the checksum does not match or an error occured
      */
-    public static boolean checkCRC(String source, String checksum)
+    public static boolean checkCRC(String data, String checksum)
     {
 
         try
         {
             crc = 0xFFFF;          // initial value
             polynomial = 0x1021;   // 0001 0000 0010 0001  (0, 5, 12)
-            byte[] bytes = source.getBytes("UTF-8");
+            byte[] bytes = data.getBytes("UTF-8");
 
             //byte[] bytes = "test".getBytes("UTF-8");
             for(byte b : bytes)
@@ -69,7 +69,7 @@ public class Crc16
         }
         catch (Exception ex)
         {
-            LOG.severe("Unsupported Exception: " + ex);
+            LOG.severe("Unsupported Exception: " + ex.getMessage());
         }
         return false;
     }

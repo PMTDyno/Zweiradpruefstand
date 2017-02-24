@@ -1096,14 +1096,14 @@ public class Gui extends javax.swing.JFrame
 
       try (FileWriter writer = new FileWriter(file);)
       {
-        //time - rpm - wdz
+        //time - rpm - wss
         for(RawDatapoint rawDatapoint : data.getRawDataList())
         {
           String time = String.valueOf(rawDatapoint.getTime());
           String rpm = String.valueOf(rawDatapoint.getRpm());
-          String wdz = String.valueOf(rawDatapoint.getWdz());
+          String wss = String.valueOf(rawDatapoint.getWss());
 
-          String line = time + ':' + rpm + ':' + wdz + '\n';
+          String line = time + ':' + rpm + ':' + wss + '\n';
           writer.write(line);
         }
         writer.close();
@@ -1613,7 +1613,7 @@ public class Gui extends javax.swing.JFrame
 
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
-      omega.add(data.getMeasureList().get(i).getWdz());
+      omega.add(data.getMeasureList().get(i).getWss());
       rpm.add(data.getMeasureList().get(i).getRpm());
       time.add(data.getMeasureList().get(i).getTime());
     }

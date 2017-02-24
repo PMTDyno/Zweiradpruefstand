@@ -72,9 +72,9 @@ public class ReadPMT
       {
         String tmp = r.readLine();
         String[] numbers = tmp.split(":");
-        // time - rpm - wdz
+        // time - rpm - wss
         double rpm;
-        double wdz = (1 / (Double.parseDouble(numbers[2].replace(",", ".")) * 26)) * 2 * Math.PI;
+        double wss = (1 / (Double.parseDouble(numbers[2].replace(",", ".")) * 26)) * 2 * Math.PI;
         
         if(data.isTwoStroke())
           rpm = 1 / Double.parseDouble(numbers[1].replace(",", ".")) * 60;
@@ -83,7 +83,7 @@ public class ReadPMT
 
         double time = Double.parseDouble(numbers[0].replace(",", "."));
 
-        list.add(new Datapoint(wdz, rpm, time));
+        list.add(new Datapoint(wss, rpm, time));
       }
 
       r.close();

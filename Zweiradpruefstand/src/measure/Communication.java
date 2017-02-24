@@ -90,7 +90,7 @@ public class Communication
   {
     try
     {
-      return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split("-", 3);
+      return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split(":");
     }
     catch (CommunicationException ex)
     {

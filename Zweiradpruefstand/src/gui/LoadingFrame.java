@@ -195,14 +195,14 @@ public class LoadingFrame extends javax.swing.JFrame
 
   public void setLoading(boolean b)
   {
-    System.out.println("loading ID: " + Thread.currentThread().getId());
+//    System.out.println("loading ID: " + Thread.currentThread().getId());
     
     jProgressBar.setIndeterminate(b);
   }
   
   public void setStatus(String status)
   {
-    System.out.println("status ID: " + Thread.currentThread().getId());
+//    System.out.println("status ID: " + Thread.currentThread().getId());
     jLabelStatus.setText(status);
   }
 

@@ -43,7 +43,7 @@ public class ProgSetDialog extends javax.swing.JDialog
         initComponents();
 
         setTitle("Programmeinstellungen");
-        setSize(new Dimension(500, 300));
+        setSize(new Dimension(500, 350));
         setResizable(false);
 
         this.inertia = data.getInertia();

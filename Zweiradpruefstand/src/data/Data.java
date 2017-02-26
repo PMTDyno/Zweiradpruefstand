@@ -3,7 +3,7 @@ package data;
 import java.util.ArrayList;
 
 /**
- * Stores the main data variables
+ * Stores the main data
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
@@ -41,7 +41,7 @@ public final class Data
   private double correctionTorque = 1.0;
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
-  
+
   private int startRPM = 2000;
   private int pngWidth = 800;
   private int pngHeight = 600;
@@ -52,16 +52,15 @@ public final class Data
   private int periodTimeMs = 40;
   private int humidity;
 
-  private ArrayList<Datapoint> measureList = new ArrayList<>();
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
-  
+  private ArrayList<Datapoint> measureList = new ArrayList<>();
+
   private boolean twoStroke = true;
   private boolean measRPM = true;
 
   /*
    * ------------------------------------------------------------------------
    */
-
   public ArrayList<Datapoint> getMeasureList()
   {
     return measureList;
@@ -82,8 +81,6 @@ public final class Data
     this.rawDataList = rawDataList;
   }
 
-  
-  
   public int getStartRPM()
   {
     return startRPM;
@@ -93,7 +90,7 @@ public final class Data
   {
     this.startRPM = startRPM;
   }
-  
+
   public boolean isMeasRPM()
   {
     return measRPM;
@@ -103,7 +100,7 @@ public final class Data
   {
     this.measRPM = measRPM;
   }
-  
+
   public String getFilePath()
   {
     return filePath;

@@ -58,9 +58,13 @@
 * ![d] Cleaning
 * ![d] Performance  
 * ![d] Calculation and filtering
-* Loading Screen
+* ![d] Loading Screen
 * ![d] New Design
 * ![d] Export .pmt File
+
+####v0.9.7
+* ![d] Bug fixes
+* ![d] Icon Cleanup
 
 ####v1.0
 * Measurement working!

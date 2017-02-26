@@ -5,10 +5,14 @@
  */
 package gui;
 
+import data.Data;
 import java.awt.Dimension;
+import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import logging.Logger;
 import javax.swing.JOptionPane;
+import measure.Communication;
+import measure.MeasurementWorker;
 
 /**
  *
@@ -17,23 +21,31 @@ import javax.swing.JOptionPane;
 public class LoadingFrame extends javax.swing.JFrame
 {
 
-  Gui gui;
+  private static final Logger LOG = Logger.getLogger(LoadingFrame.class.getName());
+
+  private Data data = Data.getInstance();
+  private Gui gui;
+  private Measure worker;
+
   /**
    * Creates new form LoadingFrame
    */
   public LoadingFrame()
   {
-    setTitle("Messvorgang läuft...");
+    LOG.setLevel(Level.ALL);
+    setTitle("Messung");
     setResizable(false);
-    setMinimumSize(new Dimension(150,130));
-    
-    setLocationRelativeTo(null);
+    setMinimumSize(new Dimension(250, 150));
+
     initComponents();
+
   }
-  
-  public void init(Gui gui)
+
+  public void init(Gui gui, Communication com)
   {
     this.gui = gui;
+    worker = new Measure(com);
+    setLocationRelativeTo(gui);
   }
 
   /**
@@ -47,15 +59,15 @@ public class LoadingFrame extends javax.swing.JFrame
   {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    jPanel2 = new javax.swing.JPanel();
+    jPanelButtons = new javax.swing.JPanel();
     jButton1 = new javax.swing.JButton();
     jButton3 = new javax.swing.JButton();
-    jPanel1 = new javax.swing.JPanel();
+    jPanelInfo = new javax.swing.JPanel();
     jProgressBar = new javax.swing.JProgressBar();
     jLabelStatus = new javax.swing.JLabel();
     jLabel = new javax.swing.JLabel();
 
-    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setResizable(false);
 
     jButton1.setText("Abbrechen");
@@ -66,9 +78,10 @@ public class LoadingFrame extends javax.swing.JFrame
         jButton1ActionPerformed(evt);
       }
     });
-    jPanel2.add(jButton1);
+    jPanelButtons.add(jButton1);
 
     jButton3.setText("Messung fertigstellen");
+    jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     jButton3.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -76,11 +89,11 @@ public class LoadingFrame extends javax.swing.JFrame
         jButton3ActionPerformed(evt);
       }
     });
-    jPanel2.add(jButton3);
+    jPanelButtons.add(jButton3);
 
-    getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+    getContentPane().add(jPanelButtons, java.awt.BorderLayout.SOUTH);
 
-    jPanel1.setLayout(new java.awt.GridBagLayout());
+    jPanelInfo.setLayout(new java.awt.GridBagLayout());
 
     jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
     jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
@@ -88,21 +101,22 @@ public class LoadingFrame extends javax.swing.JFrame
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.gridwidth = 2;
-    jPanel1.add(jProgressBar, gridBagConstraints);
+    gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+    jPanelInfo.add(jProgressBar, gridBagConstraints);
 
     jLabelStatus.setText("0");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
-    jPanel1.add(jLabelStatus, gridBagConstraints);
+    jPanelInfo.add(jLabelStatus, gridBagConstraints);
 
     jLabel.setText("Anzahl der Messpunkte: ");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
-    jPanel1.add(jLabel, gridBagConstraints);
+    jPanelInfo.add(jLabel, gridBagConstraints);
 
-    getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+    getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
@@ -173,8 +187,8 @@ public class LoadingFrame extends javax.swing.JFrame
   private javax.swing.JButton jButton3;
   private javax.swing.JLabel jLabel;
   private javax.swing.JLabel jLabelStatus;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanelButtons;
+  private javax.swing.JPanel jPanelInfo;
   private javax.swing.JProgressBar jProgressBar;
   // End of variables declaration//GEN-END:variables
 
@@ -182,28 +196,72 @@ public class LoadingFrame extends javax.swing.JFrame
   {
     if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
     {
-      gui.abortMeasurement();
-      dispose();
+      worker.cancel(true);
+      close();
     }
   }
 
   private void finish()
   {
-    gui.finishMeasurement();
-    dispose();
+    worker.stop();
+    close();
   }
 
-  public void setLoading(boolean b)
+  private void close()
   {
-//    System.out.println("loading ID: " + Thread.currentThread().getId());
-    
-    jProgressBar.setIndeterminate(b);
+    super.dispose();
   }
-  
-  public void setStatus(String status)
+
+  @Override
+  public void dispose()
   {
-//    System.out.println("status ID: " + Thread.currentThread().getId());
+    if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
+    {
+      worker.cancel(true);
+      close();
+    }
+  }
+
+  private void setStatus(String status)
+  {
+    System.out.println("status ID: " + Thread.currentThread().getId());
     jLabelStatus.setText(status);
+
+  }
+
+  public void startMeasurement()
+  {
+    worker.execute();
+    jProgressBar.setIndeterminate(true);
+  }
+
+  /**
+   * MeasurementWorker
+   */
+  private class Measure extends MeasurementWorker
+  {
+
+    public Measure(Communication com)
+    {
+      super(com);
+    }
+
+    @Override
+    protected void process(List<Integer> chunks)
+    {
+      for(Integer chunk : chunks)
+      {
+        jLabelStatus.setText(String.valueOf(chunk));
+      }
+    }
+
+    @Override
+    protected void done()
+    {
+      gui.done(worker);
+      close();
+    }
+
   }
 
 }

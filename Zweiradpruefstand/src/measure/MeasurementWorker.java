@@ -64,6 +64,21 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
   {
     //WSS - rpm - TIME
 
+//    int cnt = 0;
+//    while(true)
+//    {
+//      publish(cnt);
+//      
+//      cnt++;
+//      
+//      if(cnt > 10000 || isCancelled() || stopRequest.get())
+//        break;
+//      
+//      Thread.sleep(data.getPeriodTimeMs());
+//    }
+    
+    
+    
     try
     {
       RawDatapoint dp;

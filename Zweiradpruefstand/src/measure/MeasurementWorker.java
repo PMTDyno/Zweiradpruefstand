@@ -43,18 +43,19 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
     String[] tmp = com.getFrameData();
 
-    wss = Double.parseDouble(tmp[0].replace(',', '.'));
+    wss = Double.parseDouble(tmp[0]);
     if(data.isMeasRPM())
     {
-      rpm = Double.parseDouble(tmp[1].replace(',', '.'));
+      rpm = Double.parseDouble(tmp[1]);
       time = Integer.parseInt(tmp[2]);
     }
     else
     {
+      rpm = 0;
       time = Integer.parseInt(tmp[1]);
     }
 
-    return new RawDatapoint(wss, 0, time);
+    return new RawDatapoint(wss, rpm, time);
   }
 
   @Override

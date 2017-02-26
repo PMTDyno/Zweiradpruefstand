@@ -966,9 +966,9 @@ public class Gui extends javax.swing.JFrame
 
     enableCancelling();
 
+    loading.startMeasurement();
     loading.setVisible(true);
 
-    loading.startMeasurement();
   }
 
   private void openMeasureFile()

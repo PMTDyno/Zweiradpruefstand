@@ -968,6 +968,8 @@ public class Gui extends javax.swing.JFrame
 
     loading.startMeasurement();
     loading.setVisible(true);
+    
+    enableStarting();
 
   }
 
@@ -1617,7 +1619,7 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
+//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
         if(i == getValMaxIndex(rpm))
         {
           break;
@@ -1771,7 +1773,6 @@ public class Gui extends javax.swing.JFrame
 
       data.setMeasureList(worker.get());
       calculate();
-      enableStarting();
     }
     catch (ExecutionException ex)
     {

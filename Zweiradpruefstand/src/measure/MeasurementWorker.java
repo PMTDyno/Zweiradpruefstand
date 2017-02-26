@@ -199,6 +199,10 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
       LOG.severe("No response from controller - Timeout");
       throw ex;
     }
+    catch(InterruptedException ex)
+    {
+      return null;
+    }
     catch (Exception ex)
     {
       LOG.severe(ex);
@@ -208,7 +212,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
     {
       LOG.info("MeasurementWorker done!");
     }
-
   }
 
 }

@@ -105,7 +105,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
         }
         else
         {
-          //todo
+          //todo starten wenn geschwindigkeit erreicht
+          Thread.sleep(data.getPeriodTimeMs());
           break;
         }
         Thread.sleep(data.getPeriodTimeMs());
@@ -179,7 +180,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
               measureList.add(tmp);
             }
           }
-
+          LOG.info(measureList.size() + " Datensätze erfasst");
           return measureList;
         }
         Thread.sleep(data.getPeriodTimeMs());

@@ -55,7 +55,6 @@ public class Gui extends javax.swing.JFrame
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
 
-  private final LoadingFrame loading = new LoadingFrame();
   private final Communication com = new Communication();
 
   private final ProgSetDialog progset;
@@ -960,7 +959,7 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
-    LoadingFrame loading = new LoadingFrame();
+    MeasureDialog loading = new MeasureDialog(this, true);
     loading.init(this, com);
     if(!startVehicleSet())
       return;
@@ -1553,7 +1552,7 @@ public class Gui extends javax.swing.JFrame
     {
       schleppEnable = false;
       LOG.info("No Towing Torque");
-      JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Messdatenfehler", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Kein Schleppmoment", JOptionPane.INFORMATION_MESSAGE);
     }
 
     //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
@@ -1605,6 +1604,7 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
+        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + (omega.get(i) * 0.175 * 3.6));
         if(i == getValMaxIndex(omega))
         {
           break;

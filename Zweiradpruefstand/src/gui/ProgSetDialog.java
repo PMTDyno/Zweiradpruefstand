@@ -12,115 +12,116 @@ import javax.swing.JOptionPane;
  */
 public class ProgSetDialog extends javax.swing.JDialog
 {
-    private final Data data = Data.getInstance();
-    private static final Logger LOG = Logger.getLogger(ProgSetDialog.class.getName());
 
-    private boolean settingsChanged = false;
-    //PNG RESOLUTION
-    private int resIndex = 1; //800x600 standart
-    private boolean customRes = false;
-    private int customWidth = 800;
-    private int customHeight = 600;
-    //POWERUNIT
-    private boolean powerunitPS = true;
-    //CORRECTION
-    private double correctionPower = 1.0;
-    private double correctionTorque = 1.0;
-    private double inertia = 3.7017;
-    private int periodTimeMs = 40;
-    private int startRpm = 2000;
+  private final Data data = Data.getInstance();
+  private static final Logger LOG = Logger.getLogger(ProgSetDialog.class.getName());
 
-    /**
-     * Creates the frame with the given values
-     *
-     * @param parent The parent Frame
-     * @param modal  specifies whether dialog blocks user input to other
-     *               top-level windows when shown.
-     */
-    public ProgSetDialog(java.awt.Frame parent, boolean modal)
+  private boolean settingsChanged = false;
+  //PNG RESOLUTION
+  private int resIndex = 1; //800x600 standart
+  private boolean customRes = false;
+  private int customWidth = 800;
+  private int customHeight = 600;
+  //POWERUNIT
+  private boolean powerunitPS = true;
+  //CORRECTION
+  private double correctionPower = 1.0;
+  private double correctionTorque = 1.0;
+  private double inertia = 3.7017;
+  private int periodTimeMs = 40;
+  private int startRpm = 2000;
+
+  /**
+   * Creates the frame with the given values
+   *
+   * @param parent The parent Frame
+   * @param modal  specifies whether dialog blocks user input to other top-level
+   *               windows when shown.
+   */
+  public ProgSetDialog(java.awt.Frame parent, boolean modal)
+  {
+    super(parent, modal);
+    initComponents();
+
+    setTitle("Programmeinstellungen");
+    setSize(new Dimension(500, 350));
+    setResizable(false);
+
+    this.inertia = data.getInertia();
+
+    powerunitPS = data.getPowerunit().equals("PS");
+
+    jButRadioUnitPS.setSelected(powerunitPS);
+
+    this.correctionPower = data.getCorrectionPower();
+    this.correctionTorque = data.getCorrectionTorque();
+    this.periodTimeMs = data.getPeriodTimeMs();
+    this.startRpm = data.getStartRPM();
+
+    switch (data.getPngWidth())
     {
-        super(parent, modal);
-        initComponents();
-
-        setTitle("Programmeinstellungen");
-        setSize(new Dimension(500, 350));
-        setResizable(false);
-
-        this.inertia = data.getInertia();
-
-        powerunitPS = data.getPowerunit().equals("PS");
-
-        jButRadioUnitPS.setSelected(powerunitPS);
-
-        this.correctionPower = data.getCorrectionPower();
-        this.correctionTorque = data.getCorrectionTorque();
-        this.periodTimeMs = data.getPeriodTimeMs();
-        this.startRpm = data.getStartRPM();
-        
-        switch (data.getPngWidth())
+      case 640:
+        if(data.getPngHeight() == 480)
         {
-            case 640:
-                if(data.getPngHeight() == 480)
-                {
-                    customRes = false;
-                    resIndex = 0;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 800:
-                if(data.getPngHeight() == 600)
-                {
-                    customRes = false;
-                    resIndex = 1;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 1280:
-                if(data.getPngHeight() == 720)
-                {
-                    customRes = false;
-                    resIndex = 2;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 1920:
-                if(data.getPngHeight() == 1080)
-                {
-                    customRes = false;
-                    resIndex = 3;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            default:
-                customRes = true;
-                break;
+          customRes = false;
+          resIndex = 0;
         }
+        else
+          customRes = true;
+        break;
 
-        if(data.getPngWidth() < 400)
-            data.setPngWidth(400);
+      case 800:
+        if(data.getPngHeight() == 600)
+        {
+          customRes = false;
+          resIndex = 1;
+        }
+        else
+          customRes = true;
+        break;
 
-        if(data.getPngHeight() < 200)
-            data.setPngHeight(200);
+      case 1280:
+        if(data.getPngHeight() == 720)
+        {
+          customRes = false;
+          resIndex = 2;
+        }
+        else
+          customRes = true;
+        break;
 
-        this.customWidth = data.getPngWidth();
-        this.customHeight = data.getPngHeight();
+      case 1920:
+        if(data.getPngHeight() == 1080)
+        {
+          customRes = false;
+          resIndex = 3;
+        }
+        else
+          customRes = true;
+        break;
 
+      default:
+        customRes = true;
+        break;
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
+    if(data.getPngWidth() < 400)
+      data.setPngWidth(400);
+
+    if(data.getPngHeight() < 200)
+      data.setPngHeight(200);
+
+    this.customWidth = data.getPngWidth();
+    this.customHeight = data.getPngHeight();
+
+  }
+
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
@@ -458,13 +459,13 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     private void jButCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButCancelActionPerformed
     {//GEN-HEADEREND:event_jButCancelActionPerformed
-        settingsChanged = false;
-        dispose();
+      settingsChanged = false;
+      dispose();
     }//GEN-LAST:event_jButCancelActionPerformed
 
     private void jButConfirmActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButConfirmActionPerformed
     {//GEN-HEADEREND:event_jButConfirmActionPerformed
-        confirm();
+      confirm();
     }//GEN-LAST:event_jButConfirmActionPerformed
 
   private void jTextInertiaActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jTextInertiaActionPerformed
@@ -487,319 +488,317 @@ public class ProgSetDialog extends javax.swing.JDialog
 
   }//GEN-LAST:event_jPNGResolutionComboActionPerformed
 
-    /*---PUBLIC METHODS----------------------------*/
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+  /*---PUBLIC METHODS----------------------------*/
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[])
+  {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-            {
-                if("Nimbus".equals(info.getName()))
-                {
-                    //javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-                    break;
-                }
-            }
-        }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(ProgSetDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(()
-                -> 
-                {
-                    ProgSetDialog dialog = new ProgSetDialog(new javax.swing.JFrame(), true);
-                    dialog.addWindowListener(new java.awt.event.WindowAdapter()
-                    {
-
-                        @Override
-                        public void windowClosing(java.awt.event.WindowEvent e)
-                        {
-                            System.exit(0);
-                        }
-
-                    });
-                    dialog.setVisible(true);
-        });
-    }
-
-    /**
-     * Sets the given/default values.<br>
-     * Then calls the super method.
-     *
-     * @param b
      */
-    @Override
-    public void setVisible(boolean b)
+    try
     {
-        if(b)
+      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+      {
+        if("Nimbus".equals(info.getName()))
         {
-            settingsChanged = false;
-            //PNG RESOLUTION
+          //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+          break;
+        }
+      }
+    }
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
+    {
+      java.util.logging.Logger.getLogger(ProgSetDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
 
-            jButRadioPng.setSelected(!customRes);
-            jButRadioPngCustom.setSelected(customRes);
+    //</editor-fold>
 
-            jWidth.setEnabled(customRes);
-            jHeight.setEnabled(customRes);
+    /* Create and display the dialog */
+    java.awt.EventQueue.invokeLater(()
+            ->
+    {
+      ProgSetDialog dialog = new ProgSetDialog(new javax.swing.JFrame(), true);
+      dialog.addWindowListener(new java.awt.event.WindowAdapter()
+      {
 
-            if(resIndex == -1)
-                jPNGResolutionCombo.setSelectedIndex(1);
-
-            jPNGResolutionCombo.setEnabled(!customRes);
-
-            jWidth.setText(String.valueOf(customWidth));
-            jHeight.setText(String.valueOf(customHeight));
-
-            //POWERUNIT
-            jButRadioUnitPS.setSelected(powerunitPS);
-            jButRadioUnitkW.setSelected(!powerunitPS);
-
-            //CORRECTION
-            jSpinCorrectPower.setValue(correctionPower);
-            jSpinCorrectTorque.setValue(correctionTorque);
-
-            //INERTIA
-            jTextInertia.setText(String.format("%.4f", inertia));
-
-            //SERIALPORT
-            jSpinPeriod.setValue(periodTimeMs);
-            jSpinRpm.setValue(startRpm);
-
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e)
+        {
+          System.exit(0);
         }
 
-        super.setVisible(b);
-        LOG.finest("ProgSetDialog visible");
+      });
+      dialog.setVisible(true);
+    });
+  }
+
+  /**
+   * Sets the given/default values.<br>
+   * Then calls the super method.
+   *
+   * @param b
+   */
+  @Override
+  public void setVisible(boolean b)
+  {
+    if(b)
+    {
+      settingsChanged = false;
+      //PNG RESOLUTION
+
+      jButRadioPng.setSelected(!customRes);
+      jButRadioPngCustom.setSelected(customRes);
+
+      jWidth.setEnabled(customRes);
+      jHeight.setEnabled(customRes);
+
+      if(resIndex == -1)
+        jPNGResolutionCombo.setSelectedIndex(1);
+
+      jPNGResolutionCombo.setEnabled(!customRes);
+
+      jWidth.setText(String.valueOf(customWidth));
+      jHeight.setText(String.valueOf(customHeight));
+
+      //POWERUNIT
+      jButRadioUnitPS.setSelected(powerunitPS);
+      jButRadioUnitkW.setSelected(!powerunitPS);
+
+      //CORRECTION
+      jSpinCorrectPower.setValue(correctionPower);
+      jSpinCorrectTorque.setValue(correctionTorque);
+
+      //INERTIA
+      jTextInertia.setText(String.format("%.4f", inertia));
+
+      //SERIALPORT
+      jSpinPeriod.setValue(periodTimeMs);
+      jSpinRpm.setValue(startRpm);
+
     }
 
-    /**
-     * Checks the selected dimension and returns it.
-     *
-     * @return The Dimension
-     */
-    public Dimension getPNGResolution()
+    super.setVisible(b);
+    LOG.finest("ProgSetDialog visible");
+  }
+
+  /**
+   * Checks the selected dimension and returns it.
+   *
+   * @return The Dimension
+   */
+  public Dimension getPNGResolution()
+  {
+    Dimension dimension = new Dimension();
+
+    switch (resIndex)
     {
-        Dimension dimension = new Dimension();
-
-        switch (resIndex)
-        {
-            case -1:
-                dimension.width = customWidth;
-                dimension.height = customHeight;
-                break;
-            case 0:
-                dimension.width = 640;
-                dimension.height = 480;
-                break;
-            case 1:
-                dimension.width = 800;
-                dimension.height = 600;
-                break;
-            case 2:
-                dimension.width = 1280;
-                dimension.height = 720;
-                break;
-            case 3:
-                dimension.width = 1920;
-                dimension.height = 1080;
-                break;
-            default:
-                JOptionPane.showMessageDialog(this,
-                                              "Fehler bei Auflösung!",
-                                              "Fehler",
-                                              JOptionPane.ERROR_MESSAGE);
-        }
-
-        return dimension;
+      case -1:
+        dimension.width = customWidth;
+        dimension.height = customHeight;
+        break;
+      case 0:
+        dimension.width = 640;
+        dimension.height = 480;
+        break;
+      case 1:
+        dimension.width = 800;
+        dimension.height = 600;
+        break;
+      case 2:
+        dimension.width = 1280;
+        dimension.height = 720;
+        break;
+      case 3:
+        dimension.width = 1920;
+        dimension.height = 1080;
+        break;
+      default:
+        JOptionPane.showMessageDialog(this,
+                                      "Fehler bei Auflösung!",
+                                      "Fehler",
+                                      JOptionPane.ERROR_MESSAGE);
     }
 
-    /**
-     * @return the powerunit
-     */
-    public String getPowerunit()
+    return dimension;
+  }
+
+  /**
+   * @return the powerunit
+   */
+  public String getPowerunit()
+  {
+    if(powerunitPS)
+      return "PS";
+    else
+      return "kW";
+  }
+
+  /**
+   * @return the correction factor for the power series
+   */
+  public double getCorrectionPower()
+  {
+    return correctionPower;
+  }
+
+  /**
+   * @return the correction factor for the torque series
+   */
+  public double getCorrectionTorque()
+  {
+    return correctionTorque;
+  }
+
+  /**
+   * @return true if the setting is changed
+   */
+  public boolean isSettingsChanged()
+  {
+    return settingsChanged;
+  }
+
+  /**
+   * @return the inertia
+   */
+  public double getInertia()
+  {
+    return inertia;
+  }
+
+  /**
+   * @return the period between datapoint captures
+   */
+  public int getPeriodTimeMs()
+  {
+    return periodTimeMs;
+  }
+
+  /*---PRIVATE METHODS-------------------------------------*/
+  /**
+   * Checks if all the values are correct and saves the changed values. Then
+   * disposes the frame.
+   */
+  private void confirm()
+  {
+    //PNG RESOLUTION
+    customRes = jButRadioPngCustom.isSelected();
+    boolean error = false;
+
+    int tempW;
+    int tempH;
+    if(customRes)
     {
-        if(powerunitPS)
-            return "PS";
-        else
-            return "kW";
-    }
-
-    /**
-     * @return the correction factor for the power series
-     */
-    public double getCorrectionPower()
-    {
-        return correctionPower;
-    }
-
-    /**
-     * @return the correction factor for the torque series
-     */
-    public double getCorrectionTorque()
-    {
-        return correctionTorque;
-    }
-
-    /**
-     * @return true if the setting is changed
-     */
-    public boolean isSettingsChanged()
-    {
-        return settingsChanged;
-    }
-
-    /**
-     * @return the inertia
-     */
-    public double getInertia()
-    {
-        return inertia;
-    }
-
-    /**
-     * @return the period between datapoint captures
-     */
-    public int getPeriodTimeMs()
-    {
-        return periodTimeMs;
-    }
-
-    
-    
-    /*---PRIVATE METHODS-------------------------------------*/
-    /**
-     * Checks if all the values are correct and saves the changed values. Then
-     * disposes the frame.
-     */
-    private void confirm()
-    {
-        //PNG RESOLUTION
-        customRes = jButRadioPngCustom.isSelected();
-        boolean error = false;
-
-        int tempW;
-        int tempH;
-        if(customRes)
-        {
-            resIndex = -1;
-            try
-            {
-                tempW = Integer.parseInt(jWidth.getText());
-                tempH = Integer.parseInt(jHeight.getText());
-                if(tempW < 400 || tempH < 200)
-                    throw new IllegalArgumentException();
-                else
-                {
-                    customWidth = tempW;
-                    customHeight = tempH;
-                }
-            }
-            catch (NumberFormatException ex)
-            {
-                error = true;
-                LOG.warning("Invalid Resolution", ex);
-                JOptionPane.showMessageDialog(this, jWidth.getText()
-                                              + " x "
-                                              + jHeight.getText()
-                                              + " ist keine gültige Auflösung!",
-                                              "Keine gültige Auflösung!", JOptionPane.ERROR_MESSAGE);
-            }
-            catch (IllegalArgumentException ex)
-            {
-                error = true;
-                LOG.warning("Resolution too small(min 400x200)", ex);
-                JOptionPane.showMessageDialog(this, jWidth.getText()
-                                              + " x "
-                                              + jHeight.getText()
-                                              + " ist keine gültige Auflösung! \n"
-                                              + " Auflösung mindestens 400x200!",
-                                              "Keine gültige Auflösung!",
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-            catch (Exception ex)
-            {
-                error = true;
-                LOG.severe("Unsupported Exception", ex);
-                JOptionPane.showMessageDialog(this,
-                                              "Unbekannter Fehler aufgetreten.\n" + ex.toString(),
-                                              "Unbekannter Fehler",
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-
-        }
-        else
-            resIndex = jPNGResolutionCombo.getSelectedIndex();
-
-        //POWERUNIT
-        if(jButRadioUnitPS.isSelected())
-            powerunitPS = true;
-        else if(jButRadioUnitkW.isSelected())
-            powerunitPS = false;
+      resIndex = -1;
+      try
+      {
+        tempW = Integer.parseInt(jWidth.getText());
+        tempH = Integer.parseInt(jHeight.getText());
+        if(tempW < 400 || tempH < 200)
+          throw new IllegalArgumentException();
         else
         {
-            error = true;
-            JOptionPane.showMessageDialog(this,
-                                          "Fehler bei der Leistungseinheit!",
-                                          "Fehler Leistungseinheit!",
-                                          JOptionPane.ERROR_MESSAGE);
+          customWidth = tempW;
+          customHeight = tempH;
         }
+      }
+      catch (NumberFormatException ex)
+      {
+        error = true;
+        LOG.warning("Invalid Resolution", ex);
+        JOptionPane.showMessageDialog(this, jWidth.getText()
+                                      + " x "
+                                      + jHeight.getText()
+                                      + " ist keine gültige Auflösung!",
+                                      "Keine gültige Auflösung!", JOptionPane.ERROR_MESSAGE);
+      }
+      catch (IllegalArgumentException ex)
+      {
+        error = true;
+        LOG.warning("Resolution too small(min 400x200)", ex);
+        JOptionPane.showMessageDialog(this, jWidth.getText()
+                                      + " x "
+                                      + jHeight.getText()
+                                      + " ist keine gültige Auflösung! \n"
+                                      + " Auflösung mindestens 400x200!",
+                                      "Keine gültige Auflösung!",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
+      catch (Exception ex)
+      {
+        error = true;
+        LOG.severe("Unsupported Exception", ex);
+        JOptionPane.showMessageDialog(this,
+                                      "Unbekannter Fehler aufgetreten.\n" + ex.toString(),
+                                      "Unbekannter Fehler",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
 
-        //CORRECTION
-        correctionPower = (double) jSpinCorrectPower.getValue();
-        correctionTorque = (double) jSpinCorrectTorque.getValue();
-
-        //INERTIA
-        try
-        {
-            double tmp = Double.parseDouble(jTextInertia.getText().replaceAll(",", "."));
-            if(tmp < 0.5 || tmp > 5.0)
-                throw new NumberFormatException();
-            inertia = tmp;
-        }
-        catch (NumberFormatException | NullPointerException ex)
-        {
-            error = true;
-            LOG.warning("Inertia too small/big (0.5 - 5.0)", ex);
-            JOptionPane.showMessageDialog(this,
-                                          "Fehler bei Trägheitsmoment! \n"
-                                          + "Wert mussen zwischen 0,5 und 5,0 liegen.",
-                                          "Fehler Trägheitsmoment!",
-                                          JOptionPane.ERROR_MESSAGE);
-        }
-        catch (Exception ex)
-        {
-            error = true;
-            LOG.severe("Unsupported Exception", ex);
-            JOptionPane.showMessageDialog(this,
-                                          "Unbekannter Fehler aufgetreten\n" + ex.toString(),
-                                          "Unbekannter Fehler",
-                                          JOptionPane.ERROR_MESSAGE);
-        }
-
-        //SERIALPORT
-        periodTimeMs = (int) jSpinPeriod.getValue();
-        startRpm = (int) jSpinRpm.getValue();
-        
-        if(!error)
-        {
-            settingsChanged = true;
-            dispose();
-        }
     }
+    else
+      resIndex = jPNGResolutionCombo.getSelectedIndex();
+
+    //POWERUNIT
+    if(jButRadioUnitPS.isSelected())
+      powerunitPS = true;
+    else if(jButRadioUnitkW.isSelected())
+      powerunitPS = false;
+    else
+    {
+      error = true;
+      JOptionPane.showMessageDialog(this,
+                                    "Fehler bei der Leistungseinheit!",
+                                    "Fehler Leistungseinheit!",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+
+    //CORRECTION
+    correctionPower = (double) jSpinCorrectPower.getValue();
+    correctionTorque = (double) jSpinCorrectTorque.getValue();
+
+    //INERTIA
+    try
+    {
+      double tmp = Double.parseDouble(jTextInertia.getText().replaceAll(",", "."));
+      if(tmp < 0.5 || tmp > 5.0)
+        throw new NumberFormatException();
+      inertia = tmp;
+    }
+    catch (NumberFormatException | NullPointerException ex)
+    {
+      error = true;
+      LOG.warning("Inertia too small/big (0.5 - 5.0)", ex);
+      JOptionPane.showMessageDialog(this,
+                                    "Fehler bei Trägheitsmoment! \n"
+                                    + "Wert mussen zwischen 0,5 und 5,0 liegen.",
+                                    "Fehler Trägheitsmoment!",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+    catch (Exception ex)
+    {
+      error = true;
+      LOG.severe("Unsupported Exception", ex);
+      JOptionPane.showMessageDialog(this,
+                                    "Unbekannter Fehler aufgetreten\n" + ex.toString(),
+                                    "Unbekannter Fehler",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+
+    //SERIALPORT
+    periodTimeMs = (int) jSpinPeriod.getValue();
+    startRpm = (int) jSpinRpm.getValue();
+
+    if(!error)
+    {
+      settingsChanged = true;
+      dispose();
+    }
+  }
 
 
   // Variables declaration - do not modify//GEN-BEGIN:variables

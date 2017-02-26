@@ -18,10 +18,10 @@ import measure.MeasurementWorker;
  *
  * @author Messing Levin (meslem12@htl-kaindorf.ac.at)
  */
-public class LoadingFrame extends javax.swing.JFrame
+public class MeasureDialog extends javax.swing.JDialog
 {
 
-  private static final Logger LOG = Logger.getLogger(LoadingFrame.class.getName());
+  private static final Logger LOG = Logger.getLogger(MeasureDialog.class.getName());
 
   private Data data = Data.getInstance();
   private Gui gui;
@@ -30,10 +30,12 @@ public class LoadingFrame extends javax.swing.JFrame
   /**
    * Creates new form LoadingFrame
    */
-  public LoadingFrame()
+  public MeasureDialog(java.awt.Frame parent, boolean modal)
   {
+    super(parent, modal);
+
     LOG.setLevel(Level.ALL);
-    setTitle("Messung");
+    setTitle("Messung läuft...");
     setResizable(false);
     setMinimumSize(new Dimension(250, 150));
 
@@ -154,31 +156,39 @@ public class LoadingFrame extends javax.swing.JFrame
     }
     catch (ClassNotFoundException ex)
     {
-      java.util.logging.Logger.getLogger(LoadingFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
     catch (InstantiationException ex)
     {
-      java.util.logging.Logger.getLogger(LoadingFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
     catch (IllegalAccessException ex)
     {
-      java.util.logging.Logger.getLogger(LoadingFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
     catch (javax.swing.UnsupportedLookAndFeelException ex)
     {
-      java.util.logging.Logger.getLogger(LoadingFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
     //</editor-fold>
 
     /* Create and display the form */
-    java.awt.EventQueue.invokeLater(new Runnable()
+    java.awt.EventQueue.invokeLater(() ->
     {
-
-      public void run()
+      MeasureDialog dialog = new MeasureDialog(new javax.swing.JFrame(), true);
+      dialog.addWindowListener(new java.awt.event.WindowAdapter()
       {
-        new LoadingFrame().setVisible(true);
-      }
 
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e)
+        {
+          System.exit(0);
+        }
+
+      });
+
+      dialog.setVisible(true);
     });
   }
 

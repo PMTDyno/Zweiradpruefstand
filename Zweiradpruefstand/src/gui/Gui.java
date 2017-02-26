@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -46,12 +45,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.5
+ * @version 0.9.7
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.5";
+  private static final String VERSION = "0.9.7";
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -77,7 +76,6 @@ public class Gui extends javax.swing.JFrame
   private XYSeriesCollection dataset2 = new XYSeriesCollection();
 
   private JFreeChart chart;
-  private Measure worker;
 
   /**
    * Creates the GUI
@@ -115,7 +113,6 @@ public class Gui extends javax.swing.JFrame
 
     progset = new ProgSetDialog(this, true);
     vehicleset = new VehicleSetDialog(this, true);
-    loading.init(this);
     refreshPorts();
 
     initChart();
@@ -173,7 +170,6 @@ public class Gui extends javax.swing.JFrame
     jMenuPrint = new javax.swing.JMenuItem();
     jSeparator4 = new javax.swing.JPopupMenu.Separator();
     jMenuSettings = new javax.swing.JMenuItem();
-    jMenuVehicle = new javax.swing.JMenuItem();
     jSeparator5 = new javax.swing.JPopupMenu.Separator();
     jMenuClose = new javax.swing.JMenuItem();
     jHelp = new javax.swing.JMenu();
@@ -491,17 +487,6 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jFile.add(jMenuSettings);
-
-    jMenuVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike16.png"))); // NOI18N
-    jMenuVehicle.setText("Fahrzeug...");
-    jMenuVehicle.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jMenuVehicleActionPerformed(evt);
-      }
-    });
-    jFile.add(jMenuVehicle);
     jFile.add(jSeparator5);
 
     jMenuClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
@@ -559,10 +544,6 @@ public class Gui extends javax.swing.JFrame
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
-      print();
-    }//GEN-LAST:event_jMenuPrintActionPerformed
-
     private void jStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStartActionPerformed
     {//GEN-HEADEREND:event_jStartActionPerformed
       start();
@@ -615,21 +596,6 @@ public class Gui extends javax.swing.JFrame
       refreshPorts();
     }//GEN-LAST:event_jbutRefreshDeviceActionPerformed
 
-    private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
-    {//GEN-HEADEREND:event_jMenuSettingsActionPerformed
-      startProgSet();
-    }//GEN-LAST:event_jMenuSettingsActionPerformed
-
-    private void jMenuSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSaveActionPerformed
-    {//GEN-HEADEREND:event_jMenuSaveActionPerformed
-      savePng();
-    }//GEN-LAST:event_jMenuSaveActionPerformed
-
-    private void jMenuVehicleActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuVehicleActionPerformed
-    {//GEN-HEADEREND:event_jMenuVehicleActionPerformed
-      startVehicleSet();
-    }//GEN-LAST:event_jMenuVehicleActionPerformed
-
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuAboutActionPerformed
     {//GEN-HEADEREND:event_jMenuAboutActionPerformed
       jFrameAbout.setLocationRelativeTo(this);
@@ -646,11 +612,6 @@ public class Gui extends javax.swing.JFrame
       refreshEco();
     }//GEN-LAST:event_jRefreshActionPerformed
 
-    private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
-    {//GEN-HEADEREND:event_jMenuCloseActionPerformed
-      dispose();
-    }//GEN-LAST:event_jMenuCloseActionPerformed
-
   private int easterEgg = 0;
     private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
     {//GEN-HEADEREND:event_jLabelDateMouseClicked
@@ -663,48 +624,42 @@ public class Gui extends javax.swing.JFrame
       }
     }//GEN-LAST:event_jLabelDateMouseClicked
 
-  private void jMenuOpenActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuOpenActionPerformed
-  {//GEN-HEADEREND:event_jMenuOpenActionPerformed
-    openMeasureFile();
-  }//GEN-LAST:event_jMenuOpenActionPerformed
-
   private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
   {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
-    loading.setLoading(true);
 
-    new Thread(new Runnable()
-    {
-
-      @Override
-      public void run()
-      {
-        int tmp = 0;
-        while(tmp < 1000)
-        {
-          System.out.println(tmp);
-          tmp++;
-          loading.setStatus(String.valueOf(tmp));
-          try
-          {
-            Thread.sleep(data.getPeriodTimeMs());
-          }
-          catch (InterruptedException ex)
-          {
-            java.util.logging.Logger.getLogger(Gui.class.getName()).log(Level.SEVERE, null, ex);
-          }
-        }
-      }
-
-    }).start();
-
-    loading.setVisible(true);
+    start();
 
   }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+  private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
+  {//GEN-HEADEREND:event_jMenuCloseActionPerformed
+    dispose();
+  }//GEN-LAST:event_jMenuCloseActionPerformed
+
+  private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
+  {//GEN-HEADEREND:event_jMenuSettingsActionPerformed
+    startProgSet();
+  }//GEN-LAST:event_jMenuSettingsActionPerformed
+
+  private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuPrintActionPerformed
+  {//GEN-HEADEREND:event_jMenuPrintActionPerformed
+    print();
+  }//GEN-LAST:event_jMenuPrintActionPerformed
 
   private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
   {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
     exportFile();
   }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+  private void jMenuSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSaveActionPerformed
+  {//GEN-HEADEREND:event_jMenuSaveActionPerformed
+    savePng();
+  }//GEN-LAST:event_jMenuSaveActionPerformed
+
+  private void jMenuOpenActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuOpenActionPerformed
+  {//GEN-HEADEREND:event_jMenuOpenActionPerformed
+    openMeasureFile();
+  }//GEN-LAST:event_jMenuOpenActionPerformed
 
   /**
    * @param args the command line arguments
@@ -799,7 +754,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
-  private javax.swing.JMenuItem jMenuVehicle;
   private javax.swing.JPanel jPanSerial;
   private javax.swing.JPanel jPanelInfo;
   private javax.swing.JPanel jPanelInfo2;
@@ -858,17 +812,6 @@ public class Gui extends javax.swing.JFrame
     }
   }
 
-  public void abortMeasurement()
-  {
-    disableMeasureButtons();
-//    worker.cancel(true);
-  }
-
-  public void finishMeasurement()
-  {
-    disableMeasureButtons();
-    worker.stop();
-  }
 
   /*
    * ---PRIVATE METHODS------------------------------------------
@@ -894,7 +837,7 @@ public class Gui extends javax.swing.JFrame
    * <li>jRefresh
    * </ul>
    */
-  private void disableMeasureButtons()
+  public void disableMeasureButtons()
   {
     jStart.setEnabled(false);
     jRefresh.setEnabled(false);
@@ -1017,19 +960,16 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
-    worker = new Measure(com);
-
     LoadingFrame loading = new LoadingFrame();
-    loading.init(this);
-
-    startVehicleSet();
+    loading.init(this, com);
+    if(!startVehicleSet())
+      return;
 
     enableCancelling();
 
     loading.setVisible(true);
 
-    worker.execute();
-    loading.setLoading(true);
+    loading.startMeasurement();
   }
 
   private void openMeasureFile()
@@ -1124,79 +1064,6 @@ public class Gui extends javax.swing.JFrame
         showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
       }
     }
-  }
-
-  /**
-   * starts the MeasurementWorker
-   */
-  private class Measure extends MeasurementWorker
-  {
-
-    public Measure(Communication com)
-    {
-      super(com);
-    }
-
-    @Override
-    protected void process(List<Integer> chunks)
-    {
-      for(Integer chunk : chunks)
-      {
-        loading.setStatus(String.valueOf(chunk));
-      }
-    }
-
-    @Override
-    protected void done()
-    {
-
-      try
-      {
-        disableMeasureButtons();
-        if(get() == null)
-        {
-          throw new CancellationException();
-        }
-
-        data.setMeasureList(get());
-        calculate();
-        enableStarting();
-      }
-      catch (ExecutionException ex)
-      {
-        Throwable cause = ex.getCause();
-        if(cause instanceof CommunicationException)
-        {
-          LOG.severe(cause.getMessage());
-          showErrorMessage("Kommunikationsfehler", "Folgender Kommunikationsfehler ist aufgetreten: " + cause.getMessage());
-        }
-        else if(cause instanceof TimeoutException)
-        {
-          LOG.severe(cause.getMessage());
-          showErrorMessage("Timeout", "µC antwortet nicht - Timeout");
-        }
-        else
-        {
-          LOG.severe("Unknown Exception: " + cause.getMessage());
-          showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + cause.getMessage());
-        }
-      }
-      catch (InterruptedException ex)
-      {
-      }
-      catch (CancellationException ex)
-      {
-        LOG.info("Measurement aborted");
-      }
-      catch (Exception ex)
-      {
-        ex.printStackTrace();
-        LOG.severe("Unknown Exception: " + ex);
-        showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
-      }
-
-    }
-
   }
 
   /**
@@ -1666,7 +1533,7 @@ public class Gui extends javax.swing.JFrame
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
-        trq.add(alpha.get(i) * inertia * n );  //M=dOmega/dt * J
+        trq.add(alpha.get(i) * inertia * n);  //M=dOmega/dt * J
       }
     }
 
@@ -1720,14 +1587,14 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor*tempFactor);
+        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
       }
     }
     else
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor*tempFactor);
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
       }
     }
 
@@ -1888,6 +1755,55 @@ public class Gui extends javax.swing.JFrame
     };
 
     new Thread(runRefresh).start();
+
+  }
+
+  public void done(MeasurementWorker worker)
+  {
+    try
+    {
+      disableMeasureButtons();
+      if(worker.get() == null)
+      {
+        throw new CancellationException();
+      }
+
+      data.setMeasureList(worker.get());
+      calculate();
+      enableStarting();
+    }
+    catch (ExecutionException ex)
+    {
+      Throwable cause = ex.getCause();
+      if(cause instanceof CommunicationException)
+      {
+        LOG.severe(cause.getMessage());
+        showErrorMessage("Kommunikationsfehler", "Folgender Kommunikationsfehler ist aufgetreten: " + cause.getMessage());
+      }
+      else if(cause instanceof TimeoutException)
+      {
+        LOG.severe(cause.getMessage());
+        showErrorMessage("Timeout", "µC antwortet nicht - Timeout");
+      }
+      else
+      {
+        LOG.severe("Unknown Exception: " + cause.getMessage());
+        showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + cause.getMessage());
+      }
+    }
+    catch (InterruptedException ex)
+    {
+    }
+    catch (CancellationException ex)
+    {
+      LOG.info("Measurement aborted");
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace();
+      LOG.severe("Unknown Exception: " + ex);
+      showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
+    }
 
   }
 

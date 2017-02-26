@@ -144,7 +144,6 @@ public class Communication
         }
         catch (InterruptedException ex)
         {
-          LOG.warning(ex);
         }
       }
     }

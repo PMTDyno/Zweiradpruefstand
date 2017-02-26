@@ -1668,7 +1668,7 @@ public class Gui extends javax.swing.JFrame
     }
     catch (CommunicationException ex)
     {
-      ex.printStackTrace(System.err);
+//      ex.printStackTrace(System.err);
       LOG.warning("could not connect", ex);
       showErrorMessage("Fehler beim verbinden",
                        "Fehler beim Verbinden.\n"

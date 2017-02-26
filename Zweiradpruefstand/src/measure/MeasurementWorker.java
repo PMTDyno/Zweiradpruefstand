@@ -62,6 +62,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
                                                          TimeoutException,
                                                          Exception
   {
+    LOG.fine("Worker gestartet");
     
     //WSS - rpm - TIME
 

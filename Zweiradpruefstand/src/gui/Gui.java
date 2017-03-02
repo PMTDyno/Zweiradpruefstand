@@ -971,7 +971,9 @@ public class Gui extends javax.swing.JFrame
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
               "PMTDyno (*.pmt)", "pmt");
       chooser.setFileFilter(filter);
-      int rv = chooser.showSaveDialog(this);
+      
+      
+      int rv = chooser.showOpenDialog(this);
       if(rv == JFileChooser.APPROVE_OPTION)
       {
         file = chooser.getSelectedFile();

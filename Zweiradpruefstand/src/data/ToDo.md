@@ -1,3 +1,5 @@
+##Version History and planned Features  
+
 ####v0.1
 * ![d] GUI
 
@@ -68,7 +70,8 @@
 
 ####v0.9.8
 * ![d] RawDatapoint in String format
-* ![d]Filtering
+* ![d] Filtering
+* ![d] Bug fixes
 
 ####v1.0
 * Measurement working!

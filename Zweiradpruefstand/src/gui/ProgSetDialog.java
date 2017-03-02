@@ -12,825 +12,834 @@ import javax.swing.JOptionPane;
  */
 public class ProgSetDialog extends javax.swing.JDialog
 {
-    private final Data data = Data.getInstance();
-    private static final Logger LOG = Logger.getLogger(ProgSetDialog.class.getName());
 
-    private boolean settingsChanged = false;
-    //PNG RESOLUTION
-    private int resIndex = 1; //800x600 standart
-    private boolean customRes = false;
-    private int customWidth = 800;
-    private int customHeight = 600;
-    //POWERUNIT
-    private boolean powerunitPS = true;
-    //CORRECTION
-    private double correctionPower = 1.0;
-    private double correctionTorque = 1.0;
-    private double inertia = 3.5;
-    private int periodTimeMs = 40;
-    private int maxMeasureTimeSec = 60;
+  private final Data data = Data.getInstance();
+  private static final Logger LOG = Logger.getLogger(ProgSetDialog.class.getName());
 
-    /**
-     * Creates the frame with the given values
-     *
-     * @param parent The parent Frame
-     * @param modal  specifies whether dialog blocks user input to other
-     *               top-level windows when shown.
-     */
-    public ProgSetDialog(java.awt.Frame parent, boolean modal)
+  private boolean settingsChanged = false;
+  //PNG RESOLUTION
+  private int resIndex = 1; //800x600 standart
+  private boolean customRes = false;
+  private int customWidth = 800;
+  private int customHeight = 600;
+  //POWERUNIT
+  private boolean powerunitPS = true;
+  //CORRECTION
+  private double correctionPower = 1.0;
+  private double correctionTorque = 1.0;
+  private double inertia = 3.7017;
+  private int periodTimeMs = 40;
+  private int startRpm = 2000;
+
+  /**
+   * Creates the frame with the given values
+   *
+   * @param parent The parent Frame
+   * @param modal  specifies whether dialog blocks user input to other top-level
+   *               windows when shown.
+   */
+  public ProgSetDialog(java.awt.Frame parent, boolean modal)
+  {
+    super(parent, modal);
+    initComponents();
+
+    setTitle("Programmeinstellungen");
+    setSize(new Dimension(500, 350));
+    setResizable(false);
+
+    this.inertia = data.getInertia();
+
+    powerunitPS = data.getPowerunit().equals("PS");
+
+    jButRadioUnitPS.setSelected(powerunitPS);
+
+    this.correctionPower = data.getCorrectionPower();
+    this.correctionTorque = data.getCorrectionTorque();
+    this.periodTimeMs = data.getPeriodTimeMs();
+    this.startRpm = data.getStartRPM();
+
+    switch (data.getPngWidth())
     {
-        super(parent, modal);
-        initComponents();
-
-        setTitle("Programmeinstellungen");
-        setSize(new Dimension(500, 500));
-        setResizable(false);
-
-        this.inertia = data.getInertia();
-
-        powerunitPS = data.getPowerunit().equals("PS");
-
-        jButRadioUnitPS.setSelected(powerunitPS);
-
-        this.correctionPower = data.getCorrectionPower();
-        this.correctionTorque = data.getCorrectionTorque();
-        this.periodTimeMs = data.getPeriodTimeMs();
-        this.maxMeasureTimeSec = data.getMaxMeasureTimeSec();
-
-        switch (data.getPngWidth())
+      case 640:
+        if(data.getPngHeight() == 480)
         {
-            case 640:
-                if(data.getPngHeight() == 480)
-                {
-                    customRes = false;
-                    resIndex = 0;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 800:
-                if(data.getPngHeight() == 600)
-                {
-                    customRes = false;
-                    resIndex = 1;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 1280:
-                if(data.getPngHeight() == 720)
-                {
-                    customRes = false;
-                    resIndex = 2;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            case 1920:
-                if(data.getPngHeight() == 1080)
-                {
-                    customRes = false;
-                    resIndex = 3;
-                }
-                else
-                    customRes = true;
-                break;
-                
-            default:
-                customRes = true;
-                break;
+          customRes = false;
+          resIndex = 0;
         }
+        else
+          customRes = true;
+        break;
 
-        if(data.getPngWidth() < 400)
-            data.setPngWidth(400);
+      case 800:
+        if(data.getPngHeight() == 600)
+        {
+          customRes = false;
+          resIndex = 1;
+        }
+        else
+          customRes = true;
+        break;
 
-        if(data.getPngHeight() < 200)
-            data.setPngHeight(200);
+      case 1280:
+        if(data.getPngHeight() == 720)
+        {
+          customRes = false;
+          resIndex = 2;
+        }
+        else
+          customRes = true;
+        break;
 
-        this.customWidth = data.getPngWidth();
-        this.customHeight = data.getPngHeight();
+      case 1920:
+        if(data.getPngHeight() == 1080)
+        {
+          customRes = false;
+          resIndex = 3;
+        }
+        else
+          customRes = true;
+        break;
 
+      default:
+        customRes = true;
+        break;
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
+    if(data.getPngWidth() < 400)
+      data.setPngWidth(400);
+
+    if(data.getPngHeight() < 200)
+      data.setPngHeight(200);
+
+    this.customWidth = data.getPngWidth();
+    this.customHeight = data.getPngHeight();
+
+  }
+
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void initComponents()
+  {
+    java.awt.GridBagConstraints gridBagConstraints;
+
+    resolutionGroup = new javax.swing.ButtonGroup();
+    powerunitGroup = new javax.swing.ButtonGroup();
+    jPanel1 = new javax.swing.JPanel();
+    jPanelPNG = new javax.swing.JPanel();
+    jPanel4 = new javax.swing.JPanel();
+    jButRadioPng = new javax.swing.JRadioButton();
+    jPNGResolutionCombo = new javax.swing.JComboBox();
+    jButRadioPngCustom = new javax.swing.JRadioButton();
+    jPanel9 = new javax.swing.JPanel();
+    jWidth = new javax.swing.JTextField();
+    jLabel2 = new javax.swing.JLabel();
+    jHeight = new javax.swing.JTextField();
+    jPanelPower = new javax.swing.JPanel();
+    jPanel8 = new javax.swing.JPanel();
+    jButRadioUnitPS = new javax.swing.JRadioButton();
+    jButRadioUnitkW = new javax.swing.JRadioButton();
+    jPanelCorrection = new javax.swing.JPanel();
+    jPanel7 = new javax.swing.JPanel();
+    jSpinCorrectPower = new javax.swing.JSpinner();
+    jLabel5 = new javax.swing.JLabel();
+    jLabel6 = new javax.swing.JLabel();
+    jSpinCorrectTorque = new javax.swing.JSpinner();
+    jLabel7 = new javax.swing.JLabel();
+    jTextInertia = new javax.swing.JTextField();
+    jLabel8 = new javax.swing.JLabel();
+    jPanelSerial = new javax.swing.JPanel();
+    jPanel6 = new javax.swing.JPanel();
+    jLabel11 = new javax.swing.JLabel();
+    jSpinPeriod = new javax.swing.JSpinner();
+    jLabel14 = new javax.swing.JLabel();
+    jLabel10 = new javax.swing.JLabel();
+    jSpinRpm = new javax.swing.JSpinner();
+    jLabel13 = new javax.swing.JLabel();
+    jPanel3 = new javax.swing.JPanel();
+    jLabelInfo = new javax.swing.JLabel();
+    jPanel2 = new javax.swing.JPanel();
+    jButCancel = new javax.swing.JButton();
+    jButConfirm = new javax.swing.JButton();
+
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setLocation(new java.awt.Point(0, 0));
+    setLocationByPlatform(true);
+
+    jPanel1.setLayout(new java.awt.GridLayout(2, 2));
+
+    jPanelPNG.setLayout(new java.awt.GridBagLayout());
+
+    jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("PNG Auflösung"));
+    jPanel4.setLayout(new java.awt.GridBagLayout());
+
+    resolutionGroup.add(jButRadioPng);
+    jButRadioPng.setToolTipText("Vordefinierte Auflösung");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
+    jPanel4.add(jButRadioPng, gridBagConstraints);
+
+    jPNGResolutionCombo.setMaximumRowCount(4);
+    jPNGResolutionCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "VGA (640x480)", "SVGA (800x600)", "HD720 (1280x720)", "HD1080 (1920x1080)" }));
+    jPNGResolutionCombo.setName(""); // NOI18N
+    jPNGResolutionCombo.addActionListener(new java.awt.event.ActionListener()
     {
-        java.awt.GridBagConstraints gridBagConstraints;
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jPNGResolutionComboActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
+    jPanel4.add(jPNGResolutionCombo, gridBagConstraints);
 
-        resolutionGroup = new javax.swing.ButtonGroup();
-        powerunitGroup = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jButRadioPng = new javax.swing.JRadioButton();
-        jPNGResolutionCombo = new javax.swing.JComboBox();
-        jButRadioPngCustom = new javax.swing.JRadioButton();
-        jPanel9 = new javax.swing.JPanel();
-        jWidth = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jHeight = new javax.swing.JTextField();
-        jPanel10 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jButRadioUnitPS = new javax.swing.JRadioButton();
-        jButRadioUnitkW = new javax.swing.JRadioButton();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jSpinCorrectPower = new javax.swing.JSpinner();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jSpinCorrectTorque = new javax.swing.JSpinner();
-        jLabel7 = new javax.swing.JLabel();
-        jTextInertia = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jPanel8 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jSpinPeriod = new javax.swing.JSpinner();
-        jSpinMaxMeasureTime = new javax.swing.JSpinner();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jButCancel = new javax.swing.JButton();
-        jButConfirm = new javax.swing.JButton();
+    resolutionGroup.add(jButRadioPngCustom);
+    jButRadioPngCustom.setToolTipText("Benutzerdefinierte Auflösung");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 0);
+    jPanel4.add(jButRadioPngCustom, gridBagConstraints);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setLocation(new java.awt.Point(0, 0));
-        setLocationByPlatform(true);
+    jWidth.setColumns(5);
+    jWidth.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    jWidth.setText("0000");
+    jWidth.setToolTipText("Breite");
+    jWidth.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+    jWidth.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jWidthActionPerformed(evt);
+      }
+    });
+    jPanel9.add(jWidth);
 
-        jPanel1.setLayout(new java.awt.GridLayout(2, 2));
+    jLabel2.setText("x");
+    jPanel9.add(jLabel2);
 
-        jPanel4.setLayout(new java.awt.GridBagLayout());
+    jHeight.setColumns(5);
+    jHeight.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    jHeight.setText("0000");
+    jHeight.setToolTipText("Höhe");
+    jHeight.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jHeightActionPerformed(evt);
+      }
+    });
+    jPanel9.add(jHeight);
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("PNG Auflösung");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        jPanel4.add(jLabel1, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
+    jPanel4.add(jPanel9, gridBagConstraints);
 
-        resolutionGroup.add(jButRadioPng);
-        jButRadioPng.setSelected(true);
-        jButRadioPng.setToolTipText("Vordefinierte Auflösung");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel4.add(jButRadioPng, gridBagConstraints);
+    jPanelPNG.add(jPanel4, new java.awt.GridBagConstraints());
 
-        jPNGResolutionCombo.setMaximumRowCount(4);
-        jPNGResolutionCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "VGA (640x480)", "SVGA (800x600)", "HD720 (1280x720)", "HD1080 (1920x1080)" }));
-        jPNGResolutionCombo.setName(""); // NOI18N
-        jPNGResolutionCombo.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jPNGResolutionComboActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel4.add(jPNGResolutionCombo, gridBagConstraints);
+    jPanel1.add(jPanelPNG);
 
-        resolutionGroup.add(jButRadioPngCustom);
-        jButRadioPngCustom.setToolTipText("Benutzerdefinierte Auflösung");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        jPanel4.add(jButRadioPngCustom, gridBagConstraints);
+    jPanelPower.setLayout(new java.awt.GridBagLayout());
 
-        jWidth.setColumns(5);
-        jWidth.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jWidth.setText("0000");
-        jWidth.setToolTipText("Breite");
-        jWidth.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        jWidth.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jWidthActionPerformed(evt);
-            }
-        });
-        jPanel9.add(jWidth);
+    jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Leistungseinheit"));
+    jPanel8.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setText("x");
-        jPanel9.add(jLabel2);
+    powerunitGroup.add(jButRadioUnitPS);
+    jButRadioUnitPS.setSelected(true);
+    jButRadioUnitPS.setText("PS");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel8.add(jButRadioUnitPS, gridBagConstraints);
 
-        jHeight.setColumns(5);
-        jHeight.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jHeight.setText("0000");
-        jHeight.setToolTipText("Höhe");
-        jHeight.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jHeightActionPerformed(evt);
-            }
-        });
-        jPanel9.add(jHeight);
+    powerunitGroup.add(jButRadioUnitkW);
+    jButRadioUnitkW.setText("kW");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel8.add(jButRadioUnitkW, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        jPanel4.add(jPanel9, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.ipadx = 60;
+    gridBagConstraints.ipady = 20;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanelPower.add(jPanel8, gridBagConstraints);
 
-        jPanel1.add(jPanel4);
+    jPanel1.add(jPanelPower);
 
-        jPanel10.setLayout(new java.awt.GridBagLayout());
+    jPanelCorrection.setLayout(new java.awt.GridBagLayout());
 
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Leistungseinheit");
-        jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel10.add(jLabel3, new java.awt.GridBagConstraints());
+    jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Korrekturfaktoren"));
+    jPanel7.setLayout(new java.awt.GridBagLayout());
 
-        powerunitGroup.add(jButRadioUnitPS);
-        jButRadioUnitPS.setSelected(true);
-        jButRadioUnitPS.setText("PS");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel10.add(jButRadioUnitPS, gridBagConstraints);
+    jSpinCorrectPower.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
+    jSpinCorrectPower.setName(""); // NOI18N
+    jSpinCorrectPower.setValue(1);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 3);
+    jPanel7.add(jSpinCorrectPower, gridBagConstraints);
 
-        powerunitGroup.add(jButRadioUnitkW);
-        jButRadioUnitkW.setText("kW");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel10.add(jButRadioUnitkW, gridBagConstraints);
+    jLabel5.setText("Leistung");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    jPanel7.add(jLabel5, gridBagConstraints);
 
-        jPanel1.add(jPanel10);
+    jLabel6.setText("Drehmoment");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    jPanel7.add(jLabel6, gridBagConstraints);
 
-        jPanel7.setLayout(new java.awt.GridBagLayout());
+    jSpinCorrectTorque.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
+    jSpinCorrectTorque.setName(""); // NOI18N
+    jSpinCorrectTorque.setValue(1);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 3);
+    jPanel7.add(jSpinCorrectTorque, gridBagConstraints);
 
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Korrekturfaktoren");
-        jLabel4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        jPanel7.add(jLabel4, gridBagConstraints);
+    jLabel7.setText("Trägheitsmoment");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.insets = new java.awt.Insets(3, 10, 0, 0);
+    jPanel7.add(jLabel7, gridBagConstraints);
 
-        jSpinCorrectPower.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
-        jSpinCorrectPower.setName(""); // NOI18N
-        jSpinCorrectPower.setValue(1);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 3);
-        jPanel7.add(jSpinCorrectPower, gridBagConstraints);
+    jTextInertia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    jTextInertia.setText("3,7017");
+    jTextInertia.setToolTipText("Trägheitsmoment der Welle");
+    jTextInertia.setName(""); // NOI18N
+    jTextInertia.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jTextInertiaActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.ipady = 9;
+    gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 3);
+    jPanel7.add(jTextInertia, gridBagConstraints);
 
-        jLabel5.setText("Leistung");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel7.add(jLabel5, gridBagConstraints);
+    jLabel8.setText("kgm²");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.weightx = 0.1;
+    gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+    jPanel7.add(jLabel8, gridBagConstraints);
 
-        jLabel6.setText("Drehmoment");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel7.add(jLabel6, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.ipadx = 10;
+    gridBagConstraints.ipady = 10;
+    jPanelCorrection.add(jPanel7, gridBagConstraints);
 
-        jSpinCorrectTorque.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
-        jSpinCorrectTorque.setName(""); // NOI18N
-        jSpinCorrectTorque.setValue(1);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 2, 3);
-        jPanel7.add(jSpinCorrectTorque, gridBagConstraints);
+    jPanel1.add(jPanelCorrection);
 
-        jLabel7.setText("Trägheitsmoment");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
-        jPanel7.add(jLabel7, gridBagConstraints);
+    jPanelSerial.setLayout(new java.awt.GridBagLayout());
 
-        jTextInertia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextInertia.setText("3,5");
-        jTextInertia.setToolTipText("Trägheitsmoment der Welle");
-        jTextInertia.setName(""); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.ipady = 9;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 3);
-        jPanel7.add(jTextInertia, gridBagConstraints);
+    jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Kommunikation"));
+    jPanel6.setLayout(new java.awt.GridBagLayout());
 
-        jLabel8.setText("kgm2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
-        jPanel7.add(jLabel8, gridBagConstraints);
+    jLabel11.setText("Zeitintervall");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel6.add(jLabel11, gridBagConstraints);
 
-        jPanel5.add(jPanel7);
+    jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(10, 5, 100, 1));
+    jSpinPeriod.setToolTipText("Der Zeitabstand zwischen einzelne Pakete");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(4, 5, 6, 0);
+    jPanel6.add(jSpinPeriod, gridBagConstraints);
 
-        jPanel1.add(jPanel5);
+    jLabel14.setText("ms");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanel6.add(jLabel14, gridBagConstraints);
 
-        jPanel6.setLayout(new java.awt.GridBagLayout());
+    jLabel10.setText("Startmotordrehzahl");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel6.add(jLabel10, gridBagConstraints);
 
-        jLabel9.setText("Serieller Port");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
-        jPanel6.add(jLabel9, gridBagConstraints);
+    jSpinRpm.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
+    jSpinRpm.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
+    jPanel6.add(jSpinRpm, gridBagConstraints);
 
-        jLabel10.setText("Zeitintervall");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel6.add(jLabel10, gridBagConstraints);
+    jLabel13.setText("U/min");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanel6.add(jLabel13, gridBagConstraints);
 
-        jLabel11.setText("maximale Messdauer");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanel6.add(jLabel11, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.ipadx = 10;
+    gridBagConstraints.ipady = 10;
+    jPanelSerial.add(jPanel6, gridBagConstraints);
 
-        jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(10, 5, 100, 1));
-        jSpinPeriod.setToolTipText("Der Zeitabstand zwischen einzelne Pakete");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
-        jPanel6.add(jSpinPeriod, gridBagConstraints);
+    jPanel1.add(jPanelSerial);
 
-        jSpinMaxMeasureTime.setModel(new javax.swing.SpinnerNumberModel(60, 1, 300, 1));
-        jSpinMaxMeasureTime.setToolTipText("setzt die maximal zulässige Messdauer");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 0);
-        jPanel6.add(jSpinMaxMeasureTime, gridBagConstraints);
+    getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jLabel12.setText("sek");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(2, 3, 0, 0);
-        jPanel6.add(jLabel12, gridBagConstraints);
+    jPanel3.setLayout(new java.awt.GridLayout(2, 1));
 
-        jLabel13.setText("ms");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
-        jPanel6.add(jLabel13, gridBagConstraints);
+    jLabelInfo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+    jLabelInfo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelInfo.setText("Veränderungen der Kommunikation werden erst nach der Messung wirksam!");
+    jPanel3.add(jLabelInfo);
 
-        jPanel8.add(jPanel6);
+    jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 40, 5));
 
-        jPanel1.add(jPanel8);
+    jButCancel.setText("Abbrechen");
+    jButCancel.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButCancelActionPerformed(evt);
+      }
+    });
+    jPanel2.add(jButCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+    jButConfirm.setText("Übernehmen");
+    jButConfirm.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jButConfirmActionPerformed(evt);
+      }
+    });
+    jPanel2.add(jButConfirm);
 
-        jPanel2.setLayout(new java.awt.GridLayout(1, 2, 40, 0));
+    jPanel3.add(jPanel2);
 
-        jButCancel.setText("Abbrechen");
-        jButCancel.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jButCancelActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButCancel);
-
-        jButConfirm.setText("Übernehmen");
-        jButConfirm.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jButConfirmActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButConfirm);
-
-        jPanel3.add(jPanel2);
-
-        getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
-    }// </editor-fold>//GEN-END:initComponents
+    getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
+  }// </editor-fold>//GEN-END:initComponents
 
     private void jButCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButCancelActionPerformed
     {//GEN-HEADEREND:event_jButCancelActionPerformed
-        settingsChanged = false;
-        dispose();
+      settingsChanged = false;
+      dispose();
     }//GEN-LAST:event_jButCancelActionPerformed
-
-    private void jPNGResolutionComboActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jPNGResolutionComboActionPerformed
-    {//GEN-HEADEREND:event_jPNGResolutionComboActionPerformed
-
-    }//GEN-LAST:event_jPNGResolutionComboActionPerformed
 
     private void jButConfirmActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButConfirmActionPerformed
     {//GEN-HEADEREND:event_jButConfirmActionPerformed
-        confirm();
+      confirm();
     }//GEN-LAST:event_jButConfirmActionPerformed
 
-    private void jWidthActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jWidthActionPerformed
-    {//GEN-HEADEREND:event_jWidthActionPerformed
+  private void jTextInertiaActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jTextInertiaActionPerformed
+  {//GEN-HEADEREND:event_jTextInertiaActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jTextInertiaActionPerformed
 
-    }//GEN-LAST:event_jWidthActionPerformed
+  private void jHeightActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jHeightActionPerformed
+  {//GEN-HEADEREND:event_jHeightActionPerformed
 
-    private void jHeightActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jHeightActionPerformed
-    {//GEN-HEADEREND:event_jHeightActionPerformed
+  }//GEN-LAST:event_jHeightActionPerformed
 
-    }//GEN-LAST:event_jHeightActionPerformed
+  private void jWidthActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jWidthActionPerformed
+  {//GEN-HEADEREND:event_jWidthActionPerformed
 
-    /*---PUBLIC METHODS----------------------------*/
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+  }//GEN-LAST:event_jWidthActionPerformed
+
+  private void jPNGResolutionComboActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jPNGResolutionComboActionPerformed
+  {//GEN-HEADEREND:event_jPNGResolutionComboActionPerformed
+
+  }//GEN-LAST:event_jPNGResolutionComboActionPerformed
+
+  /*---PUBLIC METHODS----------------------------*/
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[])
+  {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-            {
-                if("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(ProgSetDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(()
-                -> 
-                {
-                    ProgSetDialog dialog = new ProgSetDialog(new javax.swing.JFrame(), true);
-                    dialog.addWindowListener(new java.awt.event.WindowAdapter()
-                    {
-
-                        @Override
-                        public void windowClosing(java.awt.event.WindowEvent e)
-                        {
-                            System.exit(0);
-                        }
-
-                    });
-                    dialog.setVisible(true);
-        });
-    }
-
-    /**
-     * Sets the given/default values.<br>
-     * Then calls the super method.
-     *
-     * @param b
      */
-    @Override
-    public void setVisible(boolean b)
+    try
     {
-        if(b)
+      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+      {
+        if("Nimbus".equals(info.getName()))
         {
-            settingsChanged = false;
-            //PNG RESOLUTION
+          //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+          break;
+        }
+      }
+    }
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
+    {
+      java.util.logging.Logger.getLogger(ProgSetDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
 
-            jButRadioPng.setSelected(!customRes);
-            jButRadioPngCustom.setSelected(customRes);
+    //</editor-fold>
 
-            jWidth.setEnabled(customRes);
-            jHeight.setEnabled(customRes);
+    /* Create and display the dialog */
+    java.awt.EventQueue.invokeLater(()
+            ->
+    {
+      ProgSetDialog dialog = new ProgSetDialog(new javax.swing.JFrame(), true);
+      dialog.addWindowListener(new java.awt.event.WindowAdapter()
+      {
 
-            if(resIndex == -1)
-                jPNGResolutionCombo.setSelectedIndex(1);
-
-            jPNGResolutionCombo.setEnabled(!customRes);
-
-            jWidth.setText(String.valueOf(customWidth));
-            jHeight.setText(String.valueOf(customHeight));
-
-            //POWERUNIT
-            jButRadioUnitPS.setSelected(powerunitPS);
-            jButRadioUnitkW.setSelected(!powerunitPS);
-
-            //CORRECTION
-            jSpinCorrectPower.setValue(correctionPower);
-            jSpinCorrectTorque.setValue(correctionTorque);
-
-            //INERTIA
-            jTextInertia.setText(String.format("%.2f", inertia));
-
-            //SERIALPORT
-            jSpinPeriod.setValue(periodTimeMs);
-            jSpinMaxMeasureTime.setValue(maxMeasureTimeSec);
-
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent e)
+        {
+          System.exit(0);
         }
 
-        super.setVisible(b);
-        LOG.finest("ProgSetDialog visible");
+      });
+      dialog.setVisible(true);
+    });
+  }
+
+  /**
+   * Sets the given/default values.<br>
+   * Then calls the super method.
+   *
+   * @param b
+   */
+  @Override
+  public void setVisible(boolean b)
+  {
+    if(b)
+    {
+      settingsChanged = false;
+      //PNG RESOLUTION
+
+      jButRadioPng.setSelected(!customRes);
+      jButRadioPngCustom.setSelected(customRes);
+
+      jWidth.setEnabled(customRes);
+      jHeight.setEnabled(customRes);
+
+      if(resIndex == -1)
+        jPNGResolutionCombo.setSelectedIndex(1);
+
+      jPNGResolutionCombo.setEnabled(!customRes);
+
+      jWidth.setText(String.valueOf(customWidth));
+      jHeight.setText(String.valueOf(customHeight));
+
+      //POWERUNIT
+      jButRadioUnitPS.setSelected(powerunitPS);
+      jButRadioUnitkW.setSelected(!powerunitPS);
+
+      //CORRECTION
+      jSpinCorrectPower.setValue(correctionPower);
+      jSpinCorrectTorque.setValue(correctionTorque);
+
+      //INERTIA
+      jTextInertia.setText(String.format("%.4f", inertia));
+
+      //SERIALPORT
+      jSpinPeriod.setValue(periodTimeMs);
+      jSpinRpm.setValue(startRpm);
+
     }
 
-    /**
-     * Checks the selected dimension and returns it.
-     *
-     * @return The Dimension
-     */
-    public Dimension getPNGResolution()
+    super.setVisible(b);
+    LOG.finest("ProgSetDialog visible");
+  }
+
+  /**
+   * Checks the selected dimension and returns it.
+   *
+   * @return The Dimension
+   */
+  public Dimension getPNGResolution()
+  {
+    Dimension dimension = new Dimension();
+
+    switch (resIndex)
     {
-        Dimension dimension = new Dimension();
-
-        switch (resIndex)
-        {
-            case -1:
-                dimension.width = customWidth;
-                dimension.height = customHeight;
-                break;
-            case 0:
-                dimension.width = 640;
-                dimension.height = 480;
-                break;
-            case 1:
-                dimension.width = 800;
-                dimension.height = 600;
-                break;
-            case 2:
-                dimension.width = 1280;
-                dimension.height = 720;
-                break;
-            case 3:
-                dimension.width = 1920;
-                dimension.height = 1080;
-                break;
-            default:
-                JOptionPane.showMessageDialog(this,
-                                              "Fehler bei Auflösung!",
-                                              "Fehler",
-                                              JOptionPane.ERROR_MESSAGE);
-        }
-
-        return dimension;
+      case -1:
+        dimension.width = customWidth;
+        dimension.height = customHeight;
+        break;
+      case 0:
+        dimension.width = 640;
+        dimension.height = 480;
+        break;
+      case 1:
+        dimension.width = 800;
+        dimension.height = 600;
+        break;
+      case 2:
+        dimension.width = 1280;
+        dimension.height = 720;
+        break;
+      case 3:
+        dimension.width = 1920;
+        dimension.height = 1080;
+        break;
+      default:
+        JOptionPane.showMessageDialog(this,
+                                      "Fehler bei Auflösung!",
+                                      "Fehler",
+                                      JOptionPane.ERROR_MESSAGE);
     }
 
-    /**
-     * @return the powerunit
-     */
-    public String getPowerunit()
+    return dimension;
+  }
+
+  /**
+   * @return the powerunit
+   */
+  public String getPowerunit()
+  {
+    if(powerunitPS)
+      return "PS";
+    else
+      return "kW";
+  }
+
+  /**
+   * @return the correction factor for the power series
+   */
+  public double getCorrectionPower()
+  {
+    return correctionPower;
+  }
+
+  /**
+   * @return the correction factor for the torque series
+   */
+  public double getCorrectionTorque()
+  {
+    return correctionTorque;
+  }
+
+  /**
+   * @return true if the setting is changed
+   */
+  public boolean isSettingsChanged()
+  {
+    return settingsChanged;
+  }
+
+  /**
+   * @return the inertia
+   */
+  public double getInertia()
+  {
+    return inertia;
+  }
+
+  /**
+   * @return the period between datapoint captures
+   */
+  public int getPeriodTimeMs()
+  {
+    return periodTimeMs;
+  }
+
+  /*---PRIVATE METHODS-------------------------------------*/
+  /**
+   * Checks if all the values are correct and saves the changed values. Then
+   * disposes the frame.
+   */
+  private void confirm()
+  {
+    //PNG RESOLUTION
+    customRes = jButRadioPngCustom.isSelected();
+    boolean error = false;
+
+    int tempW;
+    int tempH;
+    if(customRes)
     {
-        if(powerunitPS)
-            return "PS";
-        else
-            return "kW";
-    }
-
-    /**
-     * @return the correction factor for the power series
-     */
-    public double getCorrectionPower()
-    {
-        return correctionPower;
-    }
-
-    /**
-     * @return the correction factor for the torque series
-     */
-    public double getCorrectionTorque()
-    {
-        return correctionTorque;
-    }
-
-    /**
-     * @return true if the setting is changed
-     */
-    public boolean isSettingsChanged()
-    {
-        return settingsChanged;
-    }
-
-    /**
-     * @return the inertia
-     */
-    public double getInertia()
-    {
-        return inertia;
-    }
-
-    /**
-     * @return the period between single measurement datas
-     */
-    public int getPeriodTimeMs()
-    {
-        return periodTimeMs;
-    }
-
-    /**
-     * @return The maximum measurement time in seconds
-     */
-    public int getMaxMeasureTimeSec()
-    {
-        return maxMeasureTimeSec;
-    }
-
-    
-    /*---PRIVATE METHODS-------------------------------------*/
-    /**
-     * Checks if all the values are correct and saves the changed values. Then
-     * disposes the frame.
-     */
-    private void confirm()
-    {
-        //PNG RESOLUTION
-        customRes = jButRadioPngCustom.isSelected();
-        boolean error = false;
-
-        int tempW;
-        int tempH;
-        if(customRes)
-        {
-            resIndex = -1;
-            try
-            {
-                tempW = Integer.parseInt(jWidth.getText());
-                tempH = Integer.parseInt(jHeight.getText());
-                if(tempW < 400 || tempH < 200)
-                    throw new IllegalArgumentException();
-                else
-                {
-                    customWidth = tempW;
-                    customHeight = tempH;
-                }
-            }
-            catch (NumberFormatException ex)
-            {
-                error = true;
-                LOG.warning("Invalid Resolution", ex);
-                JOptionPane.showMessageDialog(this, jWidth.getText()
-                                              + " x "
-                                              + jHeight.getText()
-                                              + " ist keine gültige Auflösung!",
-                                              "Keine gültige Auflösung!", JOptionPane.ERROR_MESSAGE);
-            }
-            catch (IllegalArgumentException ex)
-            {
-                error = true;
-                LOG.warning("Resolution too small(min 400x200)", ex);
-                JOptionPane.showMessageDialog(this, jWidth.getText()
-                                              + " x "
-                                              + jHeight.getText()
-                                              + " ist keine gültige Auflösung! \n"
-                                              + " Auflösung mindestens 400x200!",
-                                              "Keine gültige Auflösung!",
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-            catch (Exception ex)
-            {
-                error = true;
-                LOG.severe("Unsupported Exception", ex);
-                JOptionPane.showMessageDialog(this,
-                                              "Unbekannter Fehler aufgetreten.\n" + ex.toString(),
-                                              "Unbekannter Fehler",
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-
-        }
-        else
-            resIndex = jPNGResolutionCombo.getSelectedIndex();
-
-        //POWERUNIT
-        if(jButRadioUnitPS.isSelected())
-            powerunitPS = true;
-        else if(jButRadioUnitkW.isSelected())
-            powerunitPS = false;
+      resIndex = -1;
+      try
+      {
+        tempW = Integer.parseInt(jWidth.getText());
+        tempH = Integer.parseInt(jHeight.getText());
+        if(tempW < 400 || tempH < 200)
+          throw new IllegalArgumentException();
         else
         {
-            error = true;
-            JOptionPane.showMessageDialog(this,
-                                          "Fehler bei der Leistungseinheit!",
-                                          "Fehler Leistungseinheit!",
-                                          JOptionPane.ERROR_MESSAGE);
+          customWidth = tempW;
+          customHeight = tempH;
         }
+      }
+      catch (NumberFormatException ex)
+      {
+        error = true;
+        LOG.warning("Invalid Resolution", ex);
+        JOptionPane.showMessageDialog(this, jWidth.getText()
+                                      + " x "
+                                      + jHeight.getText()
+                                      + " ist keine gültige Auflösung!",
+                                      "Keine gültige Auflösung!", JOptionPane.ERROR_MESSAGE);
+      }
+      catch (IllegalArgumentException ex)
+      {
+        error = true;
+        LOG.warning("Resolution too small(min 400x200)", ex);
+        JOptionPane.showMessageDialog(this, jWidth.getText()
+                                      + " x "
+                                      + jHeight.getText()
+                                      + " ist keine gültige Auflösung! \n"
+                                      + " Auflösung mindestens 400x200!",
+                                      "Keine gültige Auflösung!",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
+      catch (Exception ex)
+      {
+        error = true;
+        LOG.severe("Unsupported Exception", ex);
+        JOptionPane.showMessageDialog(this,
+                                      "Unbekannter Fehler aufgetreten.\n" + ex.toString(),
+                                      "Unbekannter Fehler",
+                                      JOptionPane.ERROR_MESSAGE);
+      }
 
-        //CORRECTION
-        correctionPower = (double) jSpinCorrectPower.getValue();
-        correctionTorque = (double) jSpinCorrectTorque.getValue();
+    }
+    else
+      resIndex = jPNGResolutionCombo.getSelectedIndex();
 
-        //INERTIA
-        try
-        {
-            double tmp = Double.parseDouble(jTextInertia.getText().replaceAll(",", "."));
-            if(tmp < 0.5 || tmp > 5.0)
-                throw new NumberFormatException();
-            inertia = tmp;
-        }
-        catch (NumberFormatException | NullPointerException ex)
-        {
-            error = true;
-            LOG.warning("Inertia too small/big (0.5 - 5.0)", ex);
-            JOptionPane.showMessageDialog(this,
-                                          "Fehler bei Trägheitsmoment! \n"
-                                          + "Wert mussen zwischen 0,5 und 5,0 liegen.",
-                                          "Fehler Trägheitsmoment!",
-                                          JOptionPane.ERROR_MESSAGE);
-        }
-        catch (Exception ex)
-        {
-            error = true;
-            LOG.severe("Unsupported Exception", ex);
-            JOptionPane.showMessageDialog(this,
-                                          "Unbekannter Fehler aufgetreten\n" + ex.toString(),
-                                          "Unbekannter Fehler",
-                                          JOptionPane.ERROR_MESSAGE);
-        }
-
-        //SERIALPORT
-        periodTimeMs = (int) jSpinPeriod.getValue();
-        maxMeasureTimeSec = (int) jSpinMaxMeasureTime.getValue();
-
-        if(!error)
-        {
-            settingsChanged = true;
-            dispose();
-        }
+    //POWERUNIT
+    if(jButRadioUnitPS.isSelected())
+      powerunitPS = true;
+    else if(jButRadioUnitkW.isSelected())
+      powerunitPS = false;
+    else
+    {
+      error = true;
+      JOptionPane.showMessageDialog(this,
+                                    "Fehler bei der Leistungseinheit!",
+                                    "Fehler Leistungseinheit!",
+                                    JOptionPane.ERROR_MESSAGE);
     }
 
+    //CORRECTION
+    correctionPower = (double) jSpinCorrectPower.getValue();
+    correctionTorque = (double) jSpinCorrectTorque.getValue();
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButCancel;
-    private javax.swing.JButton jButConfirm;
-    private javax.swing.JRadioButton jButRadioPng;
-    private javax.swing.JRadioButton jButRadioPngCustom;
-    private javax.swing.JRadioButton jButRadioUnitPS;
-    private javax.swing.JRadioButton jButRadioUnitkW;
-    private javax.swing.JTextField jHeight;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JComboBox jPNGResolutionCombo;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JSpinner jSpinCorrectPower;
-    private javax.swing.JSpinner jSpinCorrectTorque;
-    private javax.swing.JSpinner jSpinMaxMeasureTime;
-    private javax.swing.JSpinner jSpinPeriod;
-    private javax.swing.JTextField jTextInertia;
-    private javax.swing.JTextField jWidth;
-    private javax.swing.ButtonGroup powerunitGroup;
-    private javax.swing.ButtonGroup resolutionGroup;
-    // End of variables declaration//GEN-END:variables
+    //INERTIA
+    try
+    {
+      double tmp = Double.parseDouble(jTextInertia.getText().replaceAll(",", "."));
+      if(tmp < 0.5 || tmp > 5.0)
+        throw new NumberFormatException();
+      inertia = tmp;
+    }
+    catch (NumberFormatException | NullPointerException ex)
+    {
+      error = true;
+      LOG.warning("Inertia too small/big (0.5 - 5.0)", ex);
+      JOptionPane.showMessageDialog(this,
+                                    "Fehler bei Trägheitsmoment! \n"
+                                    + "Wert mussen zwischen 0,5 und 5,0 liegen.",
+                                    "Fehler Trägheitsmoment!",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+    catch (Exception ex)
+    {
+      error = true;
+      LOG.severe("Unsupported Exception", ex);
+      JOptionPane.showMessageDialog(this,
+                                    "Unbekannter Fehler aufgetreten\n" + ex.toString(),
+                                    "Unbekannter Fehler",
+                                    JOptionPane.ERROR_MESSAGE);
+    }
+
+    //SERIALPORT
+    periodTimeMs = (int) jSpinPeriod.getValue();
+    startRpm = (int) jSpinRpm.getValue();
+
+    if(!error)
+    {
+      settingsChanged = true;
+      dispose();
+    }
+  }
+
+
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton jButCancel;
+  private javax.swing.JButton jButConfirm;
+  private javax.swing.JRadioButton jButRadioPng;
+  private javax.swing.JRadioButton jButRadioPngCustom;
+  private javax.swing.JRadioButton jButRadioUnitPS;
+  private javax.swing.JRadioButton jButRadioUnitkW;
+  private javax.swing.JTextField jHeight;
+  private javax.swing.JLabel jLabel10;
+  private javax.swing.JLabel jLabel11;
+  private javax.swing.JLabel jLabel13;
+  private javax.swing.JLabel jLabel14;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JLabel jLabel8;
+  private javax.swing.JLabel jLabelInfo;
+  private javax.swing.JComboBox jPNGResolutionCombo;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel6;
+  private javax.swing.JPanel jPanel7;
+  private javax.swing.JPanel jPanel8;
+  private javax.swing.JPanel jPanel9;
+  private javax.swing.JPanel jPanelCorrection;
+  private javax.swing.JPanel jPanelPNG;
+  private javax.swing.JPanel jPanelPower;
+  private javax.swing.JPanel jPanelSerial;
+  private javax.swing.JSpinner jSpinCorrectPower;
+  private javax.swing.JSpinner jSpinCorrectTorque;
+  private javax.swing.JSpinner jSpinPeriod;
+  private javax.swing.JSpinner jSpinRpm;
+  private javax.swing.JTextField jTextInertia;
+  private javax.swing.JTextField jWidth;
+  private javax.swing.ButtonGroup powerunitGroup;
+  private javax.swing.ButtonGroup resolutionGroup;
+  // End of variables declaration//GEN-END:variables
 
 }

@@ -6,6 +6,7 @@
 #endif
 
 #define sys_log(...) // sys_log(...)
+#define sys_printf printf
 
 // declarations
 

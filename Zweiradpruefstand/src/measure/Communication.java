@@ -1,16 +1,12 @@
 package measure;
 
 import data.Data;
-import gui.Gui;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
-import javax.swing.SwingWorker;
 import logging.Logger;
 
 /**
@@ -20,534 +16,391 @@ import logging.Logger;
 public class Communication
 {
 
-    private static final Data DATA = Data.getInstance();
-    private static final Logger LOGP = Logger.getParentLogger();
-    private static final Logger LOG = Logger.getLogger(Communication.class.getName());
+  private static final Data DATA = Data.getInstance();
+  private static final Logger LOG = Logger.getLogger(Communication.class.getName());
 
-    //private static final int TIMEOUT = 100;
-    //private static final TimeUnit TIMOUT_UNIT = TimeUnit.MILLISECONDS;
-    private static final int TIMEOUT = 5;
-    private static final TimeUnit TIMOUT_UNIT = TimeUnit.SECONDS;
+  //private static final int TIMEOUT = 100;
+  //private static final TimeUnit TIMOUT_UNIT = TimeUnit.MILLISECONDS;
+  private static final int TIMEOUT = 5;
+  private static final TimeUnit TIMOUT_UNIT = TimeUnit.SECONDS;
 
-    public static final Base64.Decoder DECODER = Base64.getDecoder();
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+  private boolean connected = false;
 
-    private static int pack = 0;
+  //The ASCII Control Bytes
+  public static final byte SOT = 2; //0x02
+  public static final byte EOT = 3; //0x03
 
-    private static Communication instance = null;
+  private PortCom port;
+  private Thread receiveThread;
+  private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
+  private long refreshLock = 0;
 
-    private boolean success = false;
-    private static boolean connected = false;
+  public enum Request
+  {
+    REFRESH,
+    MEASURE,
+    START,
+    MEASURENORPM,
+    STARTNORPM
+  }
 
-    private SwingWorker worker = null;
+  public Communication()
+  {
+    LOG.setLevel(Level.ALL);
+    port = new PortCom();
+  }
 
-    //The ASCII Control Bytes
-    public static final byte C_START = 2; //0x02
-    public static final byte C_STOP = 3; //0x03
-    public static final byte C_GROUP_SEP = 29; //0x1d
-    public static final byte C_UNIT_SEP = 31;
-    public static final byte C_ACK = 6; //0x06
-    public static final byte C_NACK = 21; //0x15
-    //The ASCII Control Bytes in String format
-    public static final String SC_START = Byte.toString(C_START); //start
-    public static final String SC_STOP = Byte.toString(C_STOP); //stop
-    public static final String SC_GROUP_SEP = Byte.toString(C_GROUP_SEP); //groupSeperator
-    public static final String SC_UNIT_SEP = Byte.toString(C_UNIT_SEP); //unitSeperator
-    public static final String SC_ACK = Byte.toString(C_ACK);
-    public static final String SC_NACK = Byte.toString(C_NACK);
-
-    public final LinkedList<Frame> receivedFrames = new LinkedList<>();
-
-    private Port port;
-    private Thread receiveThread;
-    private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
-
-    /**
-     *
-     * @param serialPort
-     * @throws measure.CommunicationException
-     * @throws java.util.concurrent.TimeoutException
-     */
-    @SuppressWarnings("UseSpecificCatch")
-    public Communication(String serialPort) throws CommunicationException,
-                                                   TimeoutException, Exception
+  public void connect(String serialPort) throws CommunicationException,
+                                                TimeoutException
+  {
+    try
     {
-        instance = this;
-        LOG.setLevel(Level.ALL);
+      port.openPort(serialPort);
+      
 
-        port = new PortSim("");
-        ((PortSim) port).setMode(PortSim.SIM_MODE.NORMAL);
-        //port = new PortCom(serialPort);
+      receiveThread = new Thread(getFrame);
+      receiveThread.start();
 
-        receiveThread = new Thread(getFrame);
-        receiveThread.start();
+      //sleep here?
+      refreshEco();
+      connected = true;
+    }
+    catch (CommunicationException | TimeoutException ex)
+    {
+      throw ex;
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
 
+  }
+
+  public String getPort()
+  {
+    return port.getPort();
+  }
+
+  /**
+   *
+   * @return The captured and already checked Frame Data
+   * @throws CommunicationException if an error occured
+   * @throws TimeoutException       if a Timeout occured
+   */
+  public String[] getFrameData() throws CommunicationException, TimeoutException
+  {
+    try
+    {
+      return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split(":");
+    }
+    catch (CommunicationException ex)
+    {
+      LOG.warning(ex);
+    }
+    catch (TimeoutException ex)
+    {
+      throw ex;
+    }
+    catch (InterruptedException ex)
+    {
+    }
+
+    throw new CommunicationException("received wrong frames");
+  }
+
+  /**
+   *
+   * @param timeout
+   * @param unit
+   * @return
+   * @throws CommunicationException
+   * @throws TimeoutException
+   * @throws InterruptedException
+   */
+  public Frame readFrame(long timeout, TimeUnit unit)
+          throws CommunicationException, TimeoutException,
+                 InterruptedException
+  {
+    synchronized (receivedFrameList)
+    {
+      long startTimeMillis = System.currentTimeMillis();
+      while(true)
+      {
+        if(!receivedFrameList.isEmpty())
+        {
+          return receivedFrameList.removeFirst();
+        }
+
+        long to = startTimeMillis + unit.toMillis(timeout)
+                - System.currentTimeMillis();
+        if(to <= 0)
+        {
+          throw new TimeoutException();
+        }
+        //is the following good practise?
+        //probably not.., why not?
         try
         {
-            connect();
-
-            //port.writeString("Test");
-            //Frame frame = readFrame(TIMEOUT, TimeUnit.MILLISECONDS);
-            //Frame frame = readFrame(TIMEOUT, TimeUnit.MINUTES); //for simulation/breakpoints
-            //LOG.info(frame.toString());
+          receivedFrameList.wait(to);
         }
-        catch (Exception ex)
+        catch (InterruptedException ex)
         {
-            port = null;
-            throw ex;
-
         }
+      }
     }
 
-    public String getPort()
+  }
+
+  public String[] getAvailablePorts()
+  {
+    return port.getPortList();
+  }
+
+  public void disconnect() throws CommunicationException
+  {
+    try
     {
-        return port.getPort();
-    }
+      if(!connected || port == null)
+        return;
 
-    /**
-     *
-     * @return The captured and already checked Frame Data
-     * @throws CommunicationException
-     * @throws TimeoutException
-     */
-    public String getFrameData() throws CommunicationException, TimeoutException
-    {
-        for(int i = 0; i < 3; i++)
-        {
-            try
-            {
-                return readFrame(TIMEOUT, TIMOUT_UNIT).getData();
-
-            }
-            catch (CommunicationException ex)
-            {
-                LOG.warning(ex);
-            }
-            catch (TimeoutException ex)
-            {
-                if(i == 2)
-                    throw ex;
-                LOG.fine(String.format("%s. Timeout", i + 1));
-            }
-            catch (InterruptedException ex)
-            {
-                break;
-            }
-        }
-        throw new CommunicationException("received wrong frames");
-    }
-
-    /**
-     *
-     * @param timeout
-     * @param unit
-     * @return
-     * @throws CommunicationException
-     * @throws TimeoutException
-     * @throws InterruptedException
-     */
-    public Frame readFrame(long timeout, TimeUnit unit)
-            throws CommunicationException, TimeoutException,
-                   InterruptedException
-    {
-        synchronized (receivedFrameList)
-        {
-            long startTimeMillis = System.currentTimeMillis();
-            while(true)
-            {
-                if(!receivedFrameList.isEmpty())
-                {
-                    return receivedFrameList.removeFirst();
-                }
-
-                long to = startTimeMillis + unit.toMillis(timeout)
-                        - System.currentTimeMillis();
-                if(to <= 0)
-                {
-                    throw new TimeoutException();
-                }
-                //is the following good practise?
-                //probably not.., why not?
-                try
-                {
-                    receivedFrameList.wait(to);
-                }
-                catch (InterruptedException ex)
-                {
-                    LOG.warning(ex);
-                }
-            }
-        }
+      port.closePort();
+      connected = false;
+      LOG.info("Port disconnected");
 
     }
-
-    public static int getCurrentPackage()
+    catch (Exception ex)
     {
-        return pack;
+      throw new CommunicationException(ex);
+    }
+  }
+
+  public boolean isConnected()
+  {
+    return connected;
+  }
+
+  public void refreshEco() throws CommunicationException, TimeoutException,
+                                  IllegalStateException
+  {
+    try
+    {
+      //every 4 seconds max!
+      if(refreshLock + 4000 < System.currentTimeMillis())
+      {
+        setEco(getResponse(Request.REFRESH));
+        refreshLock = System.currentTimeMillis();
+      }
+      else
+        throw new IllegalStateException("refreshEco blocked");
+    }
+    catch (TimeoutException ex)
+    {
+      throw ex;
+    }
+    catch (IllegalStateException ex)
+    {
+      throw ex;
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
+  }
+
+  public boolean isOpened()
+  {
+    return port.isOpened();
+  }
+
+  public String[] getResponse(Request request) throws
+          CommunicationException, TimeoutException
+  {
+    for(int i = 0; i < 3; i++)
+    {
+      try
+      {
+        sendFrame(request);
+        return getFrameData();
+      }
+      catch (TimeoutException ex)
+      {
+        LOG.warning((i + 1) + ". Timeout");
+      }
+      catch (Exception ex)
+      {
+        throw ex;
+      }
+    }
+    throw new TimeoutException("Timeout");
+  }
+
+  /**
+   * only accepts request, start and measure as parameter
+   *
+   * @param request refresh, start or measure
+   * @throws CommunicationException
+   * @throws TimeoutException
+   *
+   */
+  public void sendFrame(Request request) throws CommunicationException,
+                                                TimeoutException,
+                                                IllegalArgumentException
+  {
+    if(port == null)
+    {
+      throw new CommunicationException("port not initialized!");
+    }
+    if(!isOpened())
+    {
+      throw new CommunicationException("port not opened!");
     }
 
-    public static void acceptPackage() throws IOException
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    try
     {
-        switch (pack)
-        {
-            case 0:
-                pack = 1;
-                break;
-            case 1:
-                pack = 0;
-                break;
-            default:
-                LOG.severe("package number fatal error");
-                throw new IOException("FATAL ERROR");
-        }
-    }
+      //build frame
+      baos.write(SOT);
+      switch (request)
+      {
+        case REFRESH:
+          baos.write("e".getBytes("UTF-8"));
+          break;
+        case START:
+          baos.write("s".getBytes("UTF-8"));
+          break;
+        case MEASURE:
+          baos.write("m".getBytes("UTF-8"));
+          break;
+        case STARTNORPM:
+          baos.write("g".getBytes("UTF-8"));
+          break;
+        case MEASURENORPM:
+          baos.write("r".getBytes("UTF-8"));
+          break;
+        default:
+          LOG.severe("FATAL ERROR");
+      }
+      baos.write(EOT);
 
-    public void sendAck(int pkg, boolean ack) throws CommunicationException
-    {
-        try
-        {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(Communication.C_START);
-            Thread.sleep(10);
-            baos.write(String.valueOf(getCurrentPackage()).getBytes());
-            Thread.sleep(10);
+      port.writeBytes(baos.toByteArray());
 
-            if(ack)
-            {
-                baos.write(Communication.C_ACK);
-                baos.write(Communication.C_STOP);
-                port.writeBytes(baos.toByteArray());
-
-                LOG.fine("ACK SENT");
-            }
-            else
-            {
-                baos.write(Communication.C_NACK);
-                baos.write(Communication.C_STOP);
-                port.writeBytes(baos.toByteArray());
-                LOG.fine("NACK SENT");
-            }
-
-        }
-        catch (Exception ex)
-        {
-            throw new CommunicationException(ex);
-        }
-    }
-
-    public static String[] getAvailablePorts()
-    {
-        
-        //return new PortCom("list").getPortList();
-        return new PortSim("list").getPortList();
-    }
-
-    public static Communication getInstance()
-    {
-        return instance;
-    }
-
-    public void disconnect() throws CommunicationException
-    {
-        try
-        {
-            if(port != null)
-            {
-                port.closePort();
-                connected = false;
-            }
-            else
-                throw new CommunicationException("closing Port failed");
-        }
-        catch (Exception ex)
-        {
-            throw new CommunicationException(ex);
-        }
-    }
-
-    public static boolean isConnected()
-    {
-        return connected;
-    }
-
-    public void refreshEco() throws CommunicationException, TimeoutException
-    {
-        try
-        {
-            sendFrame("refresh");
-            setEco(getFrameData());
-        }
-        catch (Exception ex)
-        {
-            throw new CommunicationException(ex);
-        }
-    }
-
-    public boolean isSuccess()
-    {
-        return success;
-    }
-
-    /**
-     * sets the worker
-     *
-     * @param w the worker
-     */
-    public void setWorker(SwingWorker w)
-    {
-        worker = w;
-    }
-
-    /**
-     * starts the measurement
-     *
-     * @param gui
-     */
-    public void start(Gui gui)
-    {
-        startWorker(new MeasurementWorker(gui, this));
-    }
-
-    /**
-     * sets the worker and starts it
-     *
-     * @param w the worker
-     */
-    private void startWorker(SwingWorker w)
-    {
-        worker = w;
-        worker.execute();
-    }
-
-    /**
-     * cancels the worker if it isn't <code>null</code>.<br>
-     * Also sets the success variable to false.
-     */
-    public void cancelWorker()
-    {
-        success = false;
-        if(worker != null)
-            worker.cancel(true);
-    }
-
-    /**
-     * Cancels the worker if it isn't <code>null</code>.<br>
-     * Also sets the success variable to true.
-     */
-    public void stopWorker()
-    {
-        success = true;
-        if(worker != null)
-            worker.cancel(true);
-    }
-
-    /**
-     * set to true if the measurement finished succesfully
-     *
-     * @param success
-     */
-    public void setSuccess(boolean success)
-    {
-        this.success = success;
-    }
-
-    /**
-     *
-     * @throws CommunicationException
-     * @throws TimeoutException
-     */
-    private void connect() throws CommunicationException, TimeoutException
-    {
-        port.openPort();
-        try
-        {
-            String str1 = getFrameData();
-
-            String tmp;
-            if(!str1.equals("req"))
-            {
-                disconnect();
-                throw new CommunicationException("wrong Device");
-            }
-
-            //LOG.finest("got req");
-            sendFrame("ready");
-            LOG.finest("sent ready");
-
-            str1 = getFrameData();
-
-            setEco(str1);
-
-            connected = true;
-
-        }
-        catch (CommunicationException ex)
-        {
-            throw ex;
-        }
-        catch (TimeoutException ex)
-        {
-            disconnect();
-            LOG.severe("Timeout");
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            disconnect();
-            ex.printStackTrace(System.err);
-            LOG.severe("Unsupported Exception", ex);
-            throw new CommunicationException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param data
-     * @throws CommunicationException
-     * @throws TimeoutException
-     */
-    public void sendFrame(String data) throws CommunicationException,
-                                              TimeoutException
-    {
-        //build frame
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try
-        {
-            baos.write(Communication.C_START);
-            baos.write(String.valueOf(getCurrentPackage()).getBytes());
-            baos.write(Communication.ENCODER.encode(data.getBytes()));
-            baos.write(Communication.C_GROUP_SEP);
-            baos.write(Crc16.getCRC(new String(baos.toByteArray(), "utf-8")).getBytes("utf-8"));
-            baos.write(Communication.C_STOP);
-        }
-        catch (IOException ex)
-        {
-            throw new CommunicationException("Error converting data string to bytes");
-        }
-        catch (Exception ex)
-        {
-            throw new CommunicationException(ex);
-        }
-
-        //send frame until ack - max 3 times
-        for(int i = 0; i < 3; i++)
-        {
-            try
-            {
-                port.writeBytes(baos.toByteArray());
-                LOG.info("Frame written: %s", baos.toString());
-                Frame ack = readFrame(TIMEOUT, TIMOUT_UNIT);
-                if(ack.isAck())
-                    return;
-            }
-            catch (TimeoutException | InterruptedException | CommunicationException ex)
-            {
-            }
-        }
-        throw new TimeoutException();
+      LOG.fine("Frame written: " + baos.toString());
 
     }
-
-    public void setEco(String data) throws NumberFormatException,
-                                           UnsupportedEncodingException
+    catch (NullPointerException ex)
     {
-        byte[] str =
-        {
-            C_UNIT_SEP
-        };
-        String rv[] = data.split(new String(str, "utf-8"), 3);
+      ex.printStackTrace(System.err);
+    }
+    catch (IOException ex)
+    {
+      throw new CommunicationException("Error converting data string to bytes");
+    }
+    catch (Exception ex)
+    {
+      throw new CommunicationException(ex);
+    }
+  }
 
-        double temperature = Double.parseDouble(rv[0]);
-        int humidity = Integer.parseInt(rv[1]);
-        double pressure = Double.parseDouble(rv[2]);
+  /**
+   * converts the data string to 3 ecosystem variables and sets them in the
+   * data.data class
+   *
+   * @param data the string to be converted and set
+   */
+  public void setEco(String[] data)
+  {
+
+    double temperature = Double.parseDouble(data[0]);
+    int humidity = Integer.parseInt(data[1]);
+    double pressure = Double.parseDouble(data[2]) / 100;
 
 //        System.out.println(temperature);
 //        System.out.println(humidity);
 //        System.out.println(pressure);
-        if(temperature < (-100) || temperature > 100
-                || humidity < 0 || humidity > 100
-                || pressure < 100 || pressure > 2000)
-        {
-            throw new IllegalStateException();
-        }
-
-        DATA.setTemperature(temperature);
-        DATA.setHumidity(humidity);
-        DATA.setPressure(pressure);
-
+    if(temperature < (-100) || temperature > 100
+            || humidity < 0 || humidity > 100
+            || pressure < 0 || pressure > 2000)
+    {
+      throw new IllegalStateException();
     }
 
-    //Runnable or Thread?, better would be to use modern kind of
-    // multithreading -> executors
-    private Runnable getFrame = new Runnable()
+    DATA.setTemperature(temperature);
+    DATA.setHumidity(humidity);
+    DATA.setPressure(pressure);
+
+  }
+
+  //Runnable or Thread?, better would be to use modern kind of
+  // multithreading -> executors
+  private Runnable getFrame = new Runnable()
+  {
+
+    @Override
+    public void run()
     {
-
-        @Override
-        public void run()
+      try
+      {
+        FrameBytes frame = null;
+        while(true)
         {
-            try
-            {
-                FrameBytes frame = null;
-                while(true)
+          byte b = port.readByte();
+          //System.out.println(b);
+          switch (b)
+          {
+
+            //ignore \n and \r
+            case 10:
+              break;
+            case 13:
+              break;
+
+            case SOT:
+              frame = new FrameBytes();
+              frame.update(b);
+              break;
+
+            case EOT:
+              if(frame != null)
+              {
+                frame.update(b);
+                LOG.info(String.format("Frame received: %s", new String(frame.getFrameBytes(), "utf-8")));
+                synchronized (receivedFrameList)
                 {
-                    byte b = port.readByte();
-                    //System.out.println(b);
-                    switch (b)
-                    {
-
-                        //ignore \n and \r
-                        case 10:
-                            break;
-                        case 13:
-                            break;
-
-                        case C_START:
-                            frame = new FrameBytes();
-                            frame.update(b);
-                            break;
-
-                        case C_STOP:
-                            if(frame != null)
-                            {
-                                frame.update(b);
-                                LOG.info(String.format("Frame received: %s", new String(frame.getFrameBytes(), "utf-8")));
-                                synchronized (receivedFrameList)
-                                {
-                                    receivedFrameList.add(new Frame(frame));
-                                    receivedFrameList.notifyAll();
-                                    frame = null;
-                                }
-                            }
-                            else
-                            {
-                                LOG.warning("missing C_START");
-                            }
-                            break;
-
-                        default:
-                            if(frame != null)
-                            {
-                                frame.update(b);
-                            }
-                            else
-                            {
-                                LOG.warning("missing C_START " + String.format("'%c'", b));
-                            }
-                    }
+                  receivedFrameList.add(new Frame(frame));
+                  receivedFrameList.notifyAll();
+                  frame = null;
                 }
-            }
-            catch (CommunicationException ex)
-            {
-                ex.printStackTrace(System.err);
-                LOG.warning(ex.getMessage());
-            }
-            catch (Exception ex)
-            {
-                LOG.warning(ex);
-            }
-        }
+              }
+              else
+              {
+                LOG.warning("missing C_START");
+              }
+              break;
 
-    };
+            default:
+              if(frame != null)
+              {
+                frame.update(b);
+              }
+              else
+              {
+                LOG.warning("missing C_START " + String.format("'%c'", b));
+              }
+          }
+        }
+      }
+      catch (CommunicationException ex)
+      {
+//        ex.printStackTrace(System.err);
+        LOG.warning(ex.getMessage());
+      }
+      catch (Exception ex)
+      {
+        LOG.warning(ex);
+      }
+    }
+
+  };
 
 }

@@ -1,8 +1,9 @@
 package measure;
 
 import java.util.LinkedList;
+import java.util.logging.Level;
+import jssc.SerialPort;
 import logging.Logger;
-
 
 /**
  *
@@ -10,175 +11,188 @@ import logging.Logger;
  */
 public class PortSim implements Port
 {
-  private static final Logger LOG = Logger.getLogger(PortSim.class.getName());
 
+    private static final Logger LOG = Logger.getLogger(PortSim.class.getName());
+    
+    
+    private final LinkedList<Chunk> receivedChunks = new LinkedList<>();
+    private SIM_MODE mode;
+    private String port;
 
-  public static enum SIM_MODE
-  {
-    NORMAL,
-    DELAYED,
-    NOTHING;
-  }
+    public PortSim()
+    {
+        LOG.info("PortSim: PortSim()");
+    }
 
-  private final LinkedList<PortChunk> receivedChunks = new LinkedList<>();
-  private SIM_MODE mode = SIM_MODE.NORMAL;
-  private String port;
-  private final String [] availablePorts = { "SIM-NORMAL", "SIM-DELAYED" };
+    @Override
+    public String[] getPortList()
+    {
+        String[] rv =
+        {
+            "SIM 1", "SIM 2"
+        };
+        return rv;
+    }
 
-  public PortSim ()
-  {
-    LOG.fine("test");
-  }
-
-  @Override
-  public boolean isOpened ()
-  {
-    return port != null;
-  }
-
-
-  @Override
-  public String[] getPortList ()
-  {
-    return availablePorts;
-  }
-
-
-  @Override
-  public String getPort ()
-  {
-    return port;
-  }
+    @Override
+    public String getPort()
+    {
+        return port;
+    }
 
 
   @Override
   public void openPort (String port) throws CommunicationException
   {
-    if (this.port != null)
-      throw new CommunicationException("Port " + port + " already open");
-    for (SIM_MODE m : SIM_MODE.values())
-    {
-      if (port.endsWith(m.name()))
-      {
-        this.port = port;
-        mode = m;
-        LOG.fine("PortSim: openPort(%s)", port);
-        return;
-      }
-    }
-    throw new IllegalArgumentException("port " + port + " not supported");
-  }
-
-  
-  @Override
-  public void closePort () throws CommunicationException
-  {
-    if (this.port == null)
-      throw new CommunicationException("no port open");
-    LOG.fine("PortSim: closePort()");
-    this.port = null;
+    LOG.info("PortSim: openPort(" + port + ")");
   }
 
 
-  void runDelayed (byte[] response)
-  {
-    new Thread(new Runnable()
+    public static enum SIM_MODE
     {
-
-      @Override
-      public void run ()
-      {
-
-        try
-        {
-          Thread.sleep(150);
-        }
-        catch (InterruptedException ex)
-        {
-          LOG.warning(ex);
-        }
-        LOG.info("chunk received");
-        synchronized (receivedChunks)
-        {
-          receivedChunks.add(new PortChunk(response));
-          receivedChunks.notifyAll();
-        }
-      }
-
+        NORMAL,
+        DELAYED,
+        NOTHING;
     }
-    ).start();
-  }
 
-
-  void runNormal (byte[] response)
-  {
-    String str = new String(response);
-    for (int i = 0; i < 10; i++)
+    @Override
+    public void closePort() throws CommunicationException
     {
-
+        LOG.info("PortSim: closePort()");
     }
+
+    void runDelayed(byte[] response)
+    {
+        new Thread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+
+                try
+                {
+                    Thread.sleep(150);
+                }
+                catch (InterruptedException ex)
+                {
+                    LOG.warning(ex);
+                }
+                LOG.info("chunk received");
+                synchronized (receivedChunks)
+                {
+                    receivedChunks.add(new Chunk(response));
+                    receivedChunks.notifyAll();
+                }
+            }
+
+        }
+        ).start();
+    }
+
+    void runNormal(byte[] response)
+    {
+        String str = new String(response);
+        for(int i = 0; i < 10; i++)
+        {
+            
+        }
 //        synchronized (receivedChunks)
 //        {
 //            receivedChunks.add(new Chunk(response));
 //            receivedChunks.notifyAll();
 //        }
-  }
-
-
-  @Override
-  public void writeBytes (byte [] b) throws CommunicationException
-  {
-    LOG.finer(b, "PortSim: writebytes(byte []) [mode=%s]", mode.name());
-    
-    try
-    {
-      switch (mode)
-      {
-        case NORMAL:
-          break;
-        case DELAYED:
-          break;
-        case NOTHING:
-          break;
-        default:
-          throw new UnsupportedOperationException("no mode set");
-      }
     }
-    catch (Exception ex)
-    {
-      LOG.warning(ex);
-      throw new CommunicationException(ex);
-    }
-  }
 
-
-  @Override
-  public byte readByte () throws CommunicationException, InterruptedException
-  {
-    synchronized (receivedChunks)
+    @Override
+    public void writeBytes(byte[] s) throws CommunicationException
     {
-      try
-      {
-        if (receivedChunks.isEmpty())
+        try
         {
-          receivedChunks.wait();
+            LOG.info("PortSim: writeString(\"%s\")", new String(s, "utf-8"));
+            byte[] sb;
+            sb = s;
+            byte[] response = new byte[sb.length + 2];
+            response[0] = Communication.SOT;
+            System.arraycopy(sb, 0, response, 1, sb.length);
+            response[sb.length + 1] = Communication.EOT;
+            switch (mode)
+            {
+                case NORMAL:
+                    runNormal(response);
+                    break;
+                case DELAYED:
+                    runDelayed(response);
+                    break;
+                case NOTHING:
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
         }
-        final PortChunk ch = receivedChunks.getFirst();
-        final byte rv = ch.next();
-        if (!ch.isByteAvailable())
-        {
-          receivedChunks.removeFirst();
+        catch (Exception ex)
+        { // UnsupportedEncodingException
+            LOG.warning(ex);
         }
-        return rv;
-      }
-      catch (InterruptedException ex)
-      {
-        throw new CommunicationException(ex);
-      }
     }
-  }
 
+    @Override
+    public byte readByte() throws CommunicationException, InterruptedException
+    {
+        synchronized (receivedChunks)
+        {
+            try
+            {
+                if(receivedChunks.isEmpty())
+                {
+                    receivedChunks.wait();
+                }
+                final Chunk ch = receivedChunks.getFirst();
+                final byte rv = ch.next();
+                if(!ch.isByteAvailable())
+                {
+                    receivedChunks.removeFirst();
+                }
+                return rv;
+            }
+            catch (InterruptedException ex)
+            {
+                throw new CommunicationException(ex);
+            }
+        }
+    }
 
+    public SIM_MODE getMode()
+    {
+        return mode;
+    }
 
+    public void setMode(SIM_MODE mode)
+    {
+        this.mode = mode;
+    }
+
+    private class Chunk
+    {
+
+        private final byte[] data;
+        private int nextIndex;
+
+        public Chunk(byte[] data)
+        {
+            this.data = data;
+        }
+
+        public byte next()
+        {
+            return data[nextIndex++];
+        }
+
+        public boolean isByteAvailable()
+        {
+            return nextIndex < data.length;
+        }
+
+    }
 
 }

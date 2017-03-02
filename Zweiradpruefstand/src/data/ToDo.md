@@ -52,15 +52,26 @@
 * ![d] ChartPanel directly into panel without internal frame  
 * ![d] gui elements description  
 
-####v1.0
-* automatic starting(custom rpm)
-* automatic stopping
-* maximal rollerspeed (kmh)
-* 4 stroke bug 
-* Bugfixing
+####v0.9.5
+* ![d] Complete new communication reloaded!  
+* ![d] Remove ACK and Package
 * ![d] Cleaning
 * ![d] Performance  
-  
+* ![d] Calculation and filtering
+* ![d] Loading Screen
+* ![d] New Design
+* ![d] Export .pmt File
+
+####v0.9.7
+* ![d] Bug fixes
+* ![d] Icon Cleanup
+
+####v0.9.8
+* ![d] RawDatapoint in String format
+* ![d]Filtering
+
+####v1.0
+* Measurement working!
   
   
 

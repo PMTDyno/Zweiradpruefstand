@@ -2,20 +2,21 @@ package gui;
 
 import data.Config;
 import data.Data;
+import data.RawDatapoint;
+import data.ReadPMT;
 import measure.MeasurementWorker;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.SplashScreen;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import logging.Logger;
@@ -44,1542 +45,1755 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.8.5
+ * @version 0.9.8
  */
 public class Gui extends javax.swing.JFrame
 {
 
-    private final ProgSetDialog progset;
-    private final VehicleSetDialog vehicleset;
-    private Communication com;
-    private ChartPanel chartPanel;
-    private final Data data = Data.getInstance();
+  private static final String VERSION = "0.9.8";
+  private static final Logger LOGP = Logger.getParentLogger();
+  private static final Logger LOG = Logger.getLogger(Gui.class.getName());
+  private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
 
-    private static final Logger LOGP = Logger.getParentLogger();
-    private static final Logger LOG = Logger.getLogger(Gui.class.getName());
-    private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
+  private final Communication com = new Communication();
 
-    private static final String VERSION = "0.9";
+  private final ProgSetDialog progset;
+  private final VehicleSetDialog vehicleset;
 
-    private final Font font = new Font("sansserif", Font.BOLD, 15);
-    private final ValueMarker maxPowerMarker = new ValueMarker(data.getMaxpower());
-    private final ValueMarker maxTorqueMarker = new ValueMarker(data.getMaxtorque());
+  private final Data data = Data.getInstance();
 
-    private XYSeries seriesTorque = new XYSeries("Drehmoment [Nm]");
-    private XYSeries seriesPower = new XYSeries("Leistung [PS]");
-    private XYSeries series1 = new XYSeries("temp1 series");
-    private XYSeries series2 = new XYSeries("temp2 series");
-    private XYSeriesCollection dataset1 = new XYSeriesCollection();
-    private XYSeriesCollection dataset2 = new XYSeriesCollection();
+  private final Font font = new Font("sansserif", Font.BOLD, 15);
+  private final ValueMarker maxPowerMarker = new ValueMarker(data.getMaxpower());
+  private final ValueMarker maxTorqueMarker = new ValueMarker(data.getMaxtorque());
 
-    private JFreeChart chart;
+  private ChartPanel chartPanel;
+  private XYSeries seriesTorque = new XYSeries("Drehmoment");
+  private XYSeries seriesPower = new XYSeries("Leistung");
+  private XYSeries series1 = new XYSeries("temp1 series");
+  private XYSeries series2 = new XYSeries("temp2 series");
+  private XYSeriesCollection dataset1 = new XYSeriesCollection();
+  private XYSeriesCollection dataset2 = new XYSeriesCollection();
 
-    /**
-     * Creates the main GUI
-     */
-    public Gui()
+  private JFreeChart chart;
+
+  /**
+   * Creates the GUI
+   */
+  public Gui()
+  {
+
+    initComponents();
+    try
     {
-        
-        initComponents();
-        try
-        {
-            Config.getInstance().load(); //settings taken over config file
-        }
-        catch (Exception ex)
-        {
-            LOG.warning("Error reading Config file", ex);
-            showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
-        }
-        jLabelInfo.setText("<html>"
-                + "<b>Version: </b>PMT Dyno v" + VERSION + "<br>"
-                + "<b>Config Datei: </b>" + data.getFilePath() + "<br>"
-                + "<b>System: </b>" + System.getProperty("os.name") + "<br>"
-                + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
-                + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
-                + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
-                + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br>"
-        );
-        jLabelVersion.setText("v" + VERSION);
-
-        setIconImage(new ImageIcon(getClass().getResource("/icons/logo128.png")).getImage());
-
-        setTitle("PMT-DYNO v" + VERSION);
-        setMinimumSize(new Dimension(1000, 450));
-        setSize(data.getWindowWidth(), data.getWindowHeight());
-        setLocation(data.getWindowRelativeX(), data.getWindowRelativeY());
-
-        progset = new ProgSetDialog(this, true);
-        vehicleset = new VehicleSetDialog(this, true);
-
-        //com = new PortSim();
-        refreshPorts();
-
-        initChart();
-
+      Config.getInstance().load(); //settings taken over config file
     }
-
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
+    catch (Exception ex)
     {
-        java.awt.GridBagConstraints gridBagConstraints;
+      LOG.warning("Error reading Config file", ex);
+      showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
+    }
+    jLabelInfo.setText("<html>"
+            + "<b>Version: </b>PMT Dyno v" + VERSION + "<br>"
+            + "<b>Config Datei: </b>" + data.getFilePath() + "<br>"
+            + "<b>System: </b>" + System.getProperty("os.name") + "<br>"
+            + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
+            + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
+            + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
+            + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br>"
+    );
+    jLabelVersion.setText("v" + VERSION);
 
-        jFrameAbout = new javax.swing.JFrame();
-        jPanelLogo = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabelVersion = new javax.swing.JLabel();
-        jPanelInfo = new javax.swing.JPanel();
-        jLabelDevelopers = new javax.swing.JLabel();
-        jLabelInfo = new javax.swing.JLabel();
-        jLabelWarning = new javax.swing.JLabel();
-        jPanelInfo2 = new javax.swing.JPanel();
-        jLabelDate = new javax.swing.JLabel();
-        jLabelAuthor = new javax.swing.JLabel();
-        jFrameGuide = new javax.swing.JFrame();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanelMeasure = new javax.swing.JPanel();
-        jLabelGuideMeasure = new javax.swing.JLabel();
-        jPanelSettings = new javax.swing.JPanel();
-        jLabelGuideSettings = new javax.swing.JLabel();
-        jToolBar = new javax.swing.JToolBar();
-        jStart = new javax.swing.JButton();
-        jStop = new javax.swing.JButton();
-        jCancel = new javax.swing.JButton();
-        jRefresh = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        jProgSet = new javax.swing.JButton();
-        jVehicleSet = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JToolBar.Separator();
-        jPrint = new javax.swing.JButton();
-        jSave = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JToolBar.Separator();
-        jPanSerial = new javax.swing.JPanel();
-        jpanDevice = new javax.swing.JPanel();
-        jComboBoxPort = new javax.swing.JComboBox<>();
-        jpanEast = new javax.swing.JPanel();
-        jpanSerialButtons = new javax.swing.JPanel();
-        jbutConnect = new javax.swing.JButton();
-        jbutDisconnect = new javax.swing.JButton();
-        jbutRefreshDevice = new javax.swing.JButton();
-        jLabelStatus = new javax.swing.JLabel();
-        jChartPanel = new javax.swing.JPanel();
-        jMenuBar = new javax.swing.JMenuBar();
-        jFile = new javax.swing.JMenu();
-        jMenuSave = new javax.swing.JMenuItem();
-        jMenuPrint = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
-        jMenuSettings = new javax.swing.JMenuItem();
-        jMenuVehicle = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        jMenuClose = new javax.swing.JMenuItem();
-        jHelp = new javax.swing.JMenu();
-        jMenuGuide = new javax.swing.JMenuItem();
-        jMenuAbout = new javax.swing.JMenuItem();
+    setIconImage(new ImageIcon(getClass().getResource("/icons/logo128.png")).getImage());
 
-        jFrameAbout.setTitle("Über...");
-        jFrameAbout.setLocation(new java.awt.Point(0, 0));
-        jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
-        jFrameAbout.setResizable(false);
+    setTitle("PMT-DYNO v" + VERSION);
+    setMinimumSize(new Dimension(1000, 450));
+    setSize(data.getWindowWidth(), data.getWindowHeight());
+    setLocation(data.getWindowRelativeX(), data.getWindowRelativeY());
 
-        jPanelLogo.setLayout(new java.awt.GridBagLayout());
+    progset = new ProgSetDialog(this, true);
+    vehicleset = new VehicleSetDialog(this, true);
+    refreshPorts();
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
-        jLabel2.setText(" PMT Dyno");
-        jLabel2.setVerifyInputWhenFocusTarget(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-        jPanelLogo.add(jLabel2, gridBagConstraints);
+    initChart();
 
-        jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jLabelVersion.setText("v");
-        jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-        jPanelLogo.add(jLabelVersion, gridBagConstraints);
+  }
 
-        jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
+  @SuppressWarnings("unchecked")
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void initComponents()
+  {
+    java.awt.GridBagConstraints gridBagConstraints;
 
-        jPanelInfo.setLayout(new java.awt.GridBagLayout());
+    jFrameAbout = new javax.swing.JFrame();
+    jPanelLogo = new javax.swing.JPanel();
+    jLabel2 = new javax.swing.JLabel();
+    jLabelVersion = new javax.swing.JLabel();
+    jPanelInfo = new javax.swing.JPanel();
+    jLabelDevelopers = new javax.swing.JLabel();
+    jLabelInfo = new javax.swing.JLabel();
+    jLabelWarning = new javax.swing.JLabel();
+    jPanelInfo2 = new javax.swing.JPanel();
+    jLabelDate = new javax.swing.JLabel();
+    jLabelAuthor = new javax.swing.JLabel();
+    jFrameGuide = new javax.swing.JFrame();
+    jTabbedPane1 = new javax.swing.JTabbedPane();
+    jPanelMeasure = new javax.swing.JPanel();
+    jLabelGuideMeasure = new javax.swing.JLabel();
+    jPanelSettings = new javax.swing.JPanel();
+    jLabelGuideSettings = new javax.swing.JLabel();
+    jToolBar = new javax.swing.JToolBar();
+    jStart = new javax.swing.JButton();
+    jRefresh = new javax.swing.JButton();
+    jSeparator1 = new javax.swing.JToolBar.Separator();
+    jProgSet = new javax.swing.JButton();
+    jSeparator2 = new javax.swing.JToolBar.Separator();
+    jPrint = new javax.swing.JButton();
+    jSave = new javax.swing.JButton();
+    jSeparator3 = new javax.swing.JToolBar.Separator();
+    jPanSerial = new javax.swing.JPanel();
+    jpanEast = new javax.swing.JPanel();
+    jComboBoxPort = new javax.swing.JComboBox<>();
+    jpanSerialButtons = new javax.swing.JPanel();
+    jbutConnect = new javax.swing.JButton();
+    jbutDisconnect = new javax.swing.JButton();
+    jbutRefreshDevice = new javax.swing.JButton();
+    jLabelStatus = new javax.swing.JLabel();
+    jChartPanel = new javax.swing.JPanel();
+    jMenuBar = new javax.swing.JMenuBar();
+    jFile = new javax.swing.JMenu();
+    jMenuOpen = new javax.swing.JMenuItem();
+    jSeparator6 = new javax.swing.JPopupMenu.Separator();
+    jMenuSave = new javax.swing.JMenuItem();
+    jMenuItem2 = new javax.swing.JMenuItem();
+    jMenuPrint = new javax.swing.JMenuItem();
+    jSeparator4 = new javax.swing.JPopupMenu.Separator();
+    jMenuSettings = new javax.swing.JMenuItem();
+    jSeparator5 = new javax.swing.JPopupMenu.Separator();
+    jMenuClose = new javax.swing.JMenuItem();
+    jHelp = new javax.swing.JMenu();
+    jMenuGuide = new javax.swing.JMenuItem();
+    jMenuAbout = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
 
-        jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelDevelopers.setText("<html> \n<center> <b>Diplomanten: </b> <br>\n Primus Christoph - Elektrotechnik<br>\n Messing Levin - Programm<br> \nTinauer Robert - Mechanik<br> \n</center>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
-        jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
+    jFrameAbout.setTitle("Über...");
+    jFrameAbout.setLocation(new java.awt.Point(0, 0));
+    jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
+    jFrameAbout.setResizable(false);
 
-        jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
-        jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
-        jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jLabelInfo.setOpaque(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        jPanelInfo.add(jLabelInfo, gridBagConstraints);
+    jPanelLogo.setLayout(new java.awt.GridBagLayout());
 
-        jLabelWarning.setText("Die Nutzung der Anlage des Prüfstandes erfolgt auf eigene Gefahr!");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        jPanelInfo.add(jLabelWarning, gridBagConstraints);
+    jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
+    jLabel2.setText(" PMT Dyno");
+    jLabel2.setVerifyInputWhenFocusTarget(false);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+    jPanelLogo.add(jLabel2, gridBagConstraints);
 
-        jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
+    jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+    jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabelVersion.setText("v");
+    jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+    jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+    gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
+    jPanelLogo.add(jLabelVersion, gridBagConstraints);
 
-        jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
+    jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
 
-        jLabelDate.setText("2016-2017");
-        jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
-                jLabelDateMouseClicked(evt);
-            }
-        });
-        jPanelInfo2.add(jLabelDate);
+    jPanelInfo.setLayout(new java.awt.GridBagLayout());
 
-        jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jLabelAuthor.setText("Autor: Messing Levin");
-        jPanelInfo2.add(jLabelAuthor);
+    jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelDevelopers.setText("<html>  <center> <b>Diplomanden: </b> <br>  Primus Christoph - Elektrotechnik<br>  Messing Levin - Programm<br>  Tinauer Robert - Mechanik<br>  </center>");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
+    jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
 
-        jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
+    jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
+    jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
+    jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    jLabelInfo.setOpaque(true);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.ipadx = 5;
+    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+    jPanelInfo.add(jLabelInfo, gridBagConstraints);
 
-        jFrameGuide.setTitle("Anleitung");
-        jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
-        jFrameGuide.setResizable(false);
+    jLabelWarning.setText("Die Nutzung des Prüfstandes erfolgt auf eigene Gefahr!");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+    jPanelInfo.add(jLabelWarning, gridBagConstraints);
 
-        jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
+    jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
 
-        jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelGuideMeasure.setText("<html> <h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
-        jPanelMeasure.add(jLabelGuideMeasure);
+    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
 
-        jTabbedPane1.addTab("Messung", jPanelMeasure);
+    jLabelDate.setText("2016-2017");
+    jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
+    {
+      public void mouseClicked(java.awt.event.MouseEvent evt)
+      {
+        jLabelDateMouseClicked(evt);
+      }
+    });
+    jPanelInfo2.add(jLabelDate);
 
-        jPanelSettings.setLayout(new java.awt.GridLayout(1, 0));
+    jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabelAuthor.setText("Autor: Messing Levin");
+    jPanelInfo2.add(jLabelAuthor);
 
-        jLabelGuideSettings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelGuideSettings.setText("todo"); // NOI18N
-        jPanelSettings.add(jLabelGuideSettings);
+    jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
 
-        jTabbedPane1.addTab("Einstellungen", jPanelSettings);
+    jFrameGuide.setTitle("Anleitung");
+    jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
+    jFrameGuide.setResizable(false);
 
-        jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+    jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setIconImages(null);
+    jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelGuideMeasure.setText("<html> TODO!!!<h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
+    jPanelMeasure.add(jLabelGuideMeasure);
 
-        jToolBar.setRollover(true);
+    jTabbedPane1.addTab("Messung", jPanelMeasure);
 
-        jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png"))); // NOI18N
-        jStart.setMnemonic('s');
-        jStart.setToolTipText("Messung starten");
-        jStart.setEnabled(false);
-        jStart.setFocusable(false);
-        jStart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jStart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jStart.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jStartActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jStart);
+    jPanelSettings.setLayout(new java.awt.GridLayout(1, 0));
 
-        jStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/stop48.png"))); // NOI18N
-        jStop.setToolTipText("Messung stoppen");
-        jStop.setEnabled(false);
-        jStop.setFocusable(false);
-        jStop.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jStop.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jStop.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jStopActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jStop);
+    jLabelGuideSettings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabelGuideSettings.setText("todo"); // NOI18N
+    jPanelSettings.add(jLabelGuideSettings);
 
-        jCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cancel48.png"))); // NOI18N
-        jCancel.setToolTipText("Messung abbrechen");
-        jCancel.setEnabled(false);
-        jCancel.setFocusable(false);
-        jCancel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jCancel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jCancel.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jCancelActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jCancel);
+    jTabbedPane1.addTab("Einstellungen", jPanelSettings);
 
-        jRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/refresh48.png"))); // NOI18N
-        jRefresh.setToolTipText("Umgebungswerte aktualisieren");
-        jRefresh.setEnabled(false);
-        jRefresh.setFocusable(false);
-        jRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jRefresh.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jRefresh.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jRefreshActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jRefresh);
-        jToolBar.add(jSeparator1);
+    jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
-        jProgSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings48.png"))); // NOI18N
-        jProgSet.setToolTipText("Programmeinstellungen");
-        jProgSet.setFocusable(false);
-        jProgSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jProgSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jProgSet.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jProgSetActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jProgSet);
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setIconImages(null);
 
-        jVehicleSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike48.png"))); // NOI18N
-        jVehicleSet.setToolTipText("Fahrzeugeinstellungen");
-        jVehicleSet.setFocusable(false);
-        jVehicleSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jVehicleSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jVehicleSet.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jVehicleSetActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jVehicleSet);
-        jToolBar.add(jSeparator2);
+    jToolBar.setRollover(true);
 
-        jPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer48.png"))); // NOI18N
-        jPrint.setToolTipText("Drucken...");
-        jPrint.setEnabled(false);
-        jPrint.setFocusable(false);
-        jPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jPrint.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jPrintActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jPrint);
+    jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png"))); // NOI18N
+    jStart.setToolTipText("Messung starten");
+    jStart.setEnabled(false);
+    jStart.setFocusable(false);
+    jStart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jStart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jStart.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jStartActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jStart);
 
-        jSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save48.png"))); // NOI18N
-        jSave.setToolTipText("Als Bild speichern");
-        jSave.setEnabled(false);
-        jSave.setFocusable(false);
-        jSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jSave.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jSaveActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jSave);
-        jToolBar.add(jSeparator3);
+    jRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/refresh48.png"))); // NOI18N
+    jRefresh.setToolTipText("Umgebungswerte aktualisieren");
+    jRefresh.setEnabled(false);
+    jRefresh.setFocusable(false);
+    jRefresh.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jRefresh.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jRefresh.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jRefreshActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jRefresh);
+    jToolBar.add(jSeparator1);
 
-        jPanSerial.setLayout(new java.awt.BorderLayout());
+    jProgSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings48.png"))); // NOI18N
+    jProgSet.setToolTipText("Programmeinstellungen");
+    jProgSet.setFocusable(false);
+    jProgSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jProgSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jProgSet.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jProgSetActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jProgSet);
+    jToolBar.add(jSeparator2);
 
-        jpanDevice.setBorder(javax.swing.BorderFactory.createEmptyBorder(7, 5, 7, 1));
-        jpanDevice.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        jpanDevice.add(jComboBoxPort, gridBagConstraints);
+    jPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer48.png"))); // NOI18N
+    jPrint.setToolTipText("Drucken...");
+    jPrint.setEnabled(false);
+    jPrint.setFocusable(false);
+    jPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jPrint.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jPrintActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jPrint);
 
-        jPanSerial.add(jpanDevice, java.awt.BorderLayout.CENTER);
+    jSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save48.png"))); // NOI18N
+    jSave.setToolTipText("Als Bild speichern");
+    jSave.setEnabled(false);
+    jSave.setFocusable(false);
+    jSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    jSave.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jSaveActionPerformed(evt);
+      }
+    });
+    jToolBar.add(jSave);
+    jToolBar.add(jSeparator3);
 
-        jpanEast.setLayout(new java.awt.GridBagLayout());
+    jPanSerial.setLayout(new java.awt.BorderLayout());
 
-        jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
+    jpanEast.setLayout(new java.awt.GridBagLayout());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.ipadx = 20;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+    jpanEast.add(jComboBoxPort, gridBagConstraints);
 
-        jbutConnect.setText("Verbinden");
-        jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
-        jbutConnect.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutConnectActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutConnect);
+    jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-        jbutDisconnect.setText("Trennen");
-        jbutDisconnect.setEnabled(false);
-        jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutDisconnectActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutDisconnect);
+    jbutConnect.setText("Verbinden");
+    jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
+    jbutConnect.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutConnectActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutConnect);
 
-        jbutRefreshDevice.setText("Aktualisieren");
-        jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jbutRefreshDeviceActionPerformed(evt);
-            }
-        });
-        jpanSerialButtons.add(jbutRefreshDevice);
+    jbutDisconnect.setText("Trennen");
+    jbutDisconnect.setEnabled(false);
+    jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutDisconnectActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutDisconnect);
 
-        jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
+    jbutRefreshDevice.setText("Aktualisieren");
+    jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutRefreshDeviceActionPerformed(evt);
+      }
+    });
+    jpanSerialButtons.add(jbutRefreshDevice);
 
-        jLabelStatus.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabelStatus.setForeground(java.awt.Color.gray);
-        jLabelStatus.setText("getrennt");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        jpanEast.add(jLabelStatus, gridBagConstraints);
+    jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
 
-        jPanSerial.add(jpanEast, java.awt.BorderLayout.EAST);
+    jLabelStatus.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+    jLabelStatus.setForeground(java.awt.Color.gray);
+    jLabelStatus.setText("getrennt");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    jpanEast.add(jLabelStatus, gridBagConstraints);
 
-        jToolBar.add(jPanSerial);
+    jPanSerial.add(jpanEast, java.awt.BorderLayout.WEST);
 
-        getContentPane().add(jToolBar, java.awt.BorderLayout.PAGE_START);
+    jToolBar.add(jPanSerial);
 
-        jChartPanel.setLayout(new java.awt.GridLayout(1, 0));
-        getContentPane().add(jChartPanel, java.awt.BorderLayout.CENTER);
+    getContentPane().add(jToolBar, java.awt.BorderLayout.PAGE_START);
 
-        jFile.setText("Datei");
+    jChartPanel.setLayout(new java.awt.GridLayout(1, 0));
+    getContentPane().add(jChartPanel, java.awt.BorderLayout.CENTER);
 
-        jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
-        jMenuSave.setText("Speichern...");
-        jMenuSave.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuSaveActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuSave);
+    jFile.setText("Datei");
 
-        jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
-        jMenuPrint.setText("Drucken...");
-        jMenuPrint.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuPrintActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuPrint);
-        jFile.add(jSeparator4);
+    jMenuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/open16.png"))); // NOI18N
+    jMenuOpen.setText("Öffnen...");
+    jMenuOpen.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuOpenActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuOpen);
+    jFile.add(jSeparator6);
 
-        jMenuSettings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings16.png"))); // NOI18N
-        jMenuSettings.setText("Einstellungen");
-        jMenuSettings.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuSettingsActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuSettings);
+    jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
+    jMenuSave.setText("Speichern...");
+    jMenuSave.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuSaveActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuSave);
 
-        jMenuVehicle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/motorbike16.png"))); // NOI18N
-        jMenuVehicle.setText("Fahrzeug...");
-        jMenuVehicle.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuVehicleActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuVehicle);
-        jFile.add(jSeparator5);
+    jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export16.png"))); // NOI18N
+    jMenuItem2.setText("Exportieren...");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuItem2);
 
-        jMenuClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
-        jMenuClose.setText("Beenden");
-        jMenuClose.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuCloseActionPerformed(evt);
-            }
-        });
-        jFile.add(jMenuClose);
+    jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
+    jMenuPrint.setText("Drucken...");
+    jMenuPrint.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuPrintActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuPrint);
+    jFile.add(jSeparator4);
 
-        jMenuBar.add(jFile);
+    jMenuSettings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings16.png"))); // NOI18N
+    jMenuSettings.setText("Einstellungen");
+    jMenuSettings.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuSettingsActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuSettings);
+    jFile.add(jSeparator5);
 
-        jHelp.setText("Hilfe");
+    jMenuClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+    jMenuClose.setText("Beenden");
+    jMenuClose.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuCloseActionPerformed(evt);
+      }
+    });
+    jFile.add(jMenuClose);
 
-        jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
-        jMenuGuide.setText("Anleitung");
-        jMenuGuide.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuGuideActionPerformed(evt);
-            }
-        });
-        jHelp.add(jMenuGuide);
+    jMenuBar.add(jFile);
 
-        jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
-        jMenuAbout.setText("Über...");
-        jMenuAbout.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jMenuAboutActionPerformed(evt);
-            }
-        });
-        jHelp.add(jMenuAbout);
+    jHelp.setText("Hilfe");
 
-        jMenuBar.add(jHelp);
+    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
+    jMenuGuide.setText("Anleitung");
+    jMenuGuide.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuGuideActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuGuide);
 
-        setJMenuBar(jMenuBar);
+    jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
+    jMenuAbout.setText("Über...");
+    jMenuAbout.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuAboutActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuAbout);
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+    jMenuItem1.setText("Test");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuItem1);
 
-    private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
-        print();
-    }//GEN-LAST:event_jMenuPrintActionPerformed
+    jMenuBar.add(jHelp);
+
+    setJMenuBar(jMenuBar);
+
+    pack();
+  }// </editor-fold>//GEN-END:initComponents
 
     private void jStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStartActionPerformed
     {//GEN-HEADEREND:event_jStartActionPerformed
-        start();
-        jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/loading48.gif")));
-        jStart.setEnabled(false);
-        jStop.setEnabled(true);
-        jCancel.setEnabled(true);
-        jRefresh.setEnabled(false);
+      start();
     }//GEN-LAST:event_jStartActionPerformed
 
     private void jPrintActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jPrintActionPerformed
     {//GEN-HEADEREND:event_jPrintActionPerformed
-        print();
+      print();
     }//GEN-LAST:event_jPrintActionPerformed
 
     private void jSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveActionPerformed
-        savePng();
+      savePng();
     }//GEN-LAST:event_jSaveActionPerformed
 
     private void jProgSetActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jProgSetActionPerformed
     {//GEN-HEADEREND:event_jProgSetActionPerformed
-        startProgSet();
+      startProgSet();
     }//GEN-LAST:event_jProgSetActionPerformed
-
-    private void jVehicleSetActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jVehicleSetActionPerformed
-    {//GEN-HEADEREND:event_jVehicleSetActionPerformed
-        startVehicleSet();
-    }//GEN-LAST:event_jVehicleSetActionPerformed
 
     private void jbutConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutConnectActionPerformed
     {//GEN-HEADEREND:event_jbutConnectActionPerformed
-        connectDevice();
+      connectDevice();
     }//GEN-LAST:event_jbutConnectActionPerformed
 
     private void jbutDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutDisconnectActionPerformed
     {//GEN-HEADEREND:event_jbutDisconnectActionPerformed
-        try
-        {
-            com.disconnect();
-            jLabelStatus.setText("getrennt");
-            jLabelStatus.setForeground(Color.GRAY);
-        }
-        catch (CommunicationException ex)
-        {
-            showErrorMessage("Fehler beim trennen", "Gerät konnte nicht getrennt werden!");
-        }
-        finally
-        {
-            jStart.setEnabled(com.isConnected());
-            jStop.setEnabled(false);
-            jCancel.setEnabled(false);
-            jRefresh.setEnabled(com.isConnected());
-            jbutConnect.setEnabled(!com.isConnected());
-            jbutDisconnect.setEnabled(com.isConnected());
-            jbutRefreshDevice.setEnabled(!com.isConnected());
-            jComboBoxPort.setEnabled(!com.isConnected());
-        }
+      try
+      {
+        com.disconnect();
+        jLabelStatus.setText("getrennt");
+        jLabelStatus.setForeground(Color.GRAY);
+      }
+      catch (CommunicationException ex)
+      {
+        showErrorMessage("Fehler beim trennen", "Gerät konnte nicht getrennt werden!");
+      }
+      finally
+      {
+        jStart.setEnabled(com.isConnected());
+        jRefresh.setEnabled(com.isConnected());
+        jbutConnect.setEnabled(!com.isConnected());
+        jbutDisconnect.setEnabled(com.isConnected());
+        jbutRefreshDevice.setEnabled(!com.isConnected());
+        jComboBoxPort.setEnabled(!com.isConnected());
+      }
     }//GEN-LAST:event_jbutDisconnectActionPerformed
 
     private void jbutRefreshDeviceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutRefreshDeviceActionPerformed
     {//GEN-HEADEREND:event_jbutRefreshDeviceActionPerformed
-        refreshPorts();
+      refreshPorts();
     }//GEN-LAST:event_jbutRefreshDeviceActionPerformed
-
-    private void jStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jStopActionPerformed
-    {//GEN-HEADEREND:event_jStopActionPerformed
-        jStop.setEnabled(false);
-        jCancel.setEnabled(false);
-        com.stopWorker();
-    }//GEN-LAST:event_jStopActionPerformed
-
-    private void jCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jCancelActionPerformed
-    {//GEN-HEADEREND:event_jCancelActionPerformed
-        if(JOptionPane.showConfirmDialog(this, "Sind Sie sicher?", "Messung abbrechen", JOptionPane.YES_NO_OPTION) == 0)
-        {
-            com.cancelWorker();
-            jStop.setEnabled(false);
-            jCancel.setEnabled(false);
-        }
-    }//GEN-LAST:event_jCancelActionPerformed
-
-    private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
-    {//GEN-HEADEREND:event_jMenuSettingsActionPerformed
-        startProgSet();
-    }//GEN-LAST:event_jMenuSettingsActionPerformed
-
-    private void jMenuSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSaveActionPerformed
-    {//GEN-HEADEREND:event_jMenuSaveActionPerformed
-        savePng();
-    }//GEN-LAST:event_jMenuSaveActionPerformed
-
-    private void jMenuVehicleActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuVehicleActionPerformed
-    {//GEN-HEADEREND:event_jMenuVehicleActionPerformed
-        startVehicleSet();
-    }//GEN-LAST:event_jMenuVehicleActionPerformed
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuAboutActionPerformed
     {//GEN-HEADEREND:event_jMenuAboutActionPerformed
-        jFrameAbout.setLocationRelativeTo(this);
-        jFrameAbout.setVisible(true);
+      jFrameAbout.setLocationRelativeTo(this);
+      jFrameAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void jMenuGuideActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuGuideActionPerformed
     {//GEN-HEADEREND:event_jMenuGuideActionPerformed
-        jFrameGuide.setLocationRelativeTo(this);
-        jFrameGuide.setVisible(true);
+      jFrameGuide.setLocationRelativeTo(this);
+      jFrameGuide.setVisible(true);
     }//GEN-LAST:event_jMenuGuideActionPerformed
 
     private void jRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRefreshActionPerformed
-        refreshEco();
+      refreshEco();
     }//GEN-LAST:event_jRefreshActionPerformed
 
-    private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
-    {//GEN-HEADEREND:event_jMenuCloseActionPerformed
-        dispose();
-    }//GEN-LAST:event_jMenuCloseActionPerformed
-
-    int easterEgg = 0;
+  private int easterEgg = 0;
     private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
     {//GEN-HEADEREND:event_jLabelDateMouseClicked
-        easterEgg++;
-        if(easterEgg >= 6)
-        {
-            System.out.println("TRIGGERED");
-            System.out.println("TRIGGERED");
-            System.out.println("TRIGGERED");
-            LOG.info("TRIGGERED");
-            LOG.info("TRIGGERED");
-            LOG.info("TRIGGERED");
-            this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
-            this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
-            this.showErrorMessage("TRIGGERED", "PRIMUS IS THE ABSOLUTE WORST!!!!111!!elf!!1eins");
-            this.
-            easterEgg = 0;
-        }
+      easterEgg++;
+      if(easterEgg >= 6)
+      {
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
+        JOptionPane.showMessageDialog(this, "Primus du Wurst!", "Easter Egg", JOptionPane.PLAIN_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
+        easterEgg = 0;
+      }
     }//GEN-LAST:event_jLabelDateMouseClicked
 
-    /**
-     * @param args the command line arguments
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
+
+    start();
+
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+  private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
+  {//GEN-HEADEREND:event_jMenuCloseActionPerformed
+    dispose();
+  }//GEN-LAST:event_jMenuCloseActionPerformed
+
+  private void jMenuSettingsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSettingsActionPerformed
+  {//GEN-HEADEREND:event_jMenuSettingsActionPerformed
+    startProgSet();
+  }//GEN-LAST:event_jMenuSettingsActionPerformed
+
+  private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuPrintActionPerformed
+  {//GEN-HEADEREND:event_jMenuPrintActionPerformed
+    print();
+  }//GEN-LAST:event_jMenuPrintActionPerformed
+
+  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
+    exportFile();
+  }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+  private void jMenuSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSaveActionPerformed
+  {//GEN-HEADEREND:event_jMenuSaveActionPerformed
+    savePng();
+  }//GEN-LAST:event_jMenuSaveActionPerformed
+
+  private void jMenuOpenActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuOpenActionPerformed
+  {//GEN-HEADEREND:event_jMenuOpenActionPerformed
+    openMeasureFile();
+  }//GEN-LAST:event_jMenuOpenActionPerformed
+
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[])
+  {
+    /*
+     * Set the Nimbus look and feel
      */
-    public static void main(String args[])
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /*
+     * If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel. For details see
+     * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+     */
+    try
     {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
+      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+      {
+        if("Nimbus".equals(info.getName()))
         {
-            for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-            {
-                if("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+          //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+          break;
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+      }
+    }
+    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
+    {
+      java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
 
-        //</editor-fold>
-        /* Create and display the form */
-        LOGP.addHandler(new logging.LogOutputStreamHandler(System.out));
-        LOG.setLevel(DEBUGLEVEL);
-        try
-        {
-            String opt = System.getProperty("DebugLevel");
-            if(opt != null)
-                LOG.setLevel(Level.parse(opt));
-        }
-        catch (IllegalArgumentException | SecurityException ex)
-        {
-            System.out.println("Invalid debug level");
-        }
-        catch (Exception ex)
-        {
-            LOG.severe("Unsupported Exception", ex);
-        }
+    //</editor-fold>
+    /*
+     * Create and display the form
+     */
+    LOGP.addHandler(new logging.LogOutputStreamHandler(System.out));
+    LOG.setLevel(DEBUGLEVEL);
+    LOGP.setLevel(DEBUGLEVEL);
+    try
+    {
+      String opt = System.getProperty("DebugLevel");
+      if(opt != null)
+      {
 
-        LOG.info("Start of Application");
-
-        java.awt.EventQueue.invokeLater(()
-                ->
-        {
-            new Gui().setVisible(true);
-        });
+        LOG.setLevel(Level.parse(opt));
+      }
+    }
+    catch (IllegalArgumentException | SecurityException ex)
+    {
+      System.out.println("Invalid debug level");
+    }
+    catch (Exception ex)
+    {
+      LOG.severe("Unsupported Exception", ex);
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jCancel;
-    private javax.swing.JPanel jChartPanel;
-    private javax.swing.JComboBox<String> jComboBoxPort;
-    private javax.swing.JMenu jFile;
-    private javax.swing.JFrame jFrameAbout;
-    private javax.swing.JFrame jFrameGuide;
-    private javax.swing.JMenu jHelp;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabelAuthor;
-    private javax.swing.JLabel jLabelDate;
-    private javax.swing.JLabel jLabelDevelopers;
-    private javax.swing.JLabel jLabelGuideMeasure;
-    private javax.swing.JLabel jLabelGuideSettings;
-    private javax.swing.JLabel jLabelInfo;
-    private javax.swing.JLabel jLabelStatus;
-    private javax.swing.JLabel jLabelVersion;
-    private javax.swing.JLabel jLabelWarning;
-    private javax.swing.JMenuItem jMenuAbout;
-    private javax.swing.JMenuBar jMenuBar;
-    private javax.swing.JMenuItem jMenuClose;
-    private javax.swing.JMenuItem jMenuGuide;
-    private javax.swing.JMenuItem jMenuPrint;
-    private javax.swing.JMenuItem jMenuSave;
-    private javax.swing.JMenuItem jMenuSettings;
-    private javax.swing.JMenuItem jMenuVehicle;
-    private javax.swing.JPanel jPanSerial;
-    private javax.swing.JPanel jPanelInfo;
-    private javax.swing.JPanel jPanelInfo2;
-    private javax.swing.JPanel jPanelLogo;
-    private javax.swing.JPanel jPanelMeasure;
-    private javax.swing.JPanel jPanelSettings;
-    private javax.swing.JButton jPrint;
-    private javax.swing.JButton jProgSet;
-    private javax.swing.JButton jRefresh;
-    private javax.swing.JButton jSave;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JToolBar.Separator jSeparator2;
-    private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
-    private javax.swing.JButton jStart;
-    private javax.swing.JButton jStop;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JToolBar jToolBar;
-    private javax.swing.JButton jVehicleSet;
-    private javax.swing.JButton jbutConnect;
-    private javax.swing.JButton jbutDisconnect;
-    private javax.swing.JButton jbutRefreshDevice;
-    private javax.swing.JPanel jpanDevice;
-    private javax.swing.JPanel jpanEast;
-    private javax.swing.JPanel jpanSerialButtons;
-    // End of variables declaration//GEN-END:variables
+    LOG.info("Start of Application");
 
-    /*---PUBLIC METHODS------------------------------------------*/
-    /**
-     * Saves the config. Then shuts down the program.
-     */
-    @Override
-    public void dispose()
+    java.awt.EventQueue.invokeLater(()
+            ->
     {
-        data.setWindowWidth(getWidth());
-        data.setWindowHeight(getHeight());
-        data.setWindowRelativeX(getLocationOnScreen().x);
-        data.setWindowRelativeY(getLocationOnScreen().y);
+      new Gui().setVisible(true);
+    });
+  }
 
-        try
-        {
-            Config.getInstance().save();
-        }
-        catch (Exception ex)
-        {
-            LOG.warning("Error saving Config file");
-            showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
-        }
-        finally
-        {
-            LOG.info("End of Application");
-            System.exit(0);
-        }
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JPanel jChartPanel;
+  private javax.swing.JComboBox<String> jComboBoxPort;
+  private javax.swing.JMenu jFile;
+  private javax.swing.JFrame jFrameAbout;
+  private javax.swing.JFrame jFrameGuide;
+  private javax.swing.JMenu jHelp;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabelAuthor;
+  private javax.swing.JLabel jLabelDate;
+  private javax.swing.JLabel jLabelDevelopers;
+  private javax.swing.JLabel jLabelGuideMeasure;
+  private javax.swing.JLabel jLabelGuideSettings;
+  private javax.swing.JLabel jLabelInfo;
+  private javax.swing.JLabel jLabelStatus;
+  private javax.swing.JLabel jLabelVersion;
+  private javax.swing.JLabel jLabelWarning;
+  private javax.swing.JMenuItem jMenuAbout;
+  private javax.swing.JMenuBar jMenuBar;
+  private javax.swing.JMenuItem jMenuClose;
+  private javax.swing.JMenuItem jMenuGuide;
+  private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
+  private javax.swing.JMenuItem jMenuOpen;
+  private javax.swing.JMenuItem jMenuPrint;
+  private javax.swing.JMenuItem jMenuSave;
+  private javax.swing.JMenuItem jMenuSettings;
+  private javax.swing.JPanel jPanSerial;
+  private javax.swing.JPanel jPanelInfo;
+  private javax.swing.JPanel jPanelInfo2;
+  private javax.swing.JPanel jPanelLogo;
+  private javax.swing.JPanel jPanelMeasure;
+  private javax.swing.JPanel jPanelSettings;
+  private javax.swing.JButton jPrint;
+  private javax.swing.JButton jProgSet;
+  private javax.swing.JButton jRefresh;
+  private javax.swing.JButton jSave;
+  private javax.swing.JToolBar.Separator jSeparator1;
+  private javax.swing.JToolBar.Separator jSeparator2;
+  private javax.swing.JToolBar.Separator jSeparator3;
+  private javax.swing.JPopupMenu.Separator jSeparator4;
+  private javax.swing.JPopupMenu.Separator jSeparator5;
+  private javax.swing.JPopupMenu.Separator jSeparator6;
+  private javax.swing.JButton jStart;
+  private javax.swing.JTabbedPane jTabbedPane1;
+  private javax.swing.JToolBar jToolBar;
+  private javax.swing.JButton jbutConnect;
+  private javax.swing.JButton jbutDisconnect;
+  private javax.swing.JButton jbutRefreshDevice;
+  private javax.swing.JPanel jpanEast;
+  private javax.swing.JPanel jpanSerialButtons;
+  // End of variables declaration//GEN-END:variables
+
+
+  /*
+   * ---PUBLIC METHODS------------------------------------------
+   */
+  /**
+   * Saves the config. Then shuts down the program.
+   */
+  @Override
+  public void dispose()
+  {
+    data.setWindowWidth(getWidth());
+    data.setWindowHeight(getHeight());
+    data.setWindowRelativeX(getLocationOnScreen().x);
+    data.setWindowRelativeY(getLocationOnScreen().y);
+
+    try
+    {
+      Config.getInstance().save();
+      com.disconnect();
     }
-
-    /**
-     * Checks if the worker is done and if an error occured.<br>
-     * Then sets the worker to <code>null</code> <br>
-     * Calculates the measurement and updates the chart.
-     *
-     * @param w The Worker
-     */
-    public void measurementDone(MeasurementWorker w)
+    catch (Exception ex)
     {
-        try
-        {
-            if(w != null)
-                w.get(); //warten bis worker fertig ist
-        }
-        catch (InterruptedException | ExecutionException ex)
-        {
-            LOG.severe("Measurement failed", ex);
-            showErrorMessage("Fehler bei Messung", "Fehler bei Messung aufgetreten.\n"
-                             + "Messung wiederholen.");
-        }
-        catch (CancellationException ex)
-        {
-        }
-        catch (Exception ex)
-        {
-            LOG.severe("Unsupported Exception", ex);
-            showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-        }
-        finally
-        {
-            com.setWorker(null);
-            if(com.isSuccess())
-            {
-                calculate();
-                updateSeriesPower();
-                updateSeriesTorque();
-
-                updateChartLabels();
-
-                jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png")));
-                jPrint.setEnabled(true);
-                jSave.setEnabled(true);
-                jStart.setEnabled(true);
-                jRefresh.setEnabled(true);
-                LOG.finer("powerchart updated");
-            }
-            else
-            {
-
-                jStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/start48.png")));
-                jStop.setEnabled(false);
-                jCancel.setEnabled(false);
-                jStart.setEnabled(true);
-                jRefresh.setEnabled(true);
-                LOG.warning("measurement aborted!");
-            }
-        }
+      LOG.severe(ex.getMessage());
+      showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
     }
-
-    /**
-     *
-     * @return the maximum elements of measure data
-     */
-    public int getMaxElements()
+    finally
     {
-        return (data.getMaxMeasureTimeSec() * 1000) / (data.getPeriodTimeMs());
+      LOG.info("End of Application");
+      System.exit(0);
     }
+  }
 
-    /**
-     * Enables the Cancelling Buttons if the boolean is true
-     *
-     * @param b boolean
-     */
-    public void setCancellingEnabled(boolean b)
-    {
-        jStop.setEnabled(b);
-        jCancel.setEnabled(b);
-    }
 
-    /**
-     * Shows an error message relative to the main GUI
-     *
-     * @param title   The Title of the Frame
-     * @param message The displayed message
-     */
-    public final void showErrorMessage(String title, String message)
-    {
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-    }
+  /*
+   * ---PRIVATE METHODS------------------------------------------
+   */
+  /**
+   * disables:
+   * <ul>
+   * <li>jStart
+   * <li>jRefresh
+   * </ul>
+   *
+   */
+  private void enableCancelling()
+  {
+    jStart.setEnabled(false);
+    jRefresh.setEnabled(false);
+  }
 
-    /*---PRIVATE METHODS----------------------------------------*/
-    /**
-     * Creates the Chart and sets the datasets/series
-     */
-    private void initChart()
-    {
-        chart = ChartFactory.createXYLineChart(data.getVehicle(),
-                                               "Motordrehzahl [U/min]",
-                                               "Leistung [" + data.getPowerunit() + "]",
-                                               dataset1,
-                                               PlotOrientation.VERTICAL,
-                                               true,
-                                               true,
-                                               false);
+  /**
+   * enables:
+   * <ul>
+   * <li>jStart
+   * <li>jRefresh
+   * </ul>
+   *
+   */
+  private void enableStarting()
+  {
+    jStart.setEnabled(true);
+    jRefresh.setEnabled(true);
 
-        ValueAxis torqueAxis = new NumberAxis("Drehmoment [Nm]");
-        torqueAxis.setLabelFont(chart.getXYPlot().getDomainAxis().getLabelFont());
+  }
 
-        seriesPower.setKey("Leistung " + "[" + data.getPowerunit() + "]");
+  /**
+   * Shows an error message relative to the main GUI
+   *
+   * @param title   The Title of the Frame
+   * @param message The displayed message
+   */
+  private void showErrorMessage(String title, String message)
+  {
+    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+  }
 
-        chart.getXYPlot().setDataset(1, dataset2);
-        chart.getXYPlot().setRangeAxis(1, torqueAxis);
-        chart.getXYPlot().mapDatasetToRangeAxis(0, 0);//1st dataset to 1st y-axis
-        chart.getXYPlot().mapDatasetToRangeAxis(1, 1); //2nd dataset to 2nd y-axis
 
-        // Hinzufuegen von series1 zu der Datenmenge dataset
-        dataset1.addSeries(seriesPower);
-        dataset2.addSeries(seriesTorque);
+  /*
+   * ---PRIVATE METHODS----------------------------------------
+   */
+  /**
+   * Creates the Chart and sets the datasets/series
+   */
+  private void initChart()
+  {
+    chart = ChartFactory.createXYLineChart(data.getVehicle(),
+                                           "Motordrehzahl [U/min]",
+                                           "Leistung [" + data.getPowerunit() + "]",
+                                           dataset1,
+                                           PlotOrientation.VERTICAL,
+                                           true,
+                                           true,
+                                           false);
 
-        maxPowerMarker.setPaint(Color.darkGray);
-        maxPowerMarker.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-                                                 1.0f, new float[]
-                                                 {
-                                                     6.0f, 7.0f
-                }, 0.0f));
+    ValueAxis torqueAxis = new NumberAxis("Drehmoment [Nm]");
+    torqueAxis.setLabelFont(chart.getXYPlot().getDomainAxis().getLabelFont());
 
-        maxPowerMarker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
-        maxPowerMarker.setLabelFont(font);
+    seriesPower.setKey("Leistung");
 
-        maxTorqueMarker.setPaint(Color.darkGray);
-        maxTorqueMarker.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-                                                  1.0f, new float[]
-                                                  {
-                                                      6.0f, 7.0f
-                }, 0.0f));
+    chart.getXYPlot().setDataset(1, dataset2);
+    chart.getXYPlot().setRangeAxis(1, torqueAxis);
+    chart.getXYPlot().mapDatasetToRangeAxis(0, 0);//1st dataset to 1st y-axis
+    chart.getXYPlot().mapDatasetToRangeAxis(1, 1); //2nd dataset to 2nd y-axis
 
-        maxTorqueMarker.setLabelTextAnchor(TextAnchor.TOP_LEFT);
-        maxTorqueMarker.setLabelFont(font);
+    // Hinzufuegen von series1 zu der Datenmenge dataset
+    dataset1.addSeries(seriesPower);
+    dataset2.addSeries(seriesTorque);
 
-        XYLineAndShapeRenderer r1 = new XYLineAndShapeRenderer();
-        r1.setSeriesPaint(0, Color.blue);
-        r1.setSeriesShapesVisible(0, false);
-        r1.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    maxPowerMarker.setPaint(Color.darkGray);
+    maxPowerMarker.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+                                             1.0f, new float[]
+                                             {
+                                               6.0f, 7.0f
+            }, 0.0f));
 
-        XYLineAndShapeRenderer r2 = new XYLineAndShapeRenderer();
-        r2.setSeriesPaint(0, Color.red);
-        r2.setSeriesShapesVisible(0, false);
-        r2.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    maxPowerMarker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
+    maxPowerMarker.setLabelFont(font);
 
-        chart.getXYPlot().setRenderer(0, r1);
-        chart.getXYPlot().setRenderer(1, r2);
+    maxTorqueMarker.setPaint(Color.darkGray);
+    maxTorqueMarker.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+                                              1.0f, new float[]
+                                              {
+                                                6.0f, 7.0f
+            }, 0.0f));
 
-        chart.getXYPlot().addRangeMarker(0, maxPowerMarker, Layer.BACKGROUND);
-        chart.getXYPlot().addRangeMarker(1, maxTorqueMarker, Layer.BACKGROUND);
+    maxTorqueMarker.setLabelTextAnchor(TextAnchor.TOP_LEFT);
+    maxTorqueMarker.setLabelFont(font);
 
-        chartPanel = new ChartPanel(chart);
+    XYLineAndShapeRenderer r1 = new XYLineAndShapeRenderer();
+    r1.setSeriesPaint(0, Color.blue);
+    r1.setSeriesShapesVisible(0, false);
+    r1.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        TextTitle eco = new TextTitle("Temperatur: NaN "
-                + "Luftfeuchtigkeit: NaN "
-                + "Luftdruck: NaN "
-                + "vmax: NaN");
+    XYLineAndShapeRenderer r2 = new XYLineAndShapeRenderer();
+    r2.setSeriesPaint(0, Color.red);
+    r2.setSeriesShapesVisible(0, false);
+    r2.setSeriesStroke(0, new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        chart.addSubtitle(eco);
+    chart.getXYPlot().setRenderer(0, r1);
+    chart.getXYPlot().setRenderer(1, r2);
 
-        jChartPanel.add(chartPanel);
+    chart.getXYPlot().addRangeMarker(0, maxPowerMarker, Layer.BACKGROUND);
+    chart.getXYPlot().addRangeMarker(1, maxTorqueMarker, Layer.BACKGROUND);
 
-        //jchartframe.setContentPane(chartPanel);
-        //jchartframe.pack();
-        //jchartframe.setVisible(true);
-    }
+    chartPanel = new ChartPanel(chart);
 
-    /**
-     * Starts the measurement
-     */
-    private void start()
-    {
-        com.start(this);
-    }
+    TextTitle eco = new TextTitle("Temperatur: NaN "
+            + "Luftfeuchtigkeit: NaN "
+            + "Luftdruck: NaN "
+            + "vmax: NaN");
 
-    /**
-     * Prints the Chart Frame
-     */
-    private void print()
-    {
-        chartPanel.createChartPrintJob();
-    }
+    chart.addSubtitle(eco);
 
-    /**
-     * Saves the Chart as PNG file
-     */
-    private void savePng()
-    {
+    jChartPanel.add(chartPanel);
 
-        File file;
+    chart.fireChartChanged();
 
-        JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "Portable Network Graphic (*.png)", "png");
-        chooser.setFileFilter(filter);
-        int rv = chooser.showSaveDialog(this);
-        if(rv == JFileChooser.APPROVE_OPTION)
-        {
-            file = chooser.getSelectedFile();
-            if(!file.getName().endsWith(".png"))
-            {
-                file = new File(file.getPath() + ".png");
-            }
+    //jchartframe.setContentPane(chartPanel);
+    //jchartframe.pack();
+    //jchartframe.setVisible(true);
+  }
 
-            try
-            {
-                ChartUtilities.saveChartAsPNG(file, chart, data.getPngWidth(), data.getPngHeight());
-            }
-            catch (IOException ex)//Fehler beim Speichern
-            {
-                LOG.warning("Error saving PNG", ex);
-                showErrorMessage("Fehler beim Speichern", "Fehler beim Speichern aufgetreten");
-            }
-            catch (NullPointerException ex)//Fehler beim Pfad
-            {
-                LOG.warning("Error with path", ex);
-                showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");
-            }
-            catch (Exception ex)
-            {
-                LOG.severe("Unsupported Exception", ex);
-                showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-            }
-        }
-    }
+  /**
+   * Starts the measurement
+   */
+  private void start()
+  {
+    MeasureDialog loading = new MeasureDialog(this, true);
+    loading.init(this, com);
+    if(!startVehicleSet())
+      return;
 
-    /**
-     * Opens up the ProgSetDialog and saves the changes values. If the
-     * measurement is already done the datasets will be updated.
-     */
-    private void startProgSet()
-    {
-        progset.setLocationRelativeTo(this);
-        progset.setVisible(true);
+    enableCancelling();
 
-        int updateLevel = 0;  //0-noUpdate 1-correct 2-convert 3-calculate
-        //Einstellungen übernehmen
-        if(progset.isSettingsChanged())
-        {
+    loading.startMeasurement();
+    loading.setVisible(true);
+    
+    enableStarting();
 
-            //CORRECTION  --OPTIMIZATION POSSIBLE
-            if(Double.compare(data.getCorrectionPower(), progset.getCorrectionPower()) != 0)
-            {
-                data.setCorrectionPower(progset.getCorrectionPower());
-                updateLevel = 1;
-            }
-            if(Double.compare(data.getCorrectionTorque(), progset.getCorrectionTorque()) != 0)
-            {
-                data.setCorrectionTorque(progset.getCorrectionTorque());
-                updateLevel = 1;
-            }
+  }
 
-            //POWERUNIT
-            if(!data.getPowerunit().equals(progset.getPowerunit()))
-            {
-                data.setPowerunit(progset.getPowerunit());
-                updateLevel = 2;
-            }
-
-            //INERTIA
-            if(Double.compare(data.getInertia(), progset.getInertia()) != 0)
-            {
-                data.setInertia(progset.getInertia());
-                updateLevel = 3;
-            }
-
-            //SERIALPORT
-            if(data.getPeriodTimeMs() != progset.getPeriodTimeMs())
-            {
-                data.setPeriodTimeMs(progset.getPeriodTimeMs());
-                updateLevel = 3;
-            }
-            if(data.getMaxMeasureTimeSec() != progset.getMaxMeasureTimeSec())
-            {
-                data.setMaxMeasureTimeSec(progset.getMaxMeasureTimeSec());
-            }
-
-            //update
-            if(com.isSuccess())
-            {
-                switch (updateLevel) //don't insert break!
-                {
-                    case 3:
-                        LOG.finest("entering level 3");
-                        data.setPower(null);
-                        data.setTorque(null);
-                        calculate();
-                        series1.clear();
-                        series2.clear();
-                        for(int i = 0; i < data.getPower().length; i++)
-                        {
-                            series1.add(data.getMotorRpm()[i], data.getPower()[i]);
-                            series2.add(data.getMotorRpm()[i], data.getTorque()[i]);
-                        }
-
-                    case 2:
-                        LOG.finest("entering level 2");
-                        if(updateLevel == 3 && data.getPowerunit().equals("PS"))
-                            convertToPs(series1);
-                        else if(updateLevel == 2 && data.getPowerunit().equals("kW"))
-                            convertToKw(series1);
-                        else if(data.getPowerunit().endsWith("PS"))
-                            convertToPs(series1);
-
-                    case 1:
-                        LOG.finest("entering level 1");
-                        dataset1.removeSeries(seriesPower);
-                        seriesPower = correctByFactor(series1, data.getCorrectionPower());
-                        dataset1.addSeries(seriesPower);
-
-                        dataset2.removeSeries(seriesTorque);
-                        seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
-                        dataset2.addSeries(seriesTorque);
-
-                        updateChartLabels();
-                        break;
-
-                    case 0:
-                        LOG.finest("no update needed");
-                        break;
-
-                    default:
-                        LOG.severe("Something went completly wrong");
-                        showErrorMessage("Fehler beim uebernehmen", "Unerwarteter Fehler beim uebernehmen der Daten aufgetreten");
-                }
-            }
-            else if(updateLevel == 2)
-            {
-                updateChartLabels();
-            }
-
-            //PNG RESOLUTION
-            data.setPngWidth(progset.getPNGResolution().width);
-            data.setPngHeight(progset.getPNGResolution().height);
-
-            try
-            {
-                //safe config File
-                Config.getInstance().save();
-            }
-            catch (Exception ex)
-            {
-                LOG.warning("Error saving Config File", ex);
-                showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
-            }
-
-        }
-
-    }
-
-    /**
-     * Opens up the VehicleSetDialog and saves the values. If the measurement is
-     * already done the datasets will be updated.
-     */
-    private void startVehicleSet()
-    {
-        vehicleset.setLocationRelativeTo(this);
-        vehicleset.setVisible(true);
-
-        //Einstellungen übernehmen
-        if(vehicleset.isSettingsChanged())
-        {
-            //TAKT
-            if(data.isTwoStroke() != vehicleset.isTwoStroke())
-            {
-                data.setTwoStroke(vehicleset.isTwoStroke());
-            }
-
-            //VEHICLENAME
-            data.setVehicle(vehicleset.getVehicleName());
-
-            chart.setTitle(data.getVehicle());
-
-            chart.fireChartChanged();
-
-            try
-            {
-                //save config File
-                Config.getInstance().save();
-            }
-            catch (Exception ex)
-            {
-                LOG.warning("Error saving Config file");
-                showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
-            }
-
-        }
-
-    }
-
-    /**
-     * refreshes the availablePorts Array and puts them into the ComboBox
-     */
-    private void refreshPorts()
-    {
-        if(Communication.getAvailablePorts() == null || Communication.getAvailablePorts().length == 0)
-        {
-            jbutConnect.setEnabled(false);
-        }
-        else
-            jbutConnect.setEnabled(true);
-
-        jComboBoxPort.removeAllItems();
-        for(String availablePort : Communication.getAvailablePorts())
-        {
-            jComboBoxPort.addItem(availablePort);
-        }
-    }
-
-    /**
-     * Converts the given series to PS
-     *
-     * @param series the series which should be converted
-     */
-    private void convertToPs(XYSeries series)
-    {
-        int max = series.getItemCount();
-
-        for(int i = 0; i < max; i++)
-        {
-            double tmp = (double) series.getY(i);
-            series.updateByIndex(i, tmp * 1.35962);
-        }
-    }
-
-    /**
-     * Converts the given series to kW
-     *
-     * @param series the series which should be converted
-     */
-    private void convertToKw(XYSeries series)
-    {
-        int max = series.getItemCount();
-
-        for(int i = 0; i < max; i++)
-        {
-            double tmp = (double) series.getY(i);
-            series.updateByIndex(i, tmp / 1.35962);
-        }
-    }
-
-    /**
-     * Corrects the series by the given factor and returns the result.
-     *
-     * @param series The series that should be copied and converted, but not
-     *               changed!
-     * @param factor The factor the series should be converted with.
-     * @return The changed series or <code>null</code> if an error occured.
-     */
-    private XYSeries correctByFactor(XYSeries series, double factor)
+  private void openMeasureFile()
+  {
+    try
     {
 
-        try
-        {
-            if(factor <= 0)
-            {
-                LOG.severe(new InputMismatchException("factor smaller or equal to 0!"));
-                showErrorMessage("Fehler bei Konvertierung", "Interner Fehler aufgetreten\n"
-                                 + "Bitte sicherstellen dass ein Korrekturfaktor zwischen 0,5 und 2,0 eingestellt ist.\n"
-                                 + "Ist dies der Fall bitte Kontakt mit dem Programmierer(Levin Messing) aufnehmen.");
-            }
-            XYSeries target = series;
+      if(!startVehicleSet())
+        return;
 
-            int max = target.getItemCount();
+      File file;
 
-            for(int i = 0; i < max; i++)
-            {
-                double tmp = (double) series.getY(i);
-                target.updateByIndex(i, tmp * factor);
-            }
-            return target;
-        }
-        catch (Exception ex)
-        {
-            LOG.severe("Unsupported Exception", ex);
-            showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-        }
-        return null;
-    }
+      JFileChooser chooser = new JFileChooser();
+      FileNameExtensionFilter filter = new FileNameExtensionFilter(
+              "PMTDyno (*.pmt)", "pmt");
+      chooser.setFileFilter(filter);
+      int rv = chooser.showSaveDialog(this);
+      if(rv == JFileChooser.APPROVE_OPTION)
+      {
+        file = chooser.getSelectedFile();
 
-    /**
-     * <b>Updates:</b>
-     * <ul>
-     * <li>maxPowerMarker</li>
-     * <li>maxTorqueMarker</li>
-     * <li>Subtitle(vehicle, temperature, humidity)</li>
-     * <li>powerunit</li>
-     * </ul>
-     */
-    private void updateChartLabels()
-    {
-        data.setMaxpower(seriesPower.getMaxY());
-        data.setMaxtorque(seriesTorque.getMaxY());
+        //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
+        //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
+        ReadPMT fr = new ReadPMT(file);
 
-        maxPowerMarker.setValue(data.getMaxpower());
-        maxTorqueMarker.setValue(data.getMaxtorque());
+        data.setMeasureList(fr.read());
 
-        String strEco = String.format("Temperatur: %.1f° Luftfeuchtigkeit: %d%% Luftdruck: %.1fmbar vmax: %.1fkm/h",
-                                      data.getTemperature(),
-                                      data.getHumidity(),
-                                      data.getPressure(),
-                                      data.getVmax());
-
-        TextTitle eco = new TextTitle(strEco);
-        chart.removeSubtitle(chart.getSubtitle(1));
-        chart.addSubtitle(eco);
-
-        String strMaxPower = String.format("Maximale Leistung: %.2f %s ", data.getMaxpower(), data.getPowerunit());
-        String strMaxTorque = String.format("Maximales Drehmoment: %.2f Nm", data.getMaxtorque());
-        maxPowerMarker.setLabel(strMaxPower);
-        maxTorqueMarker.setLabel(strMaxTorque);
-        chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
-        seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
-    }
-
-    /**
-     * converts motorRpm field to two stroke. divides by 2
-     */
-    private void convertToTwoStroke()
-    {
-        for(int i = 0; i < data.getMotorRpm().length; i++)
-        {
-            data.getMotorRpm()[i] = data.getMotorRpm()[i] / 2;
-        }
-    }
-
-    /**
-     * converts motorRpm field to four stroke. multiplies with 2
-     */
-    private void convertToFourStroke()
-    {
-        for(int i = 0; i < data.getMotorRpm().length; i++)
-        {
-            data.getMotorRpm()[i] = data.getMotorRpm()[i] * 2;
-        }
-    }
-
-    /**
-     * calculates torque and power with wheelRpm
-     */
-    private void calculate()
-    {
-        //Winkelgeschw. = (Pi/180) * Umdr.
-        //Winkelbeschl. = Winkelgeschw. / Zeit
-        //Drehmoment = Winkelbeschl. * J(kgm^2)
-        //Leistung = 2*Pi*Drehmoment*Umdr.
-        int length = data.getWheelRpm().length;
-
-        double angularspeed[] = new double[length];
-        double diff[] = new double[length - 1];
-        double angularacc[] = new double[length - 1];
-        double inertia = data.getInertia();
-        double[] torque = new double[length - 1];
-        double[] power = new double[length - 1];
-        double vmax=0;
-        int periodTimeMs = data.getPeriodTimeMs();
-        int[] wheelRpm = data.getWheelRpm();
-
-//        if(!data.isTwoStroke()) //if 4 stroke
-//        {
-//            convertToFourStroke();
-//        }
-        for(int i = 0; i < length; i++)
-        {
-            angularspeed[i] = (wheelRpm[i]/60) * (2.0*Math.PI);
-        }
-        
-        for(int i = 0; i < length - 1; i++)
-        {
-            diff[i] = (angularspeed[i + 1]) - angularspeed[i];
-            if (angularspeed[i+1]>angularspeed[i])
-            {
-                vmax=angularspeed[i+1]*0.175*3.6;
-            }
-        }
-
-        for(int i = 0; i < length - 1; i++)
-        {
-            angularacc[i] = diff[i] / (periodTimeMs / 1000.0);
-        }
-
-        for(int i = 0; i < length - 1; i++)
-        {
-            torque[i] = angularacc[i] * inertia;
-        }
-
-        for(int i = 0; i < length - 1; i++)
-        {
-            power[i] = (angularspeed[i] * torque[i]);
-            //System.out.println(i + " " + power[i]);
-        }
-
-        data.setTorque(torque);
-        data.setPower(power);
-        
-        data.setVmax(vmax);
-    }
-
-    /**
-     * Clears series1 <br>
-     * Writes series1 <br>
-     * Checks and converts to PS/kW Corrects by factor and refreshes diagram<br>
-     * Sets the seriesPower Key(for powerunit changes)
-     */
-    private void updateSeriesPower()
-    {
         series1.clear();
-        for(int i = 0; i < data.getPower().length; i++)
-        {
-            series1.add(data.getMotorRpm()[i], data.getPower()[i]);
-        }
-        if(data.getPowerunit().equals("PS"))
-            convertToPs(series1);
-
-        dataset1.removeSeries(seriesPower);
-        seriesPower = correctByFactor(series1, data.getCorrectionPower());
-        dataset1.addSeries(seriesPower);
-        seriesPower.setKey("Leistung [" + data.getPowerunit() + "]");
-        chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
-
-    }
-
-    /**
-     * Clears seriesTorque <br>
-     * Writes seriesTorque <br>
-     * Corrects by factor and refreshes diagram
-     */
-    private void updateSeriesTorque()
-    {
         series2.clear();
-        for(int i = 0; i < data.getTorque().length; i++)
-        {
-            series2.add(data.getMotorRpm()[i], data.getTorque()[i]);
-        }
-        dataset2.removeSeries(seriesTorque);
-        seriesTorque = correctByFactor(series2, data.getCorrectionTorque());
-        seriesTorque.setKey("Drehmoment [Nm]");
-        dataset2.addSeries(seriesTorque);
+
+        calculate();
+      }
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace(System.err);
+      LOG.severe("Error", ex);
+      showErrorMessage("Error", ex.getMessage());
+    }
+  }
+
+  private void exportFile()
+  {
+    if(data.getRawDataList().size() < 1)
+    {
+      showErrorMessage("Keine Messung vorhanden", "Keine Messdaten vorhanden. Bitte zuerst Messung durchführen");
+      return;
     }
 
-    /**
-     * Sets the Port and tries to connect to the Device.<br>
-     * Then updates the Ecosystem.
-     */
-    private void connectDevice()
-    {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        try
-        {
-            com = new Communication(jComboBoxPort.getSelectedItem().toString());schueler.conf
+    File file;
 
-            LOG.fine(String.format("Connected to Port: %s", com.getPort()));
+    JFileChooser chooser = new JFileChooser();
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "PMTDyno (*.pmt)", "pmt");
+    chooser.setFileFilter(filter);
+    int rv = chooser.showSaveDialog(this);
+    if(rv == JFileChooser.APPROVE_OPTION)
+    {
+      file = chooser.getSelectedFile();
+
+      if(!file.getName().endsWith(".pmt") && !file.getName().contains("."))
+      {
+        file = new File(file.getPath() + ".pmt");
+      }
+
+      try (FileWriter writer = new FileWriter(file);)
+      {
+        //time - rpm - wss
+        for(RawDatapoint rawDatapoint : data.getRawDataList())
+        {
+          String time = String.valueOf(rawDatapoint.getTime());
+          String rpm = String.valueOf(rawDatapoint.getRpm());
+          String wss = String.valueOf(rawDatapoint.getWss());
+
+          String line = time + ':' + rpm + ':' + wss + '\n';
+          writer.write(line);
+        }
+        writer.close();
+      }
+      catch (IOException ex) //Fehler beim Speichern
+      {
+        LOG.warning("Error saving .pmt", ex);
+        showErrorMessage("Fehler beim Exportieren", "Fehler beim Exportieren aufgetreten");
+      }
+      catch (NullPointerException ex)//Fehler beim Pfad
+      {
+        LOG.warning("Error with path", ex);
+        showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unsupported Exception", ex);
+        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      }
+    }
+  }
+
+  /**
+   * Prints the Chart Frame
+   */
+  private void print()
+  {
+    chartPanel.createChartPrintJob();
+  }
+
+  /**
+   * Saves the Chart as PNG file
+   */
+  private void savePng()
+  {
+
+    File file;
+
+    JFileChooser chooser = new JFileChooser();
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "Portable Network Graphic (*.png)", "png");
+    chooser.setFileFilter(filter);
+    int rv = chooser.showSaveDialog(this);
+    if(rv == JFileChooser.APPROVE_OPTION)
+    {
+      file = chooser.getSelectedFile();
+      if(!file.getName().endsWith(".png"))
+      {
+        file = new File(file.getPath() + ".png");
+      }
+
+      try
+      {
+        ChartUtilities.saveChartAsPNG(file, chart, data.getPngWidth(), data.getPngHeight());
+      }
+      catch (IOException ex)//Fehler beim Speichern
+      {
+        LOG.warning("Error saving PNG", ex);
+        showErrorMessage("Fehler beim Speichern", "Fehler beim Speichern aufgetreten");
+      }
+      catch (NullPointerException ex)//Fehler beim Pfad
+      {
+        LOG.warning("Error with path", ex);
+        showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unsupported Exception", ex);
+        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      }
+    }
+  }
+
+  /**
+   * Opens up the ProgSetDialog and saves the changes values. If the measurement
+   * is already done the datasets will be updated.
+   */
+  private void startProgSet()
+  {
+    progset.setLocationRelativeTo(this);
+    progset.setVisible(true);
+
+    int updateLevel = 0;  //0-noUpdate 1-correct 2-convert 3-calculate
+    //Einstellungen übernehmen
+    if(progset.isSettingsChanged())
+    {
+
+      //CORRECTION  --OPTIMIZATION POSSIBLE
+      if(Double.compare(data.getCorrectionPower(), progset.getCorrectionPower()) != 0)
+      {
+        data.setCorrectionPower(progset.getCorrectionPower());
+        updateLevel = 1;
+      }
+      if(Double.compare(data.getCorrectionTorque(), progset.getCorrectionTorque()) != 0)
+      {
+        data.setCorrectionTorque(progset.getCorrectionTorque());
+        updateLevel = 1;
+      }
+
+      //POWERUNIT
+      if(!data.getPowerunit().equals(progset.getPowerunit()))
+      {
+        data.setPowerunit(progset.getPowerunit());
+        updateLevel = 2;
+      }
+
+      //INERTIA
+      if(Double.compare(data.getInertia(), progset.getInertia()) != 0)
+      {
+        data.setInertia(progset.getInertia());
+        updateLevel = 3;
+      }
+
+      //SERIALPORT
+      if(data.getPeriodTimeMs() != progset.getPeriodTimeMs())
+      {
+        data.setPeriodTimeMs(progset.getPeriodTimeMs());
+        updateLevel = 3;
+      }
+
+      //update
+      if(data.getMeasureList() != null)
+      {
+        switch (updateLevel) //don't insert break!
+        {
+          case 3:
+            LOG.finest("entering level 3");
+
+            series1.clear();
+            series2.clear();
+
+            calculate();
+
+          case 2:
+            LOG.finest("entering level 2");
+            if(updateLevel == 3 && data.getPowerunit().equals("PS"))
+            {
+              convertToPs(series1);
+            }
+            else if(updateLevel == 2 && data.getPowerunit().equals("kW"))
+            {
+              convertToKw(series1);
+            }
+            else if(data.getPowerunit().endsWith("PS"))
+            {
+              convertToPs(series1);
+            }
+
+          case 1:
+            LOG.finest("entering level 1");
+            dataset1.removeSeries(seriesPower);
+            seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
+            dataset1.addSeries(seriesPower);
+
+            dataset2.removeSeries(seriesTorque);
+            seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
+            dataset2.addSeries(seriesTorque);
 
             updateChartLabels();
-        }
-        catch (CommunicationException ex)
-        {
-            //ex.printStackTrace(System.err);
-            LOG.warning("could not connect", ex);
-            showErrorMessage("Fehler beim verbinden",
-                             "Fehler beim Verbinden.\n"
-                             + "Möglicherweise falsches Gerät. Erneut mit anderem Gerät versuchen.");
-        }
-        catch (TimeoutException ex)
-        {
-            //LOG.severe("Timeout");
-            showErrorMessage("Fehler beim verbinden",
-                             "Fehler beim Verbinden.\n"
-                             + "Keine Antwort vom Gerät bekommen (Timeout)!");
-        }
-        catch (Exception ex)
-        {
-            LOG.severe("Unsupported Exception", ex);
-            showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-            ex.printStackTrace(System.err);
-        }
-        finally
-        {
-            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
+            break;
 
-        jbutDisconnect.setEnabled(Communication.isConnected());
-        jbutConnect.setEnabled(!Communication.isConnected());
-        jbutRefreshDevice.setEnabled(!Communication.isConnected());
-        jRefresh.setEnabled(Communication.isConnected());
-        jComboBoxPort.setEnabled(!Communication.isConnected());
-        jStart.setEnabled(Communication.isConnected());
+          case 0:
+            LOG.finest("no update needed");
+            break;
 
-        if(Communication.isConnected())
-        {
-            jLabelStatus.setText("verbunden");
-            jLabelStatus.setForeground(new Color(0, 130, 0));
+          default:
+            LOG.severe("Something went completly wrong");
+            showErrorMessage("Fehler beim uebernehmen", "Unerwarteter Fehler beim uebernehmen der Daten aufgetreten");
         }
+      }
+      else if(updateLevel == 2)
+      {
+        updateChartLabels();
+      }
+
+      //PNG RESOLUTION
+      data.setPngWidth(progset.getPNGResolution().width);
+      data.setPngHeight(progset.getPNGResolution().height);
+
+      try
+      {
+        //safe config File
+        Config.getInstance().save();
+      }
+      catch (Exception ex)
+      {
+        LOG.warning("Error saving Config File", ex);
+        showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
+      }
+
     }
 
-    /**
-     * Communicates with the Device and refreshes the Ecosystem.
-     */
-    private void refreshEco()
+  }
+
+  /**
+   * Opens up the VehicleSetDialog and saves the values. If the measurement is
+   * already done the datasets will be updated.
+   *
+   * @return true if the dialog is confirmed
+   */
+  private boolean startVehicleSet()
+  {
+    vehicleset.setLocationRelativeTo(this);
+    vehicleset.setVisible(true);
+
+    //Einstellungen übernehmen
+    if(vehicleset.isConfirmed())
     {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        try
-        {
-            com.refreshEco();
+      //TAKT
+      if(data.isTwoStroke() != vehicleset.isTwoStroke())
+      {
+        data.setTwoStroke(vehicleset.isTwoStroke());
+      }
 
-            LOG.fine("got ecosystem");
-            updateChartLabels();
-        }
-        catch (CommunicationException ex)
-        {
-            LOG.warning("could not refresh", ex);
-            showErrorMessage("Fehler beim aktualisieren",
-                             "Fehler beim aktualisieren.\n"
-                             + "Möglicherweise falsches Gerät. Erneut oder mit anderem Gerät versuchen.");
-        }
-        catch (TimeoutException ex)
-        {
-            LOG.warning("timeout");
-            showErrorMessage("Fehler beim aktualisieren",
-                             "Fehler beim aktualisieren.\n"
-                             + "Keine Antwort vom Gerät bekommen (Timeout)!");
-        }
-        catch (Exception ex)
-        {
-            LOG.severe("Unsupported Exception", ex);
-            showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
-        }
-        finally
-        {
-            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
+      //MEASrpm
+      if(data.isMeasRPM() != vehicleset.isMeasRpm())
+        data.setMeasRPM(vehicleset.isMeasRpm());
+
+      //VEHICLENAME
+      data.setVehicle(vehicleset.getVehicleName());
+
+      chart.setTitle(data.getVehicle());
+
+      chart.fireChartChanged();
+
+      try
+      {
+        //save config File
+        Config.getInstance().save();
+      }
+      catch (Exception ex)
+      {
+        LOG.warning("Error saving Config file");
+        showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
+      }
+      return true;
     }
+    return false;
+  }
+
+  /**
+   * refreshes the availablePorts Array and puts them into the ComboBox
+   */
+  private void refreshPorts()
+  {
+    if(com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
+    {
+      jbutConnect.setEnabled(false);
+    }
+    else
+    {
+      jbutConnect.setEnabled(true);
+    }
+
+    jComboBoxPort.removeAllItems();
+    for(String availablePort : com.getAvailablePorts())
+    {
+      jComboBoxPort.addItem(availablePort);
+    }
+  }
+
+  /**
+   * Converts the given series to PS
+   *
+   * @param series the series which should be converted
+   */
+  private void convertToPs(XYSeries series)
+  {
+    int max = series.getItemCount();
+
+    for(int i = 0; i < max; i++)
+    {
+      double tmp = (double) series.getY(i);
+      series.updateByIndex(i, tmp * 1.35962);
+    }
+  }
+
+  /**
+   * Converts the given series to kW
+   *
+   * @param series the series which should be converted
+   */
+  private void convertToKw(XYSeries series)
+  {
+    int max = series.getItemCount();
+
+    for(int i = 0; i < max; i++)
+    {
+      double tmp = (double) series.getY(i);
+      series.updateByIndex(i, tmp / 1.35962);
+    }
+  }
+
+  /**
+   * Corrects the series by the given factor and returns the result.
+   *
+   * @param series The series that should be copied and converted, but not
+   *               changed!
+   * @param factor The factor the series should be converted with.
+   * @return The changed series or <code>null</code> if an error occured.
+   */
+  private XYSeries correctByFactor(XYSeries series, String key, double factor)
+  {
+
+    try
+    {
+      if(factor <= 0)
+      {
+        LOG.severe(new InputMismatchException("factor smaller or equal to 0!"));
+        showErrorMessage("Fehler bei Konvertierung", "Interner Fehler aufgetreten\n"
+                         + "Bitte sicherstellen dass ein Korrekturfaktor zwischen 0,5 und 2,0 eingestellt ist.\n");
+      }
+      XYSeries target = new XYSeries(key);
+
+      for(int i = 0; i < series.getItemCount(); i++)
+      {
+        double x = (double) series.getX(i);
+        double y = (double) series.getY(i) * factor;
+        target.add(x, y);
+      }
+
+      return target;
+    }
+    catch (Exception ex)
+    {
+      LOG.severe("Unsupported Exception", ex);
+      showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+    }
+    return null;
+  }
+
+  /**
+   * <b>Updates:</b>
+   * <ul>
+   * <li>maxPowerMarker</li>
+   * <li>maxTorqueMarker</li>
+   * <li>Subtitle(vehicle, temperature, humidity)</li>
+   * <li>powerunit</li>
+   * </ul>
+   */
+  private void updateChartLabels()
+  {
+    data.setMaxpower(seriesPower.getMaxY());
+    data.setMaxtorque(seriesTorque.getMaxY());
+
+    maxPowerMarker.setValue(data.getMaxpower());
+    maxTorqueMarker.setValue(data.getMaxtorque());
+
+    String strEco = String.format("Temperatur: %.1f° Luftfeuchtigkeit: %d%% Luftdruck: %.1fmbar vmax: %.1fkm/h",
+                                  data.getTemperature(),
+                                  data.getHumidity(),
+                                  data.getPressure(),
+                                  data.getVmax());
+
+    TextTitle eco = new TextTitle(strEco);
+    chart.removeSubtitle(chart.getSubtitle(1));
+    chart.addSubtitle(eco);
+
+    String strMaxPower = String.format("Maximale Leistung: %.2f %s ", data.getMaxpower(), data.getPowerunit());
+    String strMaxTorque = String.format("Maximales Drehmoment: %.2f Nm", data.getMaxtorque());
+    maxPowerMarker.setLabel(strMaxPower);
+    maxTorqueMarker.setLabel(strMaxTorque);
+    chart.getXYPlot().getRangeAxis().setLabel("Leistung [" + data.getPowerunit() + "]");
+    seriesPower.setKey("Leistung");
+
+    chart.fireChartChanged();
+  }
+
+  private int getValMaxIndex(ArrayList<Double> aL)
+  {
+    int valMax = 0;
+    int i;
+    for(i = 0; i < aL.size(); i++)
+    {
+      if(aL.get(i) > aL.get(valMax))
+      {
+        valMax = i;
+      }
+    }
+    return valMax;
+  }
+
+  private ArrayList<Double> filterValuesOrder(ArrayList<Double> aL, double smoothing, int order)
+  {
+    for(int i = 0; i < order; i++)
+    {
+      aL = filterValues(aL, smoothing);
+    }
+
+    return aL;
+  }
+
+  private ArrayList<Double> filterValues(ArrayList<Double> aL, double smoothing) //higher smoothingvalue means more smoothing
+  {
+    ArrayList<Double> smoothedValues = new ArrayList<>();
+    smoothedValues.add(aL.get(0));
+    for(int i = 0; i < aL.size() - 1; i++)
+    {
+//      System.out.println(i);
+      smoothedValues.add((1 - smoothing) * smoothedValues.get(i) + smoothing * aL.get(i + 1));
+    }
+
+    return smoothedValues;
+
+  }
+
+  /**
+   * calculates Power and Torque and updates the Chart
+   *
+   * @author Robert Tinauer
+   */
+  private void calculate()
+  {
+    //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
+    //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
+
+    LOG.fine("calculating...");
+
+    double inertia = data.getInertia();
+    double n; //uebersetzungsverhaeltnis rolle zu motor
+
+    ArrayList<Double> trq = new ArrayList<>();
+    ArrayList<Double> trqSchl = new ArrayList<>(); //schleppmoment
+    ArrayList<Double> pwr = new ArrayList<>();
+    ArrayList<Double> rpm = new ArrayList<>(); //in U/min
+    ArrayList<Double> time = new ArrayList<>(); //in s
+    ArrayList<Double> alpha = new ArrayList<>();
+    ArrayList<Double> omega = new ArrayList<>();
+    ArrayList<Double> omegaSchl = new ArrayList<>();
+
+    boolean schleppEnable = true;
+
+    double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
+
+    for(int i = 0; i < data.getMeasureList().size() - 1; i++)
+    {
+      omega.add(data.getMeasureList().get(i).getWss());
+      rpm.add(data.getMeasureList().get(i).getRpm());
+      time.add(data.getMeasureList().get(i).getTime());
+    }
+    omega = filterValuesOrder(omega, 0.5, 2);
+
+    //VMAX ermitteln
+    data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
+
+    //alpha berechnen
+    for(int i = 0; i < omega.size() - 1; i++)
+    {
+      alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
+    }
+    alpha = filterValuesOrder(alpha, 0.1, 2);
+
+    //faktor fuer berechnungseinheit
+    double factor;
+
+    if(data.getPowerunit().contains("PS"))
+    {
+      factor = 1.36;
+    }
+    else
+    {
+      factor = 1;
+    }
+
+    //drehmoment roller
+    if(!data.isMeasRPM())
+    {
+      for(int i = 0; i < alpha.size(); i++)
+      {
+        trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
+      }
+    }
+    else//drehmoment kein roller
+    {
+      rpm = filterValuesOrder(rpm, 0.09, 3);
+      //uebersetzungsverhaeltnis:
+      try
+      {
+        n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(10) / (rpm.get(10) / 60 * 2 * Math.PI))) / 2;
+      }
+      catch (IndexOutOfBoundsException ex)
+      {
+        showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
+        return;
+      }
+
+      for(int i = 0; i < alpha.size(); i++)
+      {
+        //moment
+        trq.add(alpha.get(i) * inertia * n);  //M=dOmega/dt * J
+      }
+    }
+
+    //index ermitteln, ab dem moment negativ ist und somit schleppmoment vorhanden ist
+    int limitSchl = 0;
+    try
+    {
+      for(limitSchl = getValMaxIndex(omega); true; limitSchl++)
+      {
+        if(trq.get(limitSchl) < 0)
+        {
+          break;
+        }
+      }
+    }
+    catch (IndexOutOfBoundsException ex)
+    {
+      schleppEnable = false;
+      LOG.info("No Towing Torque");
+      JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Kein Schleppmoment", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
+    if(schleppEnable)
+    {
+      trqSchl = new ArrayList<Double>(trq.subList(limitSchl, trq.size()));
+      omegaSchl = new ArrayList<Double>(omega.subList(limitSchl, omega.size()));
+      ArrayList<Double> timeSchl = new ArrayList<Double>(time.subList(limitSchl, time.size()));
+
+      for(int i2 = 0; i2 < limitSchl; i2++)
+      {
+        for(int i = 0; i < trqSchl.size(); i++)
+        {
+          if(omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
+          {
+            if(trqSchl.get(i) > 0)
+            {
+              break;
+            }
+            trq.set(i2, trq.get(i2) + trqSchl.get(i) * -1);
+            i2++;
+          }
+        }
+      }
+
+      trq = filterValuesOrder(trq, 0.13, 2);
+    }
+
+    //leistung berechnen
+    if(!data.isMeasRPM())
+    {
+      for(int i = 0; i < trq.size(); i++)
+      {
+        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
+      }
+    }
+    else
+    {
+      for(int i = 0; i < trq.size(); i++)
+      {
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
+      }
+    }
+
+    series1.clear();
+    series2.clear();
+
+    if(!data.isMeasRPM())
+    {
+      for(int i = 0; i < trq.size(); i++)
+      {
+//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Geschwindigkeit: " + (omega.get(i) * 0.175 * 3.6));
+        if(i == getValMaxIndex(omega))
+        {
+          break;
+        }
+        series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
+        series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
+      
+      }
+    }
+    else
+    {
+      for(int i = 0; i < trq.size(); i++)
+      {
+//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
+        if(i == getValMaxIndex(rpm))
+        {
+          break;
+        }
+
+        series1.add(rpm.get(i), pwr.get(i));
+        series2.add(rpm.get(i), trq.get(i));
+
+      }
+    }
+
+    dataset1.removeSeries(seriesPower);
+    seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
+    dataset1.addSeries(seriesPower);
+
+    dataset2.removeSeries(seriesTorque);
+    seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
+    dataset2.addSeries(seriesTorque);
+    seriesTorque.setKey("Drehmoment [Nm]");
+
+    if(!data.isMeasRPM())
+      chart.getXYPlot().getDomainAxis().setLabel("Geschwindigkeit [km/h]");
+    else
+      chart.getXYPlot().getDomainAxis().setLabel("Motordrehzahl [U/m]");
+
+    chart.fireChartChanged();
+    updateChartLabels();
+    LOG.fine("done calculating");
+
+  }
+
+  /**
+   * Sets the Port and tries to connect to the Device.<br>
+   * Then updates the Ecosystem.
+   */
+  private void connectDevice()
+  {
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    try
+    {
+      com.connect(jComboBoxPort.getSelectedItem().toString());
+
+      LOG.fine(String.format("Connected to Port: %s", com.getPort()));
+
+      updateChartLabels();
+    }
+    catch (CommunicationException ex)
+    {
+//      ex.printStackTrace(System.err);
+      LOG.warning("could not connect", ex);
+      showErrorMessage("Fehler beim verbinden",
+                       "Fehler beim Verbinden.\n"
+                       + "Möglicherweise falsches Gerät. Erneut mit anderem Gerät versuchen.");
+    }
+    catch (TimeoutException ex)
+    {
+      //LOG.severe("Timeout");
+      showErrorMessage("Fehler beim verbinden",
+                       "Fehler beim Verbinden.\n"
+                       + "Keine Antwort vom Gerät bekommen (Timeout)!");
+    }
+    catch (Exception ex)
+    {
+      LOG.severe("Unsupported Exception", ex);
+      showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      ex.printStackTrace(System.err);
+    }
+    finally
+    {
+      setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    jbutDisconnect.setEnabled(com.isConnected());
+    jbutConnect.setEnabled(!com.isConnected());
+    jbutRefreshDevice.setEnabled(!com.isConnected());
+    jRefresh.setEnabled(com.isConnected());
+    jComboBoxPort.setEnabled(!com.isConnected());
+    jStart.setEnabled(com.isConnected());
+
+    if(com.isConnected())
+    {
+      jLabelStatus.setText("verbunden");
+      jLabelStatus.setForeground(new Color(0, 130, 0));
+    }
+  }
+
+  /**
+   * Communicates with the Device and refreshes the Ecosystem.
+   */
+  private void refreshEco()
+  {
+    Runnable runRefresh = () ->
+    {
+      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+      jRefresh.setEnabled(false);
+
+      try
+      {
+        com.refreshEco();
+
+        LOG.fine("got ecosystem");
+        updateChartLabels();
+
+      }
+      catch (CommunicationException ex)
+      {
+        LOG.warning("could not refresh", ex);
+        showErrorMessage("Fehler beim aktualisieren",
+                         "Fehler beim aktualisieren.\n"
+                         + "Möglicherweise falsches Gerät. Erneut oder mit anderem Gerät versuchen.\n\n"
+                         + ex.getMessage());
+      }
+      catch (TimeoutException ex)
+      {
+        LOG.warning("Timeout");
+        showErrorMessage("Fehler beim aktualisieren",
+                         "Fehler beim aktualisieren.\n"
+                         + "Keine Antwort vom Gerät bekommen (Timeout)!");
+      }
+      catch (IllegalStateException ex)
+      {
+        LOG.info(ex.getMessage());
+      }
+      catch (Exception ex)
+      {
+        LOG.severe("Unsupported Exception", ex);
+        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+      }
+      finally
+      {
+        setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        if(com.isConnected())
+          jRefresh.setEnabled(true);
+      }
+
+    };
+
+    new Thread(runRefresh).start();
+
+  }
+
+  public void done(MeasurementWorker worker)
+  {
+    try
+    {
+      enableCancelling();
+      if(worker.get() == null)
+      {
+        throw new CancellationException();
+      }
+
+      data.setMeasureList(worker.get());
+      calculate();
+      enableStarting();
+    }
+    catch (ExecutionException ex)
+    {
+      Throwable cause = ex.getCause();
+      if(cause instanceof CommunicationException)
+      {
+        LOG.severe(cause.getMessage());
+        showErrorMessage("Kommunikationsfehler", "Folgender Kommunikationsfehler ist aufgetreten: " + cause.getMessage());
+      }
+      else if(cause instanceof TimeoutException)
+      {
+        LOG.severe(cause.getMessage());
+        showErrorMessage("Timeout", "µC antwortet nicht - Timeout");
+      }
+      else
+      {
+        LOG.severe("Unknown Exception: " + cause.getMessage());
+        showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + cause.getMessage());
+      }
+    }
+    catch (InterruptedException ex)
+    {
+    }
+    catch (CancellationException ex)
+    {
+      LOG.info("Measurement aborted");
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace();
+      LOG.severe("Unknown Exception: " + ex);
+      showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
+    }
+
+  }
 
 }

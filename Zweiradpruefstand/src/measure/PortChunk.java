@@ -2,13 +2,14 @@ package measure;
 
 import java.util.Iterator;
 
-
 /**
  *
- * @author sx
+ * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
 public class PortChunk implements Iterable<Byte>
 {
+
+  private final byte singleByteValue;
   private final byte[] data;
   private int nextIndex = 0;
 
@@ -18,17 +19,41 @@ public class PortChunk implements Iterable<Byte>
     {
       throw new NullPointerException();
     }
+
     this.data = data;
+    singleByteValue = 0;
+  }
+
+  public PortChunk (int data)
+  {
+    if (data < 0 || data > 255)
+    {
+      throw new IllegalArgumentException();
+    }
+    this.data = null;
+    singleByteValue = (byte) (data >= 128 ? (data - 256) : data);
   }
 
   public byte next ()
   {
-    return data[nextIndex++];
+    if (data == null)
+    {
+      if (nextIndex != 0)
+      {
+        throw new IllegalStateException("no value available");
+      }
+      nextIndex++;
+      return singleByteValue;
+    }
+    else
+    {
+      return data[nextIndex++];
+    }
   }
 
   public boolean isByteAvailable ()
   {
-    return nextIndex < data.length;
+    return data == null ? (nextIndex == 0) : (nextIndex < data.length);
   }
 
   @Override
@@ -37,15 +62,16 @@ public class PortChunk implements Iterable<Byte>
     return new PortChunkIterator();
   }
 
-  
+
   private class PortChunkIterator implements Iterator<Byte>
   {
+
     private int index;
-    
+
     @Override
     public boolean hasNext ()
     {
-      return index < data.length;  
+      return index < data.length;
     }
 
     @Override
@@ -59,8 +85,7 @@ public class PortChunk implements Iterable<Byte>
     {
       throw new UnsupportedOperationException("remove not supported");
     }
-    
+
   }
-  
-  
+
 }

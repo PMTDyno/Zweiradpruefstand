@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "app.h" // is a link to the Atmega Project 
 
@@ -27,6 +28,7 @@ struct jni_App_Globals {
   struct jni_App_Cookie out;
   struct jni_App_Cookie log;
 } jni_app_globals = { NULL, { NULL, NULL }, {NULL, NULL } };
+
 
 void jni_App_setGlobals (JNIEnv *env, jobject obj)
 {
@@ -52,10 +54,10 @@ void jni_App_setGlobals (JNIEnv *env, jobject obj)
 
 
 
-int noop(void) { return 0; }
+int jni_App_noop(void) { return 0; }
 
 
-int my_writefn (struct jni_App_Cookie *cookie, const char *data, int n) 
+int jni_App_log_writefn (struct jni_App_Cookie *cookie, const char *data, int n) 
 {
 //  printf("my_writefn %08x\n", cookie);
   if (cookie == NULL || jni_app_globals.env == NULL || cookie->obj == NULL)
@@ -69,7 +71,32 @@ int my_writefn (struct jni_App_Cookie *cookie, const char *data, int n)
   return n;
 }
 
-int my_closefn (struct jni_App_Cookie *cookie) 
+int jni_App_out_writefn (struct jni_App_Cookie *cookie, const char *data, int n) 
+{
+//  printf("my_writefn %08x\n", cookie);
+  if (cookie == NULL || jni_app_globals.env == NULL || cookie->obj == NULL)
+    return 0;
+  jvalue jargs [1];
+  while (n-- > 0)
+  {
+    //sys_log(__FILE__, __LINE__, getpid(), "----> my_out_writefn: %02x", (int)*data);
+    jargs[0].i = (int)*data++;
+    (*jni_app_globals.env)->CallIntMethodA(jni_app_globals.env, cookie->obj, cookie->mid, jargs);
+    //(*jni_app_globals.env)->ExceptionClear(jni_app_globals.env);
+  }
+  return n;
+}
+
+int jni_App_out_closefn (struct jni_App_Cookie *cookie) 
+{
+  if (cookie == NULL || jni_app_globals.env == NULL || cookie->obj == NULL)
+    return 0;
+
+  return 0;
+}
+
+
+int jni_App_log_closefn (struct jni_App_Cookie *cookie) 
 {
   if (cookie == NULL || jni_app_globals.env == NULL || cookie->obj == NULL)
     return 0;
@@ -81,19 +108,27 @@ int my_closefn (struct jni_App_Cookie *cookie)
   return 0;
 }
 
-cookie_io_functions_t my_fns = {
-  (void*) noop,        // read
-  (void*) my_writefn,  // write
-  (void*) noop,        // seek
-  (void*) my_closefn   // close
+cookie_io_functions_t jni_App_log_fns = {
+  (void*) jni_App_noop,         // read
+  (void*) jni_App_log_writefn,  // write
+  (void*) jni_App_noop,         // seek
+  (void*) jni_App_log_closefn   // close
 };
+
+cookie_io_functions_t jni_App_out_fns = {
+  (void*) jni_App_noop,         // read
+  (void*) jni_App_out_writefn,  // write
+  (void*) jni_App_noop,         // seek
+  (void*) jni_App_out_closefn   // close
+};
+
 
 void sys_log (const char *fname, int line, int pid, const char *format, ...)
 {
   if (jni_app_globals.log.obj == NULL)
     return;
   
-  FILE *f = fopencookie(&jni_app_globals.log, "w", my_fns);
+  FILE *f = fopencookie(&jni_app_globals.log, "w", jni_App_log_fns);
   va_list args;
   va_start(args, format);
   fprintf(f, "%s:%d: (PID %d) ", fname, line, pid);
@@ -106,7 +141,7 @@ void sys_printf (const char *format, ...)
 {
   if (jni_app_globals.out.obj == NULL)
     return;
-  FILE *f = fopencookie(&jni_app_globals.out, "w", my_fns);
+  FILE *f = fopencookie(&jni_app_globals.out, "w", jni_App_out_fns);
   va_list args;
   va_start(args, format);
   vfprintf(f, format, args);
@@ -117,14 +152,14 @@ void sys_printf (const char *format, ...)
 JNIEXPORT void JNICALL Java_jni_App_init (JNIEnv *env, jobject obj)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_init()");
+  //sys_log(__FILE__, __LINE__, getpid(), "app_init()");
   app_init();
 }
 
 JNIEXPORT void JNICALL Java_jni_App_main (JNIEnv *env, jobject obj)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_main()");
+  //sys_log(__FILE__, __LINE__, getpid(), "app_main()");
   app_main();
 }
 
@@ -208,6 +243,6 @@ JNIEXPORT void JNICALL Java_jni_App_timer2_1ovf (JNIEnv *env, jobject obj)
 JNIEXPORT void JNICALL Java_jni_App_uart_1isr (JNIEnv *env, jobject obj, jbyte byte)
 {
   jni_App_setGlobals(env, obj);
-  sys_log(__FILE__, __LINE__, getpid(), "app_uart_isr(0x%02x)", (unsigned char)byte);
+  //sys_log(__FILE__, __LINE__, getpid(), "app_uart_isr(0x%02x)", (unsigned char)byte);
   app_uart_isr((uint8_t) byte);
 }

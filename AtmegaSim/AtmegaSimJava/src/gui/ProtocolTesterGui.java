@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import measure.Communication;
 import measure.CommunicationException;
 import measure.Port;
 import measure.PortCom;
@@ -26,7 +27,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
     //System.setProperty("logging.Logger.printAll", "");
     //System.setProperty("logging.LogRecordDataFormattedText.Terminal","NETBEANS");
     //System.setProperty("logging.LogRecordDataFormattedText.Terminal","LINUX");
-    System.setProperty("logging.Logger.Level", "INFO");
+    System.setProperty("logging.Logger.Level", "ALL");
     //System.setProperty("logging.LogOutputStreamHandler.timeFormat", "%1$ta/%1$tF/%1$tT.%1$tL #%2$-3d");
     //System.setProperty("logging.LogOutputStreamHandler.colorize", "false");
 
@@ -40,6 +41,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   // *******************************************************************************************************
    
   private Port port;
+  Communication comm = new Communication();
   
   /**
    * Creates new form ProtocolTesterGui
@@ -59,13 +61,16 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   
   private void updateSwingControls ()
   {
-    if (port != null && port.isOpened())
+    if (port != null && comm.isOpened())
     {
       jchkSimulate.setEnabled(false);
       jcbPorts.setEnabled(false);
       jbutUpdate.setEnabled(false);
       jbutOpen.setEnabled(false);
       jbutClose.setEnabled(true);
+      
+      jbutTestConnect.setEnabled(true);
+      jbutTestSend.setEnabled(true);
     }
     else
     {
@@ -74,6 +79,9 @@ public class ProtocolTesterGui extends javax.swing.JFrame
       jbutUpdate.setEnabled(true);
       jbutOpen.setEnabled(true);
       jbutClose.setEnabled(false);
+
+      jbutTestConnect.setEnabled(false);
+      jbutTestSend.setEnabled(false);
     }
   }
   
@@ -92,7 +100,20 @@ public class ProtocolTesterGui extends javax.swing.JFrame
       if (item.equals(selected))
       {
         m.setSelectedItem(item);
+        selected = null;
         break;
+      }
+    }
+    if (selected != null)
+    {
+      for (int i=0; i<m.getSize(); i++)
+      {
+        String item = (String)m.getElementAt(i);
+        if ( item.contains("USB0") )
+        {
+          m.setSelectedItem(item);
+          break;
+        }
       }
     }
   }
@@ -156,8 +177,20 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   {
     try
     {
-      String frame = "hello";
-      port.writeBytes(frame.getBytes());
+      String data = "refresh";
+      comm.sendFrame(data);
+    }
+    catch (Exception ex)
+    {
+      showThrowable(ex);
+    }
+  }
+  
+  private void testConnect ()
+  {
+    try
+    {
+      comm.init(port.getPort());
     }
     catch (Exception ex)
     {
@@ -185,6 +218,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
     jchkSimulate = new javax.swing.JCheckBox();
     jpanCenter = new javax.swing.JPanel();
     jpanTest = new javax.swing.JPanel();
+    jbutTestConnect = new javax.swing.JButton();
     jbutTestSend = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -270,6 +304,17 @@ public class ProtocolTesterGui extends javax.swing.JFrame
 
     jpanTest.setLayout(new java.awt.GridBagLayout());
 
+    jbutTestConnect.setText("Connect");
+    jbutTestConnect.setMargin(new java.awt.Insets(4, 4, 4, 4));
+    jbutTestConnect.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jbutTestConnectActionPerformed(evt);
+      }
+    });
+    jpanTest.add(jbutTestConnect, new java.awt.GridBagConstraints());
+
     jbutTestSend.setText("Send");
     jbutTestSend.setMargin(new java.awt.Insets(4, 4, 4, 4));
     jbutTestSend.addActionListener(new java.awt.event.ActionListener()
@@ -313,7 +358,15 @@ public class ProtocolTesterGui extends javax.swing.JFrame
     testSend();
   }//GEN-LAST:event_jbutTestSendActionPerformed
 
+  private void jbutTestConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutTestConnectActionPerformed
+  {//GEN-HEADEREND:event_jbutTestConnectActionPerformed
+    testConnect();
+  }//GEN-LAST:event_jbutTestConnectActionPerformed
 
+
+  
+  
+  
   /**
    * @param args the command line arguments
    */
@@ -374,6 +427,7 @@ public class ProtocolTesterGui extends javax.swing.JFrame
   private javax.swing.JLabel jLabel1;
   private javax.swing.JButton jbutClose;
   private javax.swing.JButton jbutOpen;
+  private javax.swing.JButton jbutTestConnect;
   private javax.swing.JButton jbutTestSend;
   private javax.swing.JButton jbutUpdate;
   private javax.swing.JComboBox<String> jcbPorts;

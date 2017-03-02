@@ -391,7 +391,7 @@ public class Communication
       }
       catch (CommunicationException ex)
       {
-        ex.printStackTrace(System.err);
+//        ex.printStackTrace(System.err);
         LOG.warning(ex.getMessage());
       }
       catch (Exception ex)

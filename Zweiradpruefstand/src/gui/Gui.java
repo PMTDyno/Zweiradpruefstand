@@ -45,12 +45,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.7
+ * @version 0.9.8
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.7";
+  private static final String VERSION = "0.9.8";
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -830,19 +830,6 @@ public class Gui extends javax.swing.JFrame
   }
 
   /**
-   * disables:
-   * <ul>
-   * <li>jStart
-   * <li>jRefresh
-   * </ul>
-   */
-  public void disableMeasureButtons()
-  {
-    jStart.setEnabled(false);
-    jRefresh.setEnabled(false);
-  }
-
-  /**
    * enables:
    * <ul>
    * <li>jStart
@@ -1486,7 +1473,7 @@ public class Gui extends javax.swing.JFrame
       rpm.add(data.getMeasureList().get(i).getRpm());
       time.add(data.getMeasureList().get(i).getTime());
     }
-    omega = filterValuesOrder(omega, 0.09, 3);
+    omega = filterValuesOrder(omega, 0.5, 2);
 
     //VMAX ermitteln
     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
@@ -1496,7 +1483,7 @@ public class Gui extends javax.swing.JFrame
     {
       alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
     }
-    alpha = filterValuesOrder(alpha, 0.09, 3); //passt!
+    alpha = filterValuesOrder(alpha, 0.1, 2);
 
     //faktor fuer berechnungseinheit
     double factor;
@@ -1581,7 +1568,7 @@ public class Gui extends javax.swing.JFrame
         }
       }
 
-      trq = filterValuesOrder(trq, 0.1, 2);
+      trq = filterValuesOrder(trq, 0.13, 2);
     }
 
     //leistung berechnen
@@ -1607,13 +1594,14 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Geschwindigkeit: " + (omega.get(i) * 0.175 * 3.6));
+//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Geschwindigkeit: " + (omega.get(i) * 0.175 * 3.6));
         if(i == getValMaxIndex(omega))
         {
           break;
         }
         series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
         series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
+      
       }
     }
     else
@@ -1766,7 +1754,7 @@ public class Gui extends javax.swing.JFrame
   {
     try
     {
-      disableMeasureButtons();
+      enableCancelling();
       if(worker.get() == null)
       {
         throw new CancellationException();
@@ -1774,6 +1762,7 @@ public class Gui extends javax.swing.JFrame
 
       data.setMeasureList(worker.get());
       calculate();
+      enableStarting();
     }
     catch (ExecutionException ex)
     {

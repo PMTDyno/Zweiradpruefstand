@@ -68,7 +68,7 @@
 
 ####v0.9.8
 * ![d] RawDatapoint in String format
-* Filtering
+* ![d]Filtering
 
 ####v1.0
 * Measurement working!

@@ -50,16 +50,18 @@ public class Communication
     port = new PortCom();
   }
 
-  public void init(String serialPort) throws CommunicationException,
-                                             TimeoutException
+  public void connect(String serialPort) throws CommunicationException,
+                                                TimeoutException
   {
     try
     {
       port.openPort(serialPort);
+      
 
       receiveThread = new Thread(getFrame);
       receiveThread.start();
 
+      //sleep here?
       refreshEco();
       connected = true;
     }
@@ -69,7 +71,6 @@ public class Communication
     }
     catch (Exception ex)
     {
-      port = null;
       throw new CommunicationException(ex);
     }
 

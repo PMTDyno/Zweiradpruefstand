@@ -48,7 +48,7 @@ public class PortCom implements SerialPortEventListener
     try
     {
       serialPort = new SerialPort(port);
-
+      
       if(!serialPort.openPort())
       {
         throw new CommunicationException("open Port failed");

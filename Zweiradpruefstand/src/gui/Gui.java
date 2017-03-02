@@ -141,7 +141,6 @@ public class Gui extends javax.swing.JFrame
     jLabelGuideMeasure = new javax.swing.JLabel();
     jPanelSettings = new javax.swing.JPanel();
     jLabelGuideSettings = new javax.swing.JLabel();
-    jButton2 = new javax.swing.JButton();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
     jRefresh = new javax.swing.JButton();
@@ -226,6 +225,7 @@ public class Gui extends javax.swing.JFrame
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.ipadx = 5;
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
     jPanelInfo.add(jLabelInfo, gridBagConstraints);
 
@@ -277,8 +277,6 @@ public class Gui extends javax.swing.JFrame
     jTabbedPane1.addTab("Einstellungen", jPanelSettings);
 
     jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
-
-    jButton2.setText("jButton2");
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -726,7 +724,6 @@ public class Gui extends javax.swing.JFrame
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton2;
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
   private javax.swing.JMenu jFile;
@@ -1649,7 +1646,7 @@ public class Gui extends javax.swing.JFrame
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     try
     {
-      com.init(jComboBoxPort.getSelectedItem().toString());
+      com.connect(jComboBoxPort.getSelectedItem().toString());
 
       LOG.fine(String.format("Connected to Port: %s", com.getPort()));
 

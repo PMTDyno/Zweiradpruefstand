@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author levin
+ * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
 public class ReadPMT
 {
@@ -74,14 +74,15 @@ public class ReadPMT
         String[] numbers = tmp.split(":");
         // time - rpm - wss
         double rpm;
-        double wss = (1 / (Double.parseDouble(numbers[2].replace(",", ".")) * 26)) * 2 * Math.PI;
+        double wss = (1 / ((Integer.parseInt(numbers[2])/1000000.0) * 26)) * 2 * Math.PI;
+        
         
         if(data.isTwoStroke())
-          rpm = 1 / Double.parseDouble(numbers[1].replace(",", ".")) * 60;
+          rpm = 1 / (Integer.parseInt(numbers[1])/1000000.0) * 60;
         else
-          rpm = (1 / Double.parseDouble(numbers[1].replace(",", ".")) * 60) * 2;
+          rpm = (1 / (Integer.parseInt(numbers[1])/1000000.0) * 60) * 2;
 
-        double time = Double.parseDouble(numbers[0].replace(",", "."));
+        double time = Integer.parseInt(numbers[0])/1000000.0;
 
         list.add(new Datapoint(wss, rpm, time));
       }

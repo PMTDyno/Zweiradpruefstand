@@ -38,21 +38,20 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
   private RawDatapoint getNextDatapoint() throws CommunicationException,
                                                  TimeoutException
   {
-    double wss, rpm;
-    int time;
+    String wss, rpm, time;
 
     String[] tmp = com.getFrameData();
 
-    wss = Double.parseDouble(tmp[0]);
+    wss = tmp[0];
     if(data.isMeasRPM())
     {
-      rpm = Double.parseDouble(tmp[1]);
-      time = Integer.parseInt(tmp[2]);
+      rpm = tmp[1];
+      time = tmp[2];
     }
     else
     {
-      rpm = 0;
-      time = Integer.parseInt(tmp[1]);
+      rpm = "0";
+      time = tmp[1];
     }
 
     return new RawDatapoint(wss, rpm, time);
@@ -100,7 +99,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
         if(data.isMeasRPM())
         {
           //converting to U/min 
-          rpm = dp.getRpm() / 1000000;
+          rpm = Integer.parseInt(dp.getRpm()) / 1000000;
           if(data.isTwoStroke())
             rpm = 1 / rpm * 60;
           else
@@ -151,9 +150,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
             for(RawDatapoint datapoint : list)
             {
               //in seconds
-              Datapoint tmp = new Datapoint(datapoint.getWss() / 1000000,
-                                            datapoint.getRpm() / 1000000,
-                                            datapoint.getTime() / 1000000);
+              Datapoint tmp = new Datapoint(Integer.parseInt(datapoint.getWss()) / 1000000,
+                                            Integer.parseInt(datapoint.getRpm()) / 1000000,
+                                            Integer.parseInt(datapoint.getTime()) / 1000000);
 
               //seconds to rad/s
               tmp.setWss(1 / (tmp.getWss() * 26) * 2 * Math.PI);
@@ -173,9 +172,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
             for(RawDatapoint datapoint : list)
             {
               //in seconds
-              Datapoint tmp = new Datapoint(datapoint.getWss() / 1000000,
-                                            0,
-                                            datapoint.getTime() / 1000000);
+              Datapoint tmp = new Datapoint(Integer.parseInt(datapoint.getWss()) / 1000000,
+                                            0.0,
+                                            Integer.parseInt(datapoint.getTime()) / 1000000);
 
               //seconds to rad/s
               tmp.setWss(1 / (tmp.getWss() * 26) * 2 * Math.PI);

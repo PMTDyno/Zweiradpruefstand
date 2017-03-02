@@ -7,9 +7,9 @@ package data;
 public class RawDatapoint
 {
 
-  private double wss;  // µs
-  private double rpm;  // µs
-  private double time; // µs
+  private String wss;  // µs
+  private String rpm;  // µs
+  private String time; // µs
 
   /**
    *
@@ -17,39 +17,39 @@ public class RawDatapoint
    * @param rpm  Motordrehzahl in us
    * @param time Zeitpunkt der Messung in us
    */
-  public RawDatapoint(double wss, double rpm, double time)
+  public RawDatapoint(String wss, String rpm, String time)
   {
     this.wss = wss;
     this.rpm = rpm;
     this.time = time;
   }
 
-  public double getWss()
+  public String getWss()
   {
     return wss;
   }
 
-  public double getRpm()
+  public String getRpm()
   {
     return rpm;
   }
 
-  public double getTime()
+  public String getTime()
   {
     return time;
   }
 
-  public void setTime(double time)
+  public void setTime(String time)
   {
     this.time = time;
   }
 
-  public void setWss(double wss)
+  public void setWss(String wss)
   {
     this.wss = wss;
   }
 
-  public void setRpm(double rpm)
+  public void setRpm(String rpm)
   {
     this.rpm = rpm;
   }

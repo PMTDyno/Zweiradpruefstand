@@ -197,12 +197,12 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
   private void j2TaktActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_j2TaktActionPerformed
   {//GEN-HEADEREND:event_j2TaktActionPerformed
-    // TODO add your handling code here:
+
   }//GEN-LAST:event_j2TaktActionPerformed
 
   private void j4TaktActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_j4TaktActionPerformed
   {//GEN-HEADEREND:event_j4TaktActionPerformed
-    // TODO add your handling code here:
+
   }//GEN-LAST:event_j4TaktActionPerformed
 
   private void jMeasRpmActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMeasrpmActionPerformed

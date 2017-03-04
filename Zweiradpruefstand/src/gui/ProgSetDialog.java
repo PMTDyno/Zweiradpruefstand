@@ -470,7 +470,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
   private void jTextInertiaActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jTextInertiaActionPerformed
   {//GEN-HEADEREND:event_jTextInertiaActionPerformed
-    // TODO add your handling code here:
+
   }//GEN-LAST:event_jTextInertiaActionPerformed
 
   private void jHeightActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jHeightActionPerformed

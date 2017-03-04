@@ -1555,7 +1555,7 @@ public class Gui extends javax.swing.JFrame
     {
       trqSchl = new ArrayList<>(trq.subList(limitSchl, trq.size()));
       omegaSchl = new ArrayList<>(omega.subList(limitSchl, omega.size()));
-      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
+//      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
 
       for(int i2 = 0; i2 < limitSchl; i2++)
       {

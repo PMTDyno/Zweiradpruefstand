@@ -114,7 +114,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
         Thread.sleep(data.getPeriodTimeMs());
 
         //automatic starting of measurement when rpm is higher than...
-        //todo start measurement when speed is higher than...
       } while(rpm < data.getStartRPM());
 
       list.add(dp);

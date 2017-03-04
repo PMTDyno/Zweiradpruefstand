@@ -56,7 +56,6 @@ public class Communication
     try
     {
       port.openPort(serialPort);
-      
 
       receiveThread = new Thread(getFrame);
       receiveThread.start();
@@ -360,7 +359,9 @@ public class Communication
               if(frame != null)
               {
                 frame.update(b);
-                LOG.info(String.format("Frame received: %s", new String(frame.getFrameBytes(), "utf-8")));
+                LOG.info(String.format("Frame received: %s",
+                                       new String(frame.getFrameBytes(), "utf-8")));
+                
                 synchronized (receivedFrameList)
                 {
                   receivedFrameList.add(new Frame(frame));

@@ -26,7 +26,7 @@ public class Config
 
   private Config()
   {
-    LOG.setLevel(Level.ALL);
+    LOG.setLevel(Level.WARNING);
   }
 
   public static Config getInstance()

@@ -798,6 +798,10 @@ public class Gui extends javax.swing.JFrame
       Config.getInstance().save();
       com.disconnect();
     }
+    catch(CommunicationException ex)
+    {
+      LOG.severe("Port could not be closed");
+    }
     catch (Exception ex)
     {
       LOG.severe(ex.getMessage());
@@ -1549,9 +1553,9 @@ public class Gui extends javax.swing.JFrame
     //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
     if(schleppEnable)
     {
-      trqSchl = new ArrayList<Double>(trq.subList(limitSchl, trq.size()));
-      omegaSchl = new ArrayList<Double>(omega.subList(limitSchl, omega.size()));
-      ArrayList<Double> timeSchl = new ArrayList<Double>(time.subList(limitSchl, time.size()));
+      trqSchl = new ArrayList<>(trq.subList(limitSchl, trq.size()));
+      omegaSchl = new ArrayList<>(omega.subList(limitSchl, omega.size()));
+      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
 
       for(int i2 = 0; i2 < limitSchl; i2++)
       {

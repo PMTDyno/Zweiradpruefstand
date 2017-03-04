@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
-public final class Data
+public class Data
 {
 
   private static Data instance = null;

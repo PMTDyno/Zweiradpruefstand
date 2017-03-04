@@ -1,6 +1,6 @@
 package measure;
 
-import logging.*;
+import logging.Logger;
 
 /**
  *
@@ -14,9 +14,6 @@ public class Crc16
   private static int crc;
   private static int polynomial;
 
-  public void Crc16()
-  {
-  }
 
 //    public static void main(String[] args) throws Exception
 //    {

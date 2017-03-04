@@ -193,11 +193,7 @@ public class Communication
       else
         throw new IllegalStateException("refreshEco blocked");
     }
-    catch (TimeoutException ex)
-    {
-      throw ex;
-    }
-    catch (IllegalStateException ex)
+    catch (TimeoutException | IllegalStateException ex)
     {
       throw ex;
     }

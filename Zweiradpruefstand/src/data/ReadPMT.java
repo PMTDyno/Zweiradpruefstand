@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ReadPMT
 {
 
-  Data data;
+  private final Data data;
   private final File file;
 
   public ReadPMT(File file) throws Exception

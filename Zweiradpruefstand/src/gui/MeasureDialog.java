@@ -18,12 +18,15 @@ public class MeasureDialog extends javax.swing.JDialog
 
   private static final Logger LOG = Logger.getLogger(MeasureDialog.class.getName());
 
-  private Data data = Data.getInstance();
+  private final Data data = Data.getInstance();
   private Gui gui;
   private Measure worker;
 
   /**
    * Creates new form LoadingFrame
+   *
+   * @param parent
+   * @param modal
    */
   public MeasureDialog(java.awt.Frame parent, boolean modal)
   {
@@ -133,40 +136,18 @@ public class MeasureDialog extends javax.swing.JDialog
    */
   public static void main(String args[])
   {
-    /* Set the Nimbus look and feel */
-    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-     */
+    /* Set the system look and feel */
     try
     {
-      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-      {
-        if("Nimbus".equals(info.getName()))
-        {
-          javax.swing.UIManager.setLookAndFeel(info.getClassName());
-          break;
-        }
-      }
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
     }
-    catch (ClassNotFoundException ex)
+    catch (ClassNotFoundException
+           | InstantiationException
+           | IllegalAccessException
+           | javax.swing.UnsupportedLookAndFeelException ex)
     {
       java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
-    catch (InstantiationException ex)
-    {
-      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    }
-    catch (IllegalAccessException ex)
-    {
-      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    }
-    catch (javax.swing.UnsupportedLookAndFeelException ex)
-    {
-      java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-    }
-    //</editor-fold>
-    //</editor-fold>
 
     /* Create and display the form */
     java.awt.EventQueue.invokeLater(() ->
@@ -227,13 +208,6 @@ public class MeasureDialog extends javax.swing.JDialog
     }
   }
 
-  private void setStatus(String status)
-  {
-    System.out.println("status ID: " + Thread.currentThread().getId());
-    jLabelStatus.setText(status);
-
-  }
-
   public void startMeasurement()
   {
     worker.execute();
@@ -246,7 +220,7 @@ public class MeasureDialog extends javax.swing.JDialog
   private class Measure extends MeasurementWorker
   {
 
-    public Measure(Communication com)
+    private Measure(Communication com)
     {
       super(com);
     }

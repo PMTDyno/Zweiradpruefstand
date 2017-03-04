@@ -99,7 +99,7 @@ public class Gui extends javax.swing.JFrame
             + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
             + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
             + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
-            + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br>"
+            + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br></html>"
     );
     jLabelVersion.setText("v" + VERSION);
 
@@ -673,15 +673,17 @@ public class Gui extends javax.swing.JFrame
      */
     try
     {
-      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-      {
-        if("Nimbus".equals(info.getName()))
-        {
-          //javax.swing.UIManager.setLookAndFeel(info.getClassName());
-          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-          break;
-        }
-      }
+//      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+//      {
+//        if("Nimbus".equals(info.getName()))
+//        {
+//          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//          
+//          break;
+//        }
+//      }
+      
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
     }
     catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
     {
@@ -1791,7 +1793,7 @@ public class Gui extends javax.swing.JFrame
     }
     catch (Exception ex)
     {
-      ex.printStackTrace();
+      ex.printStackTrace(System.err);
       LOG.severe("Unknown Exception: " + ex);
       showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
     }

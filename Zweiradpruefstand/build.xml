@@ -82,8 +82,7 @@
     <zipfileset src="dist/lib/jfreechart-1.0.19.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/jfreesvg-2.0.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/jssc-2.8.0.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/junit-4.11.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/junit-4.12-sources.jar" excludes="META-INF/*"/>
+    <zipfileset src="dist/lib/junit-4.12.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/orsoncharts-1.4-eval-nofx.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/orsonpdf-1.6-eval.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/servlet.jar" excludes="META-INF/*"/>

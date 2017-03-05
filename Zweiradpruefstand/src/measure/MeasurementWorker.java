@@ -89,6 +89,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
 
       do
       {
+        if(isCancelled())
+        {
+          LOG.finest("Cancel triggered!");
+          return null;
+        }
+        
         if(data.isMeasRPM())
           com.sendFrame(Communication.Request.START);
         else
@@ -112,7 +118,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
           break;
         }
         Thread.sleep(data.getPeriodTimeMs());
-
+        
         //automatic starting of measurement when rpm is higher than...
       } while(rpm < data.getStartRPM());
 

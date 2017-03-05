@@ -50,7 +50,7 @@ public class Data
   private int windowRelativeX = 0;
   private int windowRelativeY = 0;
   private int periodTimeMs = 40;
-  private int humidity;
+  private int humidity = 40;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = new ArrayList<>();

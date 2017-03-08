@@ -197,12 +197,12 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
   private void j2TaktActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_j2TaktActionPerformed
   {//GEN-HEADEREND:event_j2TaktActionPerformed
-    // TODO add your handling code here:
+
   }//GEN-LAST:event_j2TaktActionPerformed
 
   private void j4TaktActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_j4TaktActionPerformed
   {//GEN-HEADEREND:event_j4TaktActionPerformed
-    // TODO add your handling code here:
+
   }//GEN-LAST:event_j4TaktActionPerformed
 
   private void jMeasRpmActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMeasrpmActionPerformed
@@ -224,24 +224,15 @@ public class VehicleSetDialog extends javax.swing.JDialog
    */
   public static void main(String args[])
   {
-    /* Set the Nimbus look and feel */
-    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-     */
+    /* Set the system look and feel */
     try
     {
-      for(javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-      {
-        if("Nimbus".equals(info.getName()))
-        {
-//          javax.swing.UIManager.setLookAndFeel(info.getClassName());
-          javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-          break;
-        }
-      }
+      javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
     }
-    catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
+    catch (ClassNotFoundException
+           | InstantiationException
+           | IllegalAccessException
+           | javax.swing.UnsupportedLookAndFeelException ex)
     {
       java.util.logging.Logger.getLogger(VehicleSetDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }

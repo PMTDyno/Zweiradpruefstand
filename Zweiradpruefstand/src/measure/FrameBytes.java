@@ -8,50 +8,51 @@ import java.io.ByteArrayOutputStream;
  */
 public class FrameBytes
 {
-    private final ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-    private long startTimeMillis;
-    private long endTimeMillis;
-    private byte [] byteArrayCache;
 
-    public FrameBytes()
-    {
-    }
+  private final ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
+  private long startTimeMillis;
+  private long endTimeMillis;
+  private byte[] byteArrayCache;
 
-    public void update (byte b)
-    {
-        if (byteArrayCache != null)
-            throw new IllegalStateException("frame already ended");
-        
-        if (baos.size() == 0)
-            startTimeMillis = System.currentTimeMillis();
-        
-        baos.write(b);
-        endTimeMillis = System.currentTimeMillis();
-    }
-    
-    byte [] getFrameBytes ()
-    {
-        if (byteArrayCache == null)
-        {
-            byteArrayCache = baos.toByteArray();
-        }
-        return byteArrayCache;
-    }
+  public FrameBytes()
+  {
+  }
 
-    public long getStartTimeMillis()
-    {
-        return startTimeMillis;
-    }
+  public void update(byte b)
+  {
+    if(byteArrayCache != null)
+      throw new IllegalStateException("frame already ended");
 
-    public long getEndTimeMillis()
-    {
-        return endTimeMillis;
-    }
+    if(baos.size() == 0)
+      startTimeMillis = System.currentTimeMillis();
 
-    @Override
-    public String toString()
+    baos.write(b);
+    endTimeMillis = System.currentTimeMillis();
+  }
+
+  public byte[] getFrameBytes()
+  {
+    if(byteArrayCache == null)
     {
-        return "Frame{" + baos.size() +  "Bytes}";
+      byteArrayCache = baos.toByteArray();
     }
-    
+    return byteArrayCache;
+  }
+
+  public long getStartTimeMillis()
+  {
+    return startTimeMillis;
+  }
+
+  public long getEndTimeMillis()
+  {
+    return endTimeMillis;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "Frame{" + baos.size() + "Bytes}";
+  }
+
 }

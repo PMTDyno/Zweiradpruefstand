@@ -103,29 +103,4 @@ public class Frame
     }
   }
 
-
-
-  @Override
-  public String toString ()
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Frame{");
-    byte[] data = bytes.getFrameBytes();
-    sb.append(String.format("%d bytes: ", data.length));
-    for (int i = 0; i < data.length; i++)
-    {
-      if (i > 0)
-      {
-        sb.append(", ");
-      }
-      sb.append(String.format("%02x", data[i]));
-      if (data[i] >= ' ' && data[i] < 127)
-      {
-        sb.append(String.format("(%c)", (char) data[i]));
-      }
-    }
-    sb.append('}');
-    return sb.toString();
-  }
-
 }

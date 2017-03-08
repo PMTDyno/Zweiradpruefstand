@@ -3,7 +3,6 @@ package logging;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.concurrent.locks.Lock;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

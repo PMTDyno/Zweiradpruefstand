@@ -153,6 +153,7 @@ public class PortCom implements SerialPortEventListener
 
   }
 
+  @Override
   public void serialEvent(SerialPortEvent serialPortEvent)
   {
     if(serialPortEvent.getEventType() == SerialPortEvent.RXCHAR)

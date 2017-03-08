@@ -74,21 +74,9 @@
     <target name="-post-jar">
     <jar jarfile="dist/PMTDyno.jar">
     <zipfileset src="${dist.jar}" excludes="META-INF/*"/>
-    
-    <zipfileset src="dist/lib/hamcrest-core-1.3.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/jcommon-1.0.23.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/jfreechart-1.0.19-experimental.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/jfreechart-1.0.19-swt.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/jfreechart-1.0.19.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/jfreesvg-2.0.jar" excludes="META-INF/*"/>
     <zipfileset src="dist/lib/jssc-2.8.0.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/junit-4.11.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/junit-4.12-sources.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/orsoncharts-1.4-eval-nofx.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/orsonpdf-1.6-eval.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/servlet.jar" excludes="META-INF/*"/>
-    <zipfileset src="dist/lib/swtgraphics2d.jar" excludes="META-INF/*"/>
-    
     <manifest>
         <attribute name="Main-Class" value="gui.Gui"/>
     </manifest>

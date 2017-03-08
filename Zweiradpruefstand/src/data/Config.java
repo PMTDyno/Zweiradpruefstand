@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.logging.Level;
 import logging.Logger;
 
 /**
@@ -25,6 +26,7 @@ public class Config
 
   private Config()
   {
+    LOG.setLevel(Level.WARNING);
   }
 
   public static Config getInstance()

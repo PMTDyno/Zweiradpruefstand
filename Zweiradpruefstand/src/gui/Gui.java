@@ -138,11 +138,8 @@ public class Gui extends javax.swing.JFrame
     jLabelDate = new javax.swing.JLabel();
     jLabelAuthor = new javax.swing.JLabel();
     jFrameGuide = new javax.swing.JFrame();
-    jTabbedPane1 = new javax.swing.JTabbedPane();
     jPanelMeasure = new javax.swing.JPanel();
     jLabelGuideMeasure = new javax.swing.JLabel();
-    jPanelSettings = new javax.swing.JPanel();
-    jLabelGuideSettings = new javax.swing.JLabel();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
     jRefresh = new javax.swing.JButton();
@@ -166,7 +163,7 @@ public class Gui extends javax.swing.JFrame
     jMenuOpen = new javax.swing.JMenuItem();
     jSeparator6 = new javax.swing.JPopupMenu.Separator();
     jMenuSave = new javax.swing.JMenuItem();
-    jMenuItem2 = new javax.swing.JMenuItem();
+    jMenuExport = new javax.swing.JMenuItem();
     jMenuPrint = new javax.swing.JMenuItem();
     jSeparator4 = new javax.swing.JPopupMenu.Separator();
     jMenuSettings = new javax.swing.JMenuItem();
@@ -175,7 +172,6 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
-    jMenuItem1 = new javax.swing.JMenuItem();
 
     jFrameAbout.setTitle("Über...");
     jFrameAbout.setLocation(new java.awt.Point(0, 0));
@@ -268,17 +264,7 @@ public class Gui extends javax.swing.JFrame
     jLabelGuideMeasure.setText("<html> TODO!!!<h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
     jPanelMeasure.add(jLabelGuideMeasure);
 
-    jTabbedPane1.addTab("Messung", jPanelMeasure);
-
-    jPanelSettings.setLayout(new java.awt.GridLayout(1, 0));
-
-    jLabelGuideSettings.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelGuideSettings.setText("todo"); // NOI18N
-    jPanelSettings.add(jLabelGuideSettings);
-
-    jTabbedPane1.addTab("Einstellungen", jPanelSettings);
-
-    jFrameGuide.getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+    jFrameGuide.getContentPane().add(jPanelMeasure, java.awt.BorderLayout.PAGE_START);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -442,6 +428,7 @@ public class Gui extends javax.swing.JFrame
     jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
     jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
     jMenuSave.setText("Speichern...");
+    jMenuSave.setEnabled(false);
     jMenuSave.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -451,21 +438,23 @@ public class Gui extends javax.swing.JFrame
     });
     jFile.add(jMenuSave);
 
-    jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
-    jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export16.png"))); // NOI18N
-    jMenuItem2.setText("Exportieren...");
-    jMenuItem2.addActionListener(new java.awt.event.ActionListener()
+    jMenuExport.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/export16.png"))); // NOI18N
+    jMenuExport.setText("Exportieren...");
+    jMenuExport.setEnabled(false);
+    jMenuExport.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jMenuItem2ActionPerformed(evt);
+        jMenuExportActionPerformed(evt);
       }
     });
-    jFile.add(jMenuItem2);
+    jFile.add(jMenuExport);
 
     jMenuPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
     jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/printer16.png"))); // NOI18N
     jMenuPrint.setText("Drucken...");
+    jMenuPrint.setEnabled(false);
     jMenuPrint.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -525,16 +514,6 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jHelp.add(jMenuAbout);
-
-    jMenuItem1.setText("Test");
-    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jMenuItem1ActionPerformed(evt);
-      }
-    });
-    jHelp.add(jMenuItem1);
 
     jMenuBar.add(jHelp);
 
@@ -623,13 +602,6 @@ public class Gui extends javax.swing.JFrame
       }
     }//GEN-LAST:event_jLabelDateMouseClicked
 
-  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
-  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
-
-    start();
-
-  }//GEN-LAST:event_jMenuItem1ActionPerformed
-
   private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
   {//GEN-HEADEREND:event_jMenuCloseActionPerformed
     dispose();
@@ -645,10 +617,10 @@ public class Gui extends javax.swing.JFrame
     print();
   }//GEN-LAST:event_jMenuPrintActionPerformed
 
-  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem2ActionPerformed
-  {//GEN-HEADEREND:event_jMenuItem2ActionPerformed
+  private void jMenuExportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuExportActionPerformed
+  {//GEN-HEADEREND:event_jMenuExportActionPerformed
     exportFile();
-  }//GEN-LAST:event_jMenuItem2ActionPerformed
+  }//GEN-LAST:event_jMenuExportActionPerformed
 
   private void jMenuSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuSaveActionPerformed
   {//GEN-HEADEREND:event_jMenuSaveActionPerformed
@@ -739,7 +711,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JLabel jLabelDate;
   private javax.swing.JLabel jLabelDevelopers;
   private javax.swing.JLabel jLabelGuideMeasure;
-  private javax.swing.JLabel jLabelGuideSettings;
   private javax.swing.JLabel jLabelInfo;
   private javax.swing.JLabel jLabelStatus;
   private javax.swing.JLabel jLabelVersion;
@@ -747,9 +718,8 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuAbout;
   private javax.swing.JMenuBar jMenuBar;
   private javax.swing.JMenuItem jMenuClose;
+  private javax.swing.JMenuItem jMenuExport;
   private javax.swing.JMenuItem jMenuGuide;
-  private javax.swing.JMenuItem jMenuItem1;
-  private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
@@ -759,7 +729,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPanel jPanelInfo2;
   private javax.swing.JPanel jPanelLogo;
   private javax.swing.JPanel jPanelMeasure;
-  private javax.swing.JPanel jPanelSettings;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
   private javax.swing.JButton jRefresh;
@@ -771,7 +740,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPopupMenu.Separator jSeparator5;
   private javax.swing.JPopupMenu.Separator jSeparator6;
   private javax.swing.JButton jStart;
-  private javax.swing.JTabbedPane jTabbedPane1;
   private javax.swing.JToolBar jToolBar;
   private javax.swing.JButton jbutConnect;
   private javax.swing.JButton jbutDisconnect;
@@ -1642,6 +1610,13 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
     updateChartLabels();
+    
+    jSave.setEnabled(true);
+    jPrint.setEnabled(true);
+    jMenuSave.setEnabled(true);
+    jMenuPrint.setEnabled(true);
+    jMenuExport.setEnabled(true);
+    
     LOG.fine("done calculating");
 
   }

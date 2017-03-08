@@ -158,59 +158,24 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
+        <Container class="javax.swing.JPanel" name="jPanelMeasure">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="Center"/>
+              <BorderConstraints direction="First"/>
             </Constraint>
           </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="0"/>
+            <Property name="rows" type="int" value="1"/>
+          </Layout>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanelMeasure">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Messung">
-                    <Property name="tabTitle" type="java.lang.String" value="Messung"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                <Property name="columns" type="int" value="0"/>
-                <Property name="rows" type="int" value="1"/>
-              </Layout>
-              <SubComponents>
-                <Component class="javax.swing.JLabel" name="jLabelGuideMeasure">
-                  <Properties>
-                    <Property name="horizontalAlignment" type="int" value="0"/>
-                    <Property name="text" type="java.lang.String" value="&lt;html&gt; TODO!!!&lt;h2&gt;   1. Motorrad auf den Pr&#xfc;fstand stellen und befestigen &lt;br&gt;&lt;br&gt; 2. Pr&#xfc;fstand mit USB verbinden &lt;br&gt;&lt;br&gt; 3. Klicken Sie auf &lt;i&gt;Verbinden&lt;/i&gt; &lt;br&gt;&lt;br&gt;  4. Starten Sie das Motorrad &lt;br&gt;&lt;br&gt; 5. Klicken Sie auf &lt;i&gt;Start&lt;/i&gt; &lt;br&gt;&lt;br&gt; 6. Beschleunigen Sie mit Vollgas &lt;br&gt;&lt;br&gt; 7. Bei maximaler Motordrehzahl klicken Sie auf &lt;i&gt;Stop&lt;/i&gt;&lt;br&gt; &lt;br&gt;  &lt;/h2&gt;" noResource="true"/>
-                  </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Container class="javax.swing.JPanel" name="jPanelSettings">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Einstellungen">
-                    <Property name="tabTitle" type="java.lang.String" value="Einstellungen"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                <Property name="columns" type="int" value="0"/>
-                <Property name="rows" type="int" value="1"/>
-              </Layout>
-              <SubComponents>
-                <Component class="javax.swing.JLabel" name="jLabelGuideSettings">
-                  <Properties>
-                    <Property name="horizontalAlignment" type="int" value="0"/>
-                    <Property name="text" type="java.lang.String" value="todo" noResource="true"/>
-                  </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
+            <Component class="javax.swing.JLabel" name="jLabelGuideMeasure">
+              <Properties>
+                <Property name="horizontalAlignment" type="int" value="0"/>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt; TODO!!!&lt;h2&gt;   1. Motorrad auf den Pr&#xfc;fstand stellen und befestigen &lt;br&gt;&lt;br&gt; 2. Pr&#xfc;fstand mit USB verbinden &lt;br&gt;&lt;br&gt; 3. Klicken Sie auf &lt;i&gt;Verbinden&lt;/i&gt; &lt;br&gt;&lt;br&gt;  4. Starten Sie das Motorrad &lt;br&gt;&lt;br&gt; 5. Klicken Sie auf &lt;i&gt;Start&lt;/i&gt; &lt;br&gt;&lt;br&gt; 6. Beschleunigen Sie mit Vollgas &lt;br&gt;&lt;br&gt; 7. Bei maximaler Motordrehzahl klicken Sie auf &lt;i&gt;Stop&lt;/i&gt;&lt;br&gt; &lt;br&gt;  &lt;/h2&gt;" noResource="true"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>
@@ -247,12 +212,13 @@
                   <Image iconType="3" name="/icons/save16.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Speichern..."/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuSaveActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuExport">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+E"/>
@@ -261,9 +227,10 @@
                   <Image iconType="3" name="/icons/export16.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Exportieren..."/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuExportActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuPrint">
@@ -275,6 +242,7 @@
                   <Image iconType="3" name="/icons/printer16.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Drucken..."/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuPrintActionPerformed"/>
@@ -336,14 +304,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuAboutActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Test"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

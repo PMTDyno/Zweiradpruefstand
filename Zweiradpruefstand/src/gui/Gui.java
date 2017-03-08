@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import measure.Communication;
 import measure.CommunicationException;
+import org.jfree.JCommonInfo;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -99,6 +100,7 @@ public class Gui extends javax.swing.JFrame
             + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
             + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
             + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
+            + "<b>JCommon: </b>" + JCommonInfo.getInstance().getVersion() + "<br>"
             + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br></html>"
     );
     jLabelVersion.setText("v" + VERSION);
@@ -682,7 +684,7 @@ public class Gui extends javax.swing.JFrame
 //          break;
 //        }
 //      }
-      
+
       javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
     }
     catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
@@ -798,7 +800,7 @@ public class Gui extends javax.swing.JFrame
       Config.getInstance().save();
       com.disconnect();
     }
-    catch(CommunicationException ex)
+    catch (CommunicationException ex)
     {
       LOG.severe("Port could not be closed");
     }
@@ -958,7 +960,7 @@ public class Gui extends javax.swing.JFrame
 
     loading.startMeasurement();
     loading.setVisible(true);
-    
+
     enableStarting();
 
   }
@@ -977,8 +979,7 @@ public class Gui extends javax.swing.JFrame
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
               "PMTDyno (*.pmt)", "pmt");
       chooser.setFileFilter(filter);
-      
-      
+
       int rv = chooser.showOpenDialog(this);
       if(rv == JFileChooser.APPROVE_OPTION)
       {
@@ -1606,7 +1607,7 @@ public class Gui extends javax.swing.JFrame
         }
         series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
         series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
-      
+
       }
     }
     else

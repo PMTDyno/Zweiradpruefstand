@@ -73,6 +73,10 @@
 * ![d] Filtering
 * ![d] Bug fixes
 
+####v0.9.9
+* ![d] Added Speed Tachometer during Measurement
+* ![d] converted About and Guide to JDialog
+
 ####v1.0
 * Measurement working!
   

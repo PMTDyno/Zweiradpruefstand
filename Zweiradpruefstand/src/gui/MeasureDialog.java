@@ -8,6 +8,15 @@ import logging.Logger;
 import javax.swing.JOptionPane;
 import measure.Communication;
 import measure.MeasurementWorker;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.dial.DialPlot;
+import org.jfree.chart.plot.dial.DialPointer;
+import org.jfree.chart.plot.dial.DialTextAnnotation;
+import org.jfree.chart.plot.dial.DialValueIndicator;
+import org.jfree.chart.plot.dial.StandardDialFrame;
+import org.jfree.chart.plot.dial.StandardDialScale;
+import org.jfree.data.general.DefaultValueDataset;
 
 /**
  *
@@ -21,6 +30,7 @@ public class MeasureDialog extends javax.swing.JDialog
   private final Data data = Data.getInstance();
   private Gui gui;
   private Measure worker;
+  private DefaultValueDataset dataset;
 
   /**
    * Creates new form LoadingFrame
@@ -35,9 +45,66 @@ public class MeasureDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     setTitle("Messung läuft...");
     setResizable(false);
-    setMinimumSize(new Dimension(250, 150));
+    setMinimumSize(new Dimension(310, 400));
 
     initComponents();
+
+    dataset = new DefaultValueDataset(0);
+
+    DialPlot plot = new DialPlot(dataset);
+    plot.setDialFrame(new StandardDialFrame());
+    plot.addLayer(new DialPointer.Pointer());
+    DialTextAnnotation annotation = new DialTextAnnotation("km/h");
+    plot.addLayer(annotation);
+    
+
+    StandardDialScale scale = new StandardDialScale(0, 100,
+                                                    -120, -300, 10, 4);
+    
+    scale.setTickRadius(0.88);
+    scale.setTickLabelOffset(0.20);
+    plot.addScale(0, scale);
+
+    jFrameChart.setUI(null);
+    jFrameChart.add(new ChartPanel(new JFreeChart(plot)));
+    jFrameChart.pack();
+    jFrameChart.setSize(1000, 1000);
+
+//    new Thread(() ->
+//    {
+//      int time = 10;
+//      
+//      try
+//      {
+//        double value = 0;
+//        while(true)
+//        {
+//          while(true)
+//          {
+//            Thread.sleep(time);
+//            dataset.setValue(value);
+//            if(value > 99)
+//              break;
+//            
+//            value+=1;
+//          }
+//          while(true)
+//          {
+//            Thread.sleep(time);
+//            dataset.setValue(value);
+//            if(value < 1)
+//              break;
+//            
+//            value-=1;
+//          }
+//        }
+//        
+//      }
+//      catch (InterruptedException ex)
+//      {
+//        java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(Level.SEVERE, null, ex);
+//      }
+//    }).start();
 
   }
 
@@ -57,15 +124,17 @@ public class MeasureDialog extends javax.swing.JDialog
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
-    java.awt.GridBagConstraints gridBagConstraints;
 
     jPanelButtons = new javax.swing.JPanel();
     jButton1 = new javax.swing.JButton();
     jButton3 = new javax.swing.JButton();
     jPanelInfo = new javax.swing.JPanel();
-    jProgressBar = new javax.swing.JProgressBar();
-    jLabelStatus = new javax.swing.JLabel();
+    jPanelDial = new javax.swing.JPanel();
+    jFrameChart = new javax.swing.JInternalFrame();
+    jPanelStatus = new javax.swing.JPanel();
     jLabel = new javax.swing.JLabel();
+    jLabelStatus = new javax.swing.JLabel();
+    jProgressBar = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setResizable(false);
@@ -93,28 +162,26 @@ public class MeasureDialog extends javax.swing.JDialog
 
     getContentPane().add(jPanelButtons, java.awt.BorderLayout.SOUTH);
 
-    jPanelInfo.setLayout(new java.awt.GridBagLayout());
+    jPanelInfo.setLayout(new java.awt.BorderLayout());
+
+    jPanelDial.setLayout(new java.awt.GridLayout(1, 0));
+
+    jFrameChart.setVisible(true);
+    jPanelDial.add(jFrameChart);
+
+    jPanelInfo.add(jPanelDial, java.awt.BorderLayout.CENTER);
+
+    jLabel.setText("Anzahl der Messpunkte: ");
+    jPanelStatus.add(jLabel);
+
+    jLabelStatus.setText("0");
+    jPanelStatus.add(jLabelStatus);
 
     jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
     jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-    jPanelInfo.add(jProgressBar, gridBagConstraints);
+    jPanelStatus.add(jProgressBar);
 
-    jLabelStatus.setText("0");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    jPanelInfo.add(jLabelStatus, gridBagConstraints);
-
-    jLabel.setText("Anzahl der Messpunkte: ");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    jPanelInfo.add(jLabel, gridBagConstraints);
+    jPanelInfo.add(jPanelStatus, java.awt.BorderLayout.PAGE_START);
 
     getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
 
@@ -166,15 +233,19 @@ public class MeasureDialog extends javax.swing.JDialog
 
       dialog.setVisible(true);
     });
+
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton3;
+  private javax.swing.JInternalFrame jFrameChart;
   private javax.swing.JLabel jLabel;
   private javax.swing.JLabel jLabelStatus;
   private javax.swing.JPanel jPanelButtons;
+  private javax.swing.JPanel jPanelDial;
   private javax.swing.JPanel jPanelInfo;
+  private javax.swing.JPanel jPanelStatus;
   private javax.swing.JProgressBar jProgressBar;
   // End of variables declaration//GEN-END:variables
 
@@ -226,12 +297,12 @@ public class MeasureDialog extends javax.swing.JDialog
     }
 
     @Override
-    protected void process(List<Integer> chunks)
+    protected void process(List<Double> chunks)
     {
-      for(Integer chunk : chunks)
-      {
-        jLabelStatus.setText(String.valueOf(chunk));
-      }
+      
+      jLabelStatus.setText(String.valueOf(chunks.get(0).intValue()));
+      
+      dataset.setValue(chunks.get(1));
     }
 
     @Override

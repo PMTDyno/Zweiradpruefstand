@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
  */
-public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer>
+public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 {
 
   private final Data data = Data.getInstance();
@@ -67,11 +67,22 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
     //WSS - rpm - TIME
 
 //    int cnt = 0;
+//    double power = 0;
 //    while(true)
 //    {
-//      publish(cnt);
+//      Double[] val = {cnt*1.0, power};
+//      publish(val);
+//      
+//      
+//      
+//      power = Math.sin(cnt/180.0*Math.PI)*20+30;
+//      System.out.println(power);
+//      
 //      
 //      cnt++;
+//      
+//      if(cnt >= 360)
+//        cnt = 0;
 //      
 //      if(cnt > 10000 || isCancelled() || stopRequest.get())
 //        break;
@@ -127,7 +138,11 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Integer
       while(true)
       {
         count++;
-        publish(count);
+        int wss = Integer.parseInt(list.get(count-1).getWss());
+        double speed = 1 / ((wss / 1000000.0) * 26) * 2 * Math.PI * 0.175 * 3.6;
+        Double[] value = {count*1.0, speed};
+        
+        publish(value);
 
         if(data.isMeasRPM())
           com.sendFrame(Communication.Request.MEASURE);

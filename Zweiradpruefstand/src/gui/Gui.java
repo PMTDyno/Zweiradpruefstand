@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import measure.Communication;
 import measure.CommunicationException;
-import org.jfree.JCommonInfo;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -51,7 +50,9 @@ import org.jfree.ui.TextAnchor;
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.8";
+  private static final String VERSION = "0.9.9";
+
+  
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -60,7 +61,9 @@ public class Gui extends javax.swing.JFrame
 
   private final ProgSetDialog progset;
   private final VehicleSetDialog vehicleset;
-
+  private final AboutDialog about;
+  private final GuideDialog guide;
+  
   private final Data data = Data.getInstance();
 
   private final Font font = new Font("sansserif", Font.BOLD, 15);
@@ -93,22 +96,14 @@ public class Gui extends javax.swing.JFrame
       LOG.warning("Error reading Config file", ex);
       showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
     }
-    jLabelInfo.setText("<html>"
-            + "<b>Version: </b>PMT Dyno v" + VERSION + "<br>"
-            + "<b>Config Datei: </b>" + data.getFilePath() + "<br>"
-            + "<b>System: </b>" + System.getProperty("os.name") + "<br>"
-            + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
-            + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
-            + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
-            + "<b>JCommon: </b>" + JCommonInfo.getInstance().getVersion() + "<br>"
-            + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br></html>"
-    );
-    jLabelVersion.setText("v" + VERSION);
-
+    
+    about = new AboutDialog(this, true);
+    guide = new GuideDialog(this, true);
+    
     setIconImage(new ImageIcon(getClass().getResource("/icons/logo128.png")).getImage());
 
-    setTitle("PMT-DYNO v" + VERSION);
-    setMinimumSize(new Dimension(1000, 450));
+    setTitle("PMTDyno v" + VERSION);
+    setMinimumSize(new Dimension(800, 450));
     setSize(data.getWindowWidth(), data.getWindowHeight());
     setLocation(data.getWindowRelativeX(), data.getWindowRelativeY());
 
@@ -126,20 +121,6 @@ public class Gui extends javax.swing.JFrame
   {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    jFrameAbout = new javax.swing.JFrame();
-    jPanelLogo = new javax.swing.JPanel();
-    jLabel2 = new javax.swing.JLabel();
-    jLabelVersion = new javax.swing.JLabel();
-    jPanelInfo = new javax.swing.JPanel();
-    jLabelDevelopers = new javax.swing.JLabel();
-    jLabelInfo = new javax.swing.JLabel();
-    jLabelWarning = new javax.swing.JLabel();
-    jPanelInfo2 = new javax.swing.JPanel();
-    jLabelDate = new javax.swing.JLabel();
-    jLabelAuthor = new javax.swing.JLabel();
-    jFrameGuide = new javax.swing.JFrame();
-    jPanelMeasure = new javax.swing.JPanel();
-    jLabelGuideMeasure = new javax.swing.JLabel();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
     jRefresh = new javax.swing.JButton();
@@ -173,99 +154,6 @@ public class Gui extends javax.swing.JFrame
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
     jMenuItem1 = new javax.swing.JMenuItem();
-
-    jFrameAbout.setTitle("Über...");
-    jFrameAbout.setLocation(new java.awt.Point(0, 0));
-    jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
-    jFrameAbout.setResizable(false);
-
-    jPanelLogo.setLayout(new java.awt.GridBagLayout());
-
-    jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
-    jLabel2.setText(" PMT Dyno");
-    jLabel2.setVerifyInputWhenFocusTarget(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-    jPanelLogo.add(jLabel2, gridBagConstraints);
-
-    jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-    jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabelVersion.setText("v");
-    jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-    jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-    gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-    jPanelLogo.add(jLabelVersion, gridBagConstraints);
-
-    jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
-
-    jPanelInfo.setLayout(new java.awt.GridBagLayout());
-
-    jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-    jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelDevelopers.setText("<html>  <center> <b>Diplomanden: </b> <br>  Primus Christoph - Elektrotechnik<br>  Messing Levin - Programm<br>  Tinauer Robert - Mechanik<br>  </center>");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
-    jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
-
-    jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
-    jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
-    jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-    jLabelInfo.setOpaque(true);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.ipadx = 5;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelInfo, gridBagConstraints);
-
-    jLabelWarning.setText("Die Nutzung des Prüfstandes erfolgt auf eigene Gefahr!");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelWarning, gridBagConstraints);
-
-    jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
-
-    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
-
-    jLabelDate.setText("2016-2017");
-    jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
-    {
-      public void mouseClicked(java.awt.event.MouseEvent evt)
-      {
-        jLabelDateMouseClicked(evt);
-      }
-    });
-    jPanelInfo2.add(jLabelDate);
-
-    jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabelAuthor.setText("Autor: Messing Levin");
-    jPanelInfo2.add(jLabelAuthor);
-
-    jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
-
-    jFrameGuide.setTitle("Anleitung");
-    jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
-    jFrameGuide.setResizable(false);
-
-    jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
-
-    jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelGuideMeasure.setText("<html> TODO!!!<h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
-    jPanelMeasure.add(jLabelGuideMeasure);
-
-    jFrameGuide.getContentPane().add(jPanelMeasure, java.awt.BorderLayout.PAGE_START);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -428,7 +316,7 @@ public class Gui extends javax.swing.JFrame
 
     jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
     jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
-    jMenuSave.setText("Speichern...");
+    jMenuSave.setText("Als Bild speichern...");
     jMenuSave.setEnabled(false);
     jMenuSave.addActionListener(new java.awt.event.ActionListener()
     {
@@ -493,7 +381,7 @@ public class Gui extends javax.swing.JFrame
 
     jHelp.setText("Hilfe");
 
-    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
     jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
     jMenuGuide.setText("Anleitung");
     jMenuGuide.addActionListener(new java.awt.event.ActionListener()
@@ -506,7 +394,7 @@ public class Gui extends javax.swing.JFrame
     jHelp.add(jMenuGuide);
 
     jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
-    jMenuAbout.setText("Über...");
+    jMenuAbout.setText("Über");
     jMenuAbout.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -587,14 +475,17 @@ public class Gui extends javax.swing.JFrame
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuAboutActionPerformed
     {//GEN-HEADEREND:event_jMenuAboutActionPerformed
-      jFrameAbout.setLocationRelativeTo(this);
-      jFrameAbout.setVisible(true);
+      about.setLocationRelativeTo(this);
+      about.setVisible(true);
+      
+//      jFrameAbout.setLocationRelativeTo(this);
+//      jFrameAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void jMenuGuideActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuGuideActionPerformed
     {//GEN-HEADEREND:event_jMenuGuideActionPerformed
-      jFrameGuide.setLocationRelativeTo(this);
-      jFrameGuide.setVisible(true);
+      guide.setLocationRelativeTo(this);
+      guide.setVisible(true);
     }//GEN-LAST:event_jMenuGuideActionPerformed
 
     private void jRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRefreshActionPerformed
@@ -602,17 +493,6 @@ public class Gui extends javax.swing.JFrame
     }//GEN-LAST:event_jRefreshActionPerformed
 
   private int easterEgg = 0;
-    private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
-    {//GEN-HEADEREND:event_jLabelDateMouseClicked
-      easterEgg++;
-      if(easterEgg >= 6)
-      {
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
-        JOptionPane.showMessageDialog(this, "Primus du Wurst!", "Easter Egg", JOptionPane.PLAIN_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
-        easterEgg = 0;
-      }
-    }//GEN-LAST:event_jLabelDateMouseClicked
-
   private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
   {//GEN-HEADEREND:event_jMenuCloseActionPerformed
     dispose();
@@ -719,18 +599,8 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
   private javax.swing.JMenu jFile;
-  private javax.swing.JFrame jFrameAbout;
-  private javax.swing.JFrame jFrameGuide;
   private javax.swing.JMenu jHelp;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabelAuthor;
-  private javax.swing.JLabel jLabelDate;
-  private javax.swing.JLabel jLabelDevelopers;
-  private javax.swing.JLabel jLabelGuideMeasure;
-  private javax.swing.JLabel jLabelInfo;
   private javax.swing.JLabel jLabelStatus;
-  private javax.swing.JLabel jLabelVersion;
-  private javax.swing.JLabel jLabelWarning;
   private javax.swing.JMenuItem jMenuAbout;
   private javax.swing.JMenuBar jMenuBar;
   private javax.swing.JMenuItem jMenuClose;
@@ -742,10 +612,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
   private javax.swing.JPanel jPanSerial;
-  private javax.swing.JPanel jPanelInfo;
-  private javax.swing.JPanel jPanelInfo2;
-  private javax.swing.JPanel jPanelLogo;
-  private javax.swing.JPanel jPanelMeasure;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
   private javax.swing.JButton jRefresh;
@@ -1793,5 +1659,13 @@ public class Gui extends javax.swing.JFrame
     }
 
   }
+
+  public static String getVERSION()
+  {
+    return VERSION;
+  }
+  
+  
+  
 
 }

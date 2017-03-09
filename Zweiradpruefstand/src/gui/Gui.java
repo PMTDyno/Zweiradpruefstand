@@ -52,7 +52,6 @@ public class Gui extends javax.swing.JFrame
 
   private static final String VERSION = "0.9.9";
 
-  
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -63,7 +62,7 @@ public class Gui extends javax.swing.JFrame
   private final VehicleSetDialog vehicleset;
   private final AboutDialog about;
   private final GuideDialog guide;
-  
+
   private final Data data = Data.getInstance();
 
   private final Font font = new Font("sansserif", Font.BOLD, 15);
@@ -96,10 +95,10 @@ public class Gui extends javax.swing.JFrame
       LOG.warning("Error reading Config file", ex);
       showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
     }
-    
+
     about = new AboutDialog(this, true);
     guide = new GuideDialog(this, true);
-    
+
     setIconImage(new ImageIcon(getClass().getResource("/icons/logo128.png")).getImage());
 
     setTitle("PMTDyno v" + VERSION);
@@ -134,9 +133,9 @@ public class Gui extends javax.swing.JFrame
     jpanEast = new javax.swing.JPanel();
     jComboBoxPort = new javax.swing.JComboBox<>();
     jpanSerialButtons = new javax.swing.JPanel();
-    jbutConnect = new javax.swing.JButton();
-    jbutDisconnect = new javax.swing.JButton();
-    jbutRefreshDevice = new javax.swing.JButton();
+    jConnect = new javax.swing.JButton();
+    jDisconnect = new javax.swing.JButton();
+    jRefreshDevice = new javax.swing.JButton();
     jLabelStatus = new javax.swing.JLabel();
     jChartPanel = new javax.swing.JPanel();
     jMenuBar = new javax.swing.JMenuBar();
@@ -249,37 +248,37 @@ public class Gui extends javax.swing.JFrame
 
     jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-    jbutConnect.setText("Verbinden");
-    jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
-    jbutConnect.addActionListener(new java.awt.event.ActionListener()
+    jConnect.setText("Verbinden");
+    jConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
+    jConnect.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutConnectActionPerformed(evt);
+        jConnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutConnect);
+    jpanSerialButtons.add(jConnect);
 
-    jbutDisconnect.setText("Trennen");
-    jbutDisconnect.setEnabled(false);
-    jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
+    jDisconnect.setText("Trennen");
+    jDisconnect.setEnabled(false);
+    jDisconnect.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutDisconnectActionPerformed(evt);
+        jDisconnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutDisconnect);
+    jpanSerialButtons.add(jDisconnect);
 
-    jbutRefreshDevice.setText("Aktualisieren");
-    jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
+    jRefreshDevice.setText("Aktualisieren");
+    jRefreshDevice.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutRefreshDeviceActionPerformed(evt);
+        jRefreshDeviceActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutRefreshDevice);
+    jpanSerialButtons.add(jRefreshDevice);
 
     jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
 
@@ -440,13 +439,13 @@ public class Gui extends javax.swing.JFrame
       startProgSet();
     }//GEN-LAST:event_jProgSetActionPerformed
 
-    private void jbutConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutConnectActionPerformed
-    {//GEN-HEADEREND:event_jbutConnectActionPerformed
+    private void jConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jConnectActionPerformed
+    {//GEN-HEADEREND:event_jConnectActionPerformed
       connectDevice();
-    }//GEN-LAST:event_jbutConnectActionPerformed
+    }//GEN-LAST:event_jConnectActionPerformed
 
-    private void jbutDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutDisconnectActionPerformed
-    {//GEN-HEADEREND:event_jbutDisconnectActionPerformed
+    private void jDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jDisconnectActionPerformed
+    {//GEN-HEADEREND:event_jDisconnectActionPerformed
       try
       {
         com.disconnect();
@@ -461,23 +460,23 @@ public class Gui extends javax.swing.JFrame
       {
         jStart.setEnabled(com.isConnected());
         jRefresh.setEnabled(com.isConnected());
-        jbutConnect.setEnabled(!com.isConnected());
-        jbutDisconnect.setEnabled(com.isConnected());
-        jbutRefreshDevice.setEnabled(!com.isConnected());
+        jConnect.setEnabled(!com.isConnected());
+        jDisconnect.setEnabled(com.isConnected());
+        jRefreshDevice.setEnabled(!com.isConnected());
         jComboBoxPort.setEnabled(!com.isConnected());
       }
-    }//GEN-LAST:event_jbutDisconnectActionPerformed
+    }//GEN-LAST:event_jDisconnectActionPerformed
 
-    private void jbutRefreshDeviceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutRefreshDeviceActionPerformed
-    {//GEN-HEADEREND:event_jbutRefreshDeviceActionPerformed
+    private void jRefreshDeviceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jRefreshDeviceActionPerformed
+    {//GEN-HEADEREND:event_jRefreshDeviceActionPerformed
       refreshPorts();
-    }//GEN-LAST:event_jbutRefreshDeviceActionPerformed
+    }//GEN-LAST:event_jRefreshDeviceActionPerformed
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuAboutActionPerformed
     {//GEN-HEADEREND:event_jMenuAboutActionPerformed
       about.setLocationRelativeTo(this);
       about.setVisible(true);
-      
+
 //      jFrameAbout.setLocationRelativeTo(this);
 //      jFrameAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
@@ -598,6 +597,8 @@ public class Gui extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
+  private javax.swing.JButton jConnect;
+  private javax.swing.JButton jDisconnect;
   private javax.swing.JMenu jFile;
   private javax.swing.JMenu jHelp;
   private javax.swing.JLabel jLabelStatus;
@@ -615,6 +616,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
   private javax.swing.JButton jRefresh;
+  private javax.swing.JButton jRefreshDevice;
   private javax.swing.JButton jSave;
   private javax.swing.JToolBar.Separator jSeparator1;
   private javax.swing.JToolBar.Separator jSeparator2;
@@ -624,9 +626,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPopupMenu.Separator jSeparator6;
   private javax.swing.JButton jStart;
   private javax.swing.JToolBar jToolBar;
-  private javax.swing.JButton jbutConnect;
-  private javax.swing.JButton jbutDisconnect;
-  private javax.swing.JButton jbutRefreshDevice;
   private javax.swing.JPanel jpanEast;
   private javax.swing.JPanel jpanSerialButtons;
   // End of variables declaration//GEN-END:variables
@@ -1134,11 +1133,11 @@ public class Gui extends javax.swing.JFrame
   {
     if(com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
     {
-      jbutConnect.setEnabled(false);
+      jConnect.setEnabled(false);
     }
     else
     {
-      jbutConnect.setEnabled(true);
+      jConnect.setEnabled(true);
     }
 
     jComboBoxPort.removeAllItems();
@@ -1542,9 +1541,9 @@ public class Gui extends javax.swing.JFrame
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
-    jbutDisconnect.setEnabled(com.isConnected());
-    jbutConnect.setEnabled(!com.isConnected());
-    jbutRefreshDevice.setEnabled(!com.isConnected());
+    jDisconnect.setEnabled(com.isConnected());
+    jConnect.setEnabled(!com.isConnected());
+    jRefreshDevice.setEnabled(!com.isConnected());
     jRefresh.setEnabled(com.isConnected());
     jComboBoxPort.setEnabled(!com.isConnected());
     jStart.setEnabled(com.isConnected());
@@ -1664,8 +1663,5 @@ public class Gui extends javax.swing.JFrame
   {
     return VERSION;
   }
-  
-  
-  
 
 }

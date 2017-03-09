@@ -70,8 +70,8 @@ public class Gui extends javax.swing.JFrame
   private ChartPanel chartPanel;
   private XYSeries seriesTorque = new XYSeries("Drehmoment");
   private XYSeries seriesPower = new XYSeries("Leistung");
-  private XYSeries series1 = new XYSeries("temp1 series");
-  private XYSeries series2 = new XYSeries("temp2 series");
+  private XYSeries series1 = new XYSeries("tempLeistung series");
+  private XYSeries series2 = new XYSeries("tempDrehmoment series");
   private XYSeriesCollection dataset1 = new XYSeriesCollection();
   private XYSeriesCollection dataset2 = new XYSeriesCollection();
 
@@ -172,6 +172,7 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
 
     jFrameAbout.setTitle("Über...");
     jFrameAbout.setLocation(new java.awt.Point(0, 0));
@@ -515,6 +516,16 @@ public class Gui extends javax.swing.JFrame
     });
     jHelp.add(jMenuAbout);
 
+    jMenuItem1.setText("StartWorker");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuItem1);
+
     jMenuBar.add(jHelp);
 
     setJMenuBar(jMenuBar);
@@ -632,6 +643,11 @@ public class Gui extends javax.swing.JFrame
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
+    start();
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -720,6 +736,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuExport;
   private javax.swing.JMenuItem jMenuGuide;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
@@ -856,7 +873,7 @@ public class Gui extends javax.swing.JFrame
     chart.getXYPlot().mapDatasetToRangeAxis(0, 0);//1st dataset to 1st y-axis
     chart.getXYPlot().mapDatasetToRangeAxis(1, 1); //2nd dataset to 2nd y-axis
 
-    // Hinzufuegen von series1 zu der Datenmenge dataset
+    // Hinzufuegen von series zu der Datenmenge dataset
     dataset1.addSeries(seriesPower);
     dataset2.addSeries(seriesTorque);
 
@@ -909,9 +926,6 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
 
-    //jchartframe.setContentPane(chartPanel);
-    //jchartframe.pack();
-    //jchartframe.setVisible(true);
   }
 
   /**
@@ -1610,13 +1624,13 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
     updateChartLabels();
-    
+
     jSave.setEnabled(true);
     jPrint.setEnabled(true);
     jMenuSave.setEnabled(true);
     jMenuPrint.setEnabled(true);
     jMenuExport.setEnabled(true);
-    
+
     LOG.fine("done calculating");
 
   }

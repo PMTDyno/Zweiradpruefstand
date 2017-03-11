@@ -41,7 +41,8 @@ public class VehicleSetDialog extends javax.swing.JDialog
     this.vehicleName = data.getVehicle();
     this.twoStroke = data.isTwoStroke();
 
-    j2Takt.setSelected(this.twoStroke);
+    jButConfirm.requestFocusInWindow();
+
   }
 
   /**
@@ -81,6 +82,13 @@ public class VehicleSetDialog extends javax.swing.JDialog
     jVehicleName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jVehicleName.setText("Honda CWF 125");
     jVehicleName.setMinimumSize(new java.awt.Dimension(60, 20));
+    jVehicleName.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jVehicleNameActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -218,6 +226,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
       j4Takt.setEnabled(false);
     }
   }//GEN-LAST:event_jMeasrpmActionPerformed
+
+  private void jVehicleNameActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jVehicleNameActionPerformed
+  {//GEN-HEADEREND:event_jVehicleNameActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jVehicleNameActionPerformed
 
   /**
    * @param args the command line arguments

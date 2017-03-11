@@ -112,6 +112,8 @@ public class Gui extends javax.swing.JFrame
 
     initChart();
 
+    jComboBoxPort.requestFocusInWindow();
+
   }
 
   @SuppressWarnings("unchecked")

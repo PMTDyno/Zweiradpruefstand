@@ -59,56 +59,18 @@ public class MeasureDialog extends javax.swing.JDialog
     DialTextAnnotation annotation = new DialTextAnnotation("km/h");
     annotation.setFont(new Font(null, Font.BOLD, 20));
     plot.addLayer(annotation);
-    
-    
 
     StandardDialScale scale = new StandardDialScale(0, 100,
                                                     -120, -300, 10, 4);
-    
+
     scale.setTickRadius(0.88);
     scale.setTickLabelOffset(0.20);
     plot.addScale(0, scale);
 
-    jFrameChart.setUI(null);
-    jFrameChart.add(new ChartPanel(new JFreeChart(plot)));
-    jFrameChart.pack();
-    jFrameChart.setSize(1000, 1000);
-
-//    new Thread(() ->
-//    {
-//      int time = 10;
-//      
-//      try
-//      {
-//        double value = 0;
-//        while(true)
-//        {
-//          while(true)
-//          {
-//            Thread.sleep(time);
-//            dataset.setValue(value);
-//            if(value > 99)
-//              break;
-//            
-//            value+=1;
-//          }
-//          while(true)
-//          {
-//            Thread.sleep(time);
-//            dataset.setValue(value);
-//            if(value < 1)
-//              break;
-//            
-//            value-=1;
-//          }
-//        }
-//        
-//      }
-//      catch (InterruptedException ex)
-//      {
-//        java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(Level.SEVERE, null, ex);
-//      }
-//    }).start();
+    jFrameDial.setUI(null);
+    jFrameDial.add(new ChartPanel(new JFreeChart(plot)));
+    jFrameDial.pack();
+    jFrameDial.setSize(500, 500);
 
   }
 
@@ -130,11 +92,11 @@ public class MeasureDialog extends javax.swing.JDialog
   {
 
     jPanelButtons = new javax.swing.JPanel();
-    jButton1 = new javax.swing.JButton();
-    jButton3 = new javax.swing.JButton();
+    jbutCancel = new javax.swing.JButton();
+    jbutFinish = new javax.swing.JButton();
     jPanelInfo = new javax.swing.JPanel();
     jPanelDial = new javax.swing.JPanel();
-    jFrameChart = new javax.swing.JInternalFrame();
+    jFrameDial = new javax.swing.JInternalFrame();
     jPanelStatus = new javax.swing.JPanel();
     jLabel = new javax.swing.JLabel();
     jProgressBar = new javax.swing.JProgressBar();
@@ -142,26 +104,26 @@ public class MeasureDialog extends javax.swing.JDialog
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setResizable(false);
 
-    jButton1.setText("Abbrechen");
-    jButton1.addActionListener(new java.awt.event.ActionListener()
+    jbutCancel.setText("Abbrechen");
+    jbutCancel.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jButton1ActionPerformed(evt);
+        jbutCancelActionPerformed(evt);
       }
     });
-    jPanelButtons.add(jButton1);
+    jPanelButtons.add(jbutCancel);
 
-    jButton3.setText("Messung fertigstellen");
-    jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jButton3.addActionListener(new java.awt.event.ActionListener()
+    jbutFinish.setText("Messung fertigstellen");
+    jbutFinish.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jbutFinish.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jButton3ActionPerformed(evt);
+        jbutFinishActionPerformed(evt);
       }
     });
-    jPanelButtons.add(jButton3);
+    jPanelButtons.add(jbutFinish);
 
     getContentPane().add(jPanelButtons, java.awt.BorderLayout.SOUTH);
 
@@ -169,8 +131,8 @@ public class MeasureDialog extends javax.swing.JDialog
 
     jPanelDial.setLayout(new java.awt.GridLayout(1, 0));
 
-    jFrameChart.setVisible(true);
-    jPanelDial.add(jFrameChart);
+    jFrameDial.setVisible(true);
+    jPanelDial.add(jFrameDial);
 
     jPanelInfo.add(jPanelDial, java.awt.BorderLayout.CENTER);
 
@@ -192,15 +154,15 @@ public class MeasureDialog extends javax.swing.JDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
-  {//GEN-HEADEREND:event_jButton1ActionPerformed
+  private void jbutCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutCancelActionPerformed
+  {//GEN-HEADEREND:event_jbutCancelActionPerformed
     abort();
-  }//GEN-LAST:event_jButton1ActionPerformed
+  }//GEN-LAST:event_jbutCancelActionPerformed
 
-  private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
-  {//GEN-HEADEREND:event_jButton3ActionPerformed
+  private void jbutFinishActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutFinishActionPerformed
+  {//GEN-HEADEREND:event_jbutFinishActionPerformed
     finish();
-  }//GEN-LAST:event_jButton3ActionPerformed
+  }//GEN-LAST:event_jbutFinishActionPerformed
 
   /**
    * @param args the command line arguments
@@ -241,15 +203,15 @@ public class MeasureDialog extends javax.swing.JDialog
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton1;
-  private javax.swing.JButton jButton3;
-  private javax.swing.JInternalFrame jFrameChart;
+  private javax.swing.JInternalFrame jFrameDial;
   private javax.swing.JLabel jLabel;
   private javax.swing.JPanel jPanelButtons;
   private javax.swing.JPanel jPanelDial;
   private javax.swing.JPanel jPanelInfo;
   private javax.swing.JPanel jPanelStatus;
   private javax.swing.JProgressBar jProgressBar;
+  private javax.swing.JButton jbutCancel;
+  private javax.swing.JButton jbutFinish;
   // End of variables declaration//GEN-END:variables
 
   private void abort()
@@ -286,6 +248,7 @@ public class MeasureDialog extends javax.swing.JDialog
   {
     worker.execute();
     jProgressBar.setIndeterminate(true);
+    jbutFinish.requestFocusInWindow();
   }
 
   /**
@@ -302,7 +265,7 @@ public class MeasureDialog extends javax.swing.JDialog
     @Override
     protected void process(List<Double> chunks)
     {
-      
+
 //      jLabelStatus.setText(String.valueOf(chunks.get(0).intValue()));
       jProgressBar.setString(String.valueOf(chunks.get(0).intValue()));
       dataset.setValue(chunks.get(1));

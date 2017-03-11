@@ -119,7 +119,7 @@ public class AboutDialog extends javax.swing.JDialog
 
     getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
 
-    jPanelInfo2.setLayout(new java.awt.GridLayout());
+    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
 
     jLabelDate.setText("2016-2017");
     jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()

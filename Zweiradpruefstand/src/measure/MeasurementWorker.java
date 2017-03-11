@@ -63,35 +63,33 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
                                                          Exception
   {
     LOG.fine("Worker gestartet");
-    
-    //WSS - rpm - TIME
 
-    int cnt = 0;
-    double power = 0;
-    while(true)
-    {
-      Double[] val = {cnt*1.0, power};
-      publish(val);
-      
-      
-      
-      power = Math.sin(cnt/180.0*Math.PI)*20+30;
-      System.out.println(power);
-      
-      
-      cnt++;
-      
-      if(cnt >= 360)
-        cnt = 0;
-      
-      if(cnt > 10000 || isCancelled() || stopRequest.get())
-        break;
-      
-      Thread.sleep(data.getPeriodTimeMs());
-    }
-    
-    
-    
+    //WSS - RPM - TIME
+//    int cnt = 0;
+//    double power = 0;
+//    while(true)
+//    {
+//      Double[] val =
+//      {
+//        cnt * 1.0, power
+//      };
+//
+//      publish(val);
+//
+//      power = Math.sin(cnt / 180.0 * Math.PI) * 20 + 30;
+//      System.out.println(power);
+//
+//      cnt++;
+//
+//      if(cnt >= 360)
+//        cnt = 0;
+//
+//      if(cnt > 10000 || isCancelled() || stopRequest.get())
+//        break;
+//
+//      Thread.sleep(data.getPeriodTimeMs());
+//    }
+
     try
     {
       RawDatapoint dp;
@@ -105,7 +103,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
           LOG.finest("Cancel triggered!");
           return null;
         }
-        
+
         if(data.isMeasRPM())
           com.sendFrame(Communication.Request.START);
         else
@@ -129,7 +127,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
           break;
         }
         Thread.sleep(data.getPeriodTimeMs());
-        
+
         //automatic starting of measurement when rpm is higher than...
       } while(rpm < data.getStartRPM());
 
@@ -138,10 +136,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       while(true)
       {
         count++;
-        int wss = Integer.parseInt(list.get(count-1).getWss());
+        int wss = Integer.parseInt(list.get(count - 1).getWss());
         double speed = 1 / ((wss / 1000000.0) * 26) * 2 * Math.PI * 0.175 * 3.6;
-        Double[] value = {count*1.0, speed};
-        
+        Double[] value =
+        {
+          count * 1.0, speed
+        };
+
         publish(value);
 
         if(data.isMeasRPM())
@@ -218,7 +219,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       LOG.severe("No response from controller - Timeout");
       throw ex;
     }
-    catch(InterruptedException ex)
+    catch (InterruptedException ex)
     {
       return null;
     }

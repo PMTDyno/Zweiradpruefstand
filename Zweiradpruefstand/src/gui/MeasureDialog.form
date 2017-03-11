@@ -33,21 +33,21 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="jbutCancel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Abbrechen"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbutCancelActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton3">
+        <Component class="javax.swing.JButton" name="jbutFinish">
           <Properties>
             <Property name="text" type="java.lang.String" value="Messung fertigstellen"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbutFinishActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -73,7 +73,7 @@
             <Property name="rows" type="int" value="1"/>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JInternalFrame" name="jFrameChart">
+            <Container class="javax.swing.JInternalFrame" name="jFrameDial">
               <Properties>
                 <Property name="visible" type="boolean" value="true"/>
               </Properties>

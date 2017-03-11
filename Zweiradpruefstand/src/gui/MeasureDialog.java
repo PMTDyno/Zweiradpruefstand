@@ -2,10 +2,13 @@ package gui;
 
 import data.Data;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.List;
 import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.plaf.ProgressBarUI;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 import measure.Communication;
 import measure.MeasurementWorker;
 import org.jfree.chart.ChartPanel;
@@ -13,7 +16,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.dial.DialPlot;
 import org.jfree.chart.plot.dial.DialPointer;
 import org.jfree.chart.plot.dial.DialTextAnnotation;
-import org.jfree.chart.plot.dial.DialValueIndicator;
 import org.jfree.chart.plot.dial.StandardDialFrame;
 import org.jfree.chart.plot.dial.StandardDialScale;
 import org.jfree.data.general.DefaultValueDataset;
@@ -55,7 +57,9 @@ public class MeasureDialog extends javax.swing.JDialog
     plot.setDialFrame(new StandardDialFrame());
     plot.addLayer(new DialPointer.Pointer());
     DialTextAnnotation annotation = new DialTextAnnotation("km/h");
+    annotation.setFont(new Font(null, Font.BOLD, 20));
     plot.addLayer(annotation);
+    
     
 
     StandardDialScale scale = new StandardDialScale(0, 100,
@@ -133,7 +137,6 @@ public class MeasureDialog extends javax.swing.JDialog
     jFrameChart = new javax.swing.JInternalFrame();
     jPanelStatus = new javax.swing.JPanel();
     jLabel = new javax.swing.JLabel();
-    jLabelStatus = new javax.swing.JLabel();
     jProgressBar = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -174,11 +177,12 @@ public class MeasureDialog extends javax.swing.JDialog
     jLabel.setText("Anzahl der Messpunkte: ");
     jPanelStatus.add(jLabel);
 
-    jLabelStatus.setText("0");
-    jPanelStatus.add(jLabelStatus);
-
-    jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+    jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+    jProgressBar.setToolTipText("Anzahl der Messpunkte");
+    jProgressBar.setIndeterminate(true);
     jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
+    jProgressBar.setString("0");
+    jProgressBar.setStringPainted(true);
     jPanelStatus.add(jProgressBar);
 
     jPanelInfo.add(jPanelStatus, java.awt.BorderLayout.PAGE_START);
@@ -241,7 +245,6 @@ public class MeasureDialog extends javax.swing.JDialog
   private javax.swing.JButton jButton3;
   private javax.swing.JInternalFrame jFrameChart;
   private javax.swing.JLabel jLabel;
-  private javax.swing.JLabel jLabelStatus;
   private javax.swing.JPanel jPanelButtons;
   private javax.swing.JPanel jPanelDial;
   private javax.swing.JPanel jPanelInfo;
@@ -300,8 +303,8 @@ public class MeasureDialog extends javax.swing.JDialog
     protected void process(List<Double> chunks)
     {
       
-      jLabelStatus.setText(String.valueOf(chunks.get(0).intValue()));
-      
+//      jLabelStatus.setText(String.valueOf(chunks.get(0).intValue()));
+      jProgressBar.setString(String.valueOf(chunks.get(0).intValue()));
       dataset.setValue(chunks.get(1));
     }
 

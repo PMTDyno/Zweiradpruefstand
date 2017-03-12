@@ -5,10 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
 import java.util.logging.Level;
+import javax.swing.JInternalFrame;
 import logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.plaf.ProgressBarUI;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 import measure.Communication;
 import measure.MeasurementWorker;
 import org.jfree.chart.ChartPanel;
@@ -30,9 +29,11 @@ public class MeasureDialog extends javax.swing.JDialog
   private static final Logger LOG = Logger.getLogger(MeasureDialog.class.getName());
 
   private final Data data = Data.getInstance();
+  private final DefaultValueDataset dataset = new DefaultValueDataset(0);
+  
   private Gui gui;
   private Measure worker;
-  private DefaultValueDataset dataset;
+  
 
   /**
    * Creates new form LoadingFrame
@@ -51,27 +52,7 @@ public class MeasureDialog extends javax.swing.JDialog
 
     initComponents();
 
-    dataset = new DefaultValueDataset(0);
-
-    DialPlot plot = new DialPlot(dataset);
-    plot.setDialFrame(new StandardDialFrame());
-    plot.addLayer(new DialPointer.Pointer());
-    DialTextAnnotation annotation = new DialTextAnnotation("km/h");
-    annotation.setFont(new Font(null, Font.BOLD, 20));
-    plot.addLayer(annotation);
-
-    StandardDialScale scale = new StandardDialScale(0, 100,
-                                                    -120, -300, 10, 4);
-
-    scale.setTickRadius(0.88);
-    scale.setTickLabelOffset(0.20);
-    plot.addScale(0, scale);
-
-    jFrameDial.setUI(null);
-    jFrameDial.add(new ChartPanel(new JFreeChart(plot)));
-    jFrameDial.pack();
-    jFrameDial.setSize(500, 500);
-
+    createDial(dataset, "km/h", jFrameSpeed);
   }
 
   public void init(Gui gui, Communication com)
@@ -96,7 +77,7 @@ public class MeasureDialog extends javax.swing.JDialog
     jbutFinish = new javax.swing.JButton();
     jPanelInfo = new javax.swing.JPanel();
     jPanelDial = new javax.swing.JPanel();
-    jFrameDial = new javax.swing.JInternalFrame();
+    jFrameSpeed = new javax.swing.JInternalFrame();
     jPanelStatus = new javax.swing.JPanel();
     jLabel = new javax.swing.JLabel();
     jProgressBar = new javax.swing.JProgressBar();
@@ -131,8 +112,9 @@ public class MeasureDialog extends javax.swing.JDialog
 
     jPanelDial.setLayout(new java.awt.GridLayout(1, 0));
 
-    jFrameDial.setVisible(true);
-    jPanelDial.add(jFrameDial);
+    jFrameSpeed.setVisible(true);
+    jFrameSpeed.getContentPane().setLayout(new java.awt.GridLayout(1, 1));
+    jPanelDial.add(jFrameSpeed);
 
     jPanelInfo.add(jPanelDial, java.awt.BorderLayout.CENTER);
 
@@ -203,7 +185,7 @@ public class MeasureDialog extends javax.swing.JDialog
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JInternalFrame jFrameDial;
+  private javax.swing.JInternalFrame jFrameSpeed;
   private javax.swing.JLabel jLabel;
   private javax.swing.JPanel jPanelButtons;
   private javax.swing.JPanel jPanelDial;
@@ -232,6 +214,29 @@ public class MeasureDialog extends javax.swing.JDialog
   private void close()
   {
     super.dispose();
+  }
+  
+  private void createDial(DefaultValueDataset set, String title, JInternalFrame frame)
+  {
+    
+    DialPlot plot = new DialPlot(set);
+    plot.setDialFrame(new StandardDialFrame());
+    plot.addLayer(new DialPointer.Pointer());
+    DialTextAnnotation annotation = new DialTextAnnotation(title);
+    annotation.setFont(new Font(null, Font.BOLD, 20));
+    plot.addLayer(annotation);
+
+    StandardDialScale scale = new StandardDialScale(0, 100,
+                                                    -120, -300, 10, 4);
+
+    scale.setTickRadius(0.88);
+    scale.setTickLabelOffset(0.20);
+    plot.addScale(0, scale);
+
+    frame.setUI(null);
+    frame.add(new ChartPanel(new JFreeChart(plot)));
+    frame.pack();
+    frame.setSize(500, 500);
   }
 
   @Override

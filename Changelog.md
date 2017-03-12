@@ -1,40 +1,43 @@
 ##Version History and planned Features  
 
-####v0.1
+Features marked with an ![d] are done.  
+Features without an ![d] are planned.  
+
+###v0.1
 * ![d] GUI
 
-####v0.2
+###v0.2
 * ![d] JFreeChart
 * ![d] variety of settings
 
-####v0.3
-* ![d] save picture
-* ![d] print
+###v0.3
+* ![d] save chart as picture
+* ![d] print chart
 * ![d] save/load settings
 
-####v0.4
+###v0.4
 * ![d] GUI for communication
-* ![d] prototype communication with µC
+* ![d] prototype communication with uC
 
-####v0.5
+###v0.5
 * ![d] Measuring and calculating
 * ![d] Worker for measuring
 
-####v0.6
+###v0.6
 * ![d] inertia possible to change
 * ![d] period time possible to change
 * ![d] maximum measure time possible to change
 * ![d] Config class
 * ![d] Error Messages
 
-####v0.7
+###v0.7
 * ![d] Com improvements
 * ![d] Instruction Page
 * ![d] legend chart improvements
 * ![d] measure in progress signal
 * ![d] second axis
 
-####v0.8
+###v0.8
 * ![d] Refresh
 * ![d] Documentation
 
@@ -47,7 +50,7 @@
 * ![d] Singleton Config and Data class
 * ![d] Better version handling
 
-####v0.9
+###v0.9
 * ![d] Complete new communication  
 * ![d] Acknowledge  
 * ![d] Checksum  
@@ -59,7 +62,8 @@
 * ![d] Remove ACK and Package
 * ![d] Cleaning
 * ![d] Performance  
-* ![d] Calculation and filtering
+* ![d] Calculation and filt
+* ![d] New Designering
 * ![d] Loading Screen
 * ![d] New Design
 * ![d] Export .pmt File
@@ -75,10 +79,12 @@
 
 ####v0.9.9
 * ![d] Added Speed Tachometer during Measurement
-* ![d] converted About and Guide to JDialog
+* ![d] converted About and Guide to JDialog class
+* ![d] Small Design improvements
+* ![d] Request Focus of Buttons
 
-####v1.0
-* Measurement working!
+##v1.0
+* Measurement with referential bike correct
   
   
 

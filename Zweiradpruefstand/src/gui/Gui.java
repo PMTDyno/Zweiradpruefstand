@@ -1098,9 +1098,11 @@ public class Gui extends javax.swing.JFrame
     {
       //TAKT
       if(data.isTwoStroke() != vehicleset.isTwoStroke())
-      {
         data.setTwoStroke(vehicleset.isTwoStroke());
-      }
+
+      //TRANSMISSION
+      if(data.isAutomatic() != vehicleset.isAutomatic())
+        data.setAutomatic(vehicleset.isAutomatic());
 
       //MEASrpm
       if(data.isMeasRPM() != vehicleset.isMeasRpm())

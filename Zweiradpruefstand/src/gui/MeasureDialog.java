@@ -53,6 +53,7 @@ public class MeasureDialog extends javax.swing.JDialog
     initComponents();
 
     createDial(dataset, "km/h", jFrameSpeed);
+//    createDial(new DefaultValueDataset(0), "rpm", jFrameSpeed);
   }
 
   public void init(Gui gui, Communication com)

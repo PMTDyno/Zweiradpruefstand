@@ -19,6 +19,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private boolean measRpm = false;
   private boolean confirmed = false;
   private boolean twoStroke;
+  private boolean automatic;
   private String vehicleName;
 
   /**
@@ -57,6 +58,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
     java.awt.GridBagConstraints gridBagConstraints;
 
     taktButGroup = new javax.swing.ButtonGroup();
+    transmissionButGroup = new javax.swing.ButtonGroup();
     jPanel5 = new javax.swing.JPanel();
     jPanel6 = new javax.swing.JPanel();
     jVehicleName = new javax.swing.JTextField();
@@ -66,6 +68,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
     jPanel4 = new javax.swing.JPanel();
     j2Takt = new javax.swing.JRadioButton();
     j4Takt = new javax.swing.JRadioButton();
+    jPanel8 = new javax.swing.JPanel();
+    jManual = new javax.swing.JRadioButton();
+    jAutomatic = new javax.swing.JRadioButton();
     jPanel7 = new javax.swing.JPanel();
     jPanel1 = new javax.swing.JPanel();
     jButCancel = new javax.swing.JButton();
@@ -102,7 +107,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
     jPanel6.add(jLabel1, gridBagConstraints);
 
-    jPanel5.add(jPanel6, new java.awt.GridBagConstraints());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.gridwidth = 2;
+    jPanel5.add(jPanel6, gridBagConstraints);
 
     jMeasRpm.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jMeasRpm.setSelected(true);
@@ -119,6 +128,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridwidth = 2;
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
     jPanel5.add(jPanel3, gridBagConstraints);
 
@@ -126,7 +136,6 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     taktButGroup.add(j2Takt);
     j2Takt.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-    j2Takt.setSelected(true);
     j2Takt.setText("2 Takt");
     j2Takt.addActionListener(new java.awt.event.ActionListener()
     {
@@ -156,6 +165,45 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
     jPanel5.add(jPanel4, gridBagConstraints);
+
+    jPanel8.setLayout(new java.awt.GridBagLayout());
+
+    transmissionButGroup.add(jManual);
+    jManual.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jManual.setSelected(true);
+    jManual.setText("Schaltgetriebe");
+    jManual.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jManualActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel8.add(jManual, gridBagConstraints);
+
+    transmissionButGroup.add(jAutomatic);
+    jAutomatic.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jAutomatic.setText("Automatik");
+    jAutomatic.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jAutomaticActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanel8.add(jAutomatic, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 0);
+    jPanel5.add(jPanel8, gridBagConstraints);
 
     getContentPane().add(jPanel5, java.awt.BorderLayout.CENTER);
 
@@ -219,11 +267,15 @@ public class VehicleSetDialog extends javax.swing.JDialog
     {
       j2Takt.setEnabled(true);
       j4Takt.setEnabled(true);
+      jManual.setEnabled(true);
+      jAutomatic.setEnabled(true);
     }
     else
     {
       j2Takt.setEnabled(false);
       j4Takt.setEnabled(false);
+      jManual.setEnabled(false);
+      jAutomatic.setEnabled(false);
     }
   }//GEN-LAST:event_jMeasrpmActionPerformed
 
@@ -231,6 +283,16 @@ public class VehicleSetDialog extends javax.swing.JDialog
   {//GEN-HEADEREND:event_jVehicleNameActionPerformed
     // TODO add your handling code here:
   }//GEN-LAST:event_jVehicleNameActionPerformed
+
+  private void jManualActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jManualActionPerformed
+  {//GEN-HEADEREND:event_jManualActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jManualActionPerformed
+
+  private void jAutomaticActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jAutomaticActionPerformed
+  {//GEN-HEADEREND:event_jAutomaticActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jAutomaticActionPerformed
 
   /**
    * @param args the command line arguments
@@ -277,9 +339,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JRadioButton j2Takt;
   private javax.swing.JRadioButton j4Takt;
+  private javax.swing.JRadioButton jAutomatic;
   private javax.swing.JButton jButCancel;
   private javax.swing.JButton jButConfirm;
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JRadioButton jManual;
   private javax.swing.JCheckBox jMeasRpm;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel3;
@@ -287,8 +351,10 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanel5;
   private javax.swing.JPanel jPanel6;
   private javax.swing.JPanel jPanel7;
+  private javax.swing.JPanel jPanel8;
   private javax.swing.JTextField jVehicleName;
   private javax.swing.ButtonGroup taktButGroup;
+  private javax.swing.ButtonGroup transmissionButGroup;
   // End of variables declaration//GEN-END:variables
 
   /*---PUBLIC METHODS----------------------------------*/
@@ -307,6 +373,10 @@ public class VehicleSetDialog extends javax.swing.JDialog
       //TAKT
       j2Takt.setSelected(twoStroke);
       j4Takt.setSelected(!twoStroke);
+      
+      //TRANSMISSION
+      jAutomatic.setSelected(automatic);
+      jManual.setSelected(!automatic);
 
       //VEHICLENAME
       jVehicleName.setText(vehicleName);
@@ -338,6 +408,12 @@ public class VehicleSetDialog extends javax.swing.JDialog
     return measRpm;
   }
 
+  public boolean isAutomatic()
+  {
+    return automatic;
+  }
+
+  
   /**
    * @return true if the settings have changed
    */
@@ -357,6 +433,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
     //TAKT
     twoStroke = j2Takt.isSelected();
 
+    //TRANSMISSION
+    automatic = jAutomatic.isSelected();
+    
     //MEASRPM
     measRpm = jMeasRpm.isSelected();
 

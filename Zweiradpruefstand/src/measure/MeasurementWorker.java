@@ -67,31 +67,32 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     LOG.fine("Worker gestartet");
 
     //WSS - RPM - TIME
-    int cnt = 0;
-    double power = 0;
-    double umin = 0;
-    while(true)
-    {
-      Double[] val =
-      {
-        cnt * 1.0, power, umin
-      };
+//    int cnt = 0;
+//    double power = 0;
+//    double umin = 0;
+//    while(true)
+//    {
+//      Double[] val =
+//      {
+//        cnt * 1.0, power, umin
+//      };
+//
+//      publish(val);
+//
+//      power = Math.sin(cnt / 180.0 * Math.PI) * 20 + 30;
+//      umin = power * 100;
+//
+//      cnt++;
+//
+//      if(cnt >= 360)
+//        cnt = 0;
+//
+//      if(cnt > 10000 || isCancelled() || stopRequest.get())
+//        break;
+//
+//      Thread.sleep(data.getPeriodTimeMs());
+//    }
 
-      publish(val);
-
-      power = Math.sin(cnt / 180.0 * Math.PI) * 20 + 30;
-      umin = power * 100;
-
-      cnt++;
-
-      if(cnt >= 360)
-        cnt = 0;
-
-      if(cnt > 10000 || isCancelled() || stopRequest.get())
-        break;
-
-      Thread.sleep(data.getPeriodTimeMs());
-    }
     try
     {
       RawDatapoint dp;

@@ -2,6 +2,10 @@ package data;
 
 /**
  *
+ * wss - rad/s <br>
+ * rpm - U/min <br>
+ * time - seconds <br>
+ * 
  * @author levin
  */
 public class Datapoint
@@ -9,7 +13,7 @@ public class Datapoint
 
   private double wss;  // rad/s
   private double rpm;  // U/min
-  private double time; // 
+  private double time; // seconds
 
   /**
    *

@@ -800,11 +800,13 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
-    MeasureDialog loading = new MeasureDialog(this, true);
-    loading.init(this, com);
+
     if(!startVehicleSet())
       return;
-
+    
+    MeasureDialog loading = new MeasureDialog(this, true);
+    loading.init(this, com);
+    
     enableCancelling();
 
     loading.startMeasurement();
@@ -1445,7 +1447,7 @@ public class Gui extends javax.swing.JFrame
       series1.clear();
       series2.clear();
 
-      if(!data.isMeasRPM()||data.isAutomatic())
+      if(!data.isMeasRPM() || data.isAutomatic())
       {
         for(int i = 0; i < trq.size(); i++)
         {
@@ -1502,11 +1504,11 @@ public class Gui extends javax.swing.JFrame
 
     }
   }
-  
-    /**
-     * Sets the Port and tries to connect to the Device.<br>
-     * Then updates the Ecosystem.
-     */
+
+  /**
+   * Sets the Port and tries to connect to the Device.<br>
+   * Then updates the Ecosystem.
+   */
   private void connectDevice()
   {
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

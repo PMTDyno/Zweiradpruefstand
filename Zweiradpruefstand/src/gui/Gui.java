@@ -1303,9 +1303,9 @@ public class Gui extends javax.swing.JFrame
    */
   private void calculate()
   {
+
     //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
     //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
-
     LOG.fine("calculating...");
 
     double inertia = data.getInertia();
@@ -1366,148 +1366,147 @@ public class Gui extends javax.swing.JFrame
     {
       rpm = filterValuesOrder(rpm, 0.09, 3);
       //uebersetzungsverhaeltnis:
-      try
-      {
-        n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(10) / (rpm.get(10) / 60 * 2 * Math.PI))) / 2;
-      }
-      catch (IndexOutOfBoundsException ex)
-      {
-        showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
-        return;
-      }
 
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
-        trq.add(alpha.get(i) * inertia * n);  //M=dOmega/dt * J
-      }
-    }
-
-    //index ermitteln, ab dem moment negativ ist und somit schleppmoment vorhanden ist
-    int limitSchl = 0;
-    try
-    {
-      for(limitSchl = getValMaxIndex(omega); true; limitSchl++)
-      {
-        if(trq.get(limitSchl) < 0)
+        try
         {
-          break;
+          trq.add(alpha.get(i) * inertia * ((omega.get(i) / (rpm.get(i) / 60 * 2 * 3.14)) + (omega.get(i + 1) / (rpm.get(i + 1) / 60 * 2 * Math.PI))) / 2);  //M=dOmega/dt * J
+        }
+        catch (IndexOutOfBoundsException ex)
+        {
+          showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
+          return;
         }
       }
-    }
-    catch (IndexOutOfBoundsException ex)
-    {
-      schleppEnable = false;
-      LOG.info("No Towing Torque");
-      JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Kein Schleppmoment", JOptionPane.INFORMATION_MESSAGE);
-    }
 
-    //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
-    if(schleppEnable)
-    {
-      trqSchl = new ArrayList<>(trq.subList(limitSchl, trq.size()));
-      omegaSchl = new ArrayList<>(omega.subList(limitSchl, omega.size()));
-//      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
-
-      for(int i2 = 0; i2 < limitSchl; i2++)
+      //index ermitteln, ab dem moment negativ ist und somit schleppmoment vorhanden ist
+      int limitSchl = 0;
+      try
       {
-        for(int i = 0; i < trqSchl.size(); i++)
+        for(limitSchl = getValMaxIndex(omega); true; limitSchl++)
         {
-          if(omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
+          if(trq.get(limitSchl) < 0)
           {
-            if(trqSchl.get(i) > 0)
-            {
-              break;
-            }
-            trq.set(i2, trq.get(i2) + trqSchl.get(i) * -1);
-            i2++;
+            break;
           }
         }
       }
-
-      trq = filterValuesOrder(trq, 0.13, 2);
-    }
-
-    //leistung berechnen
-    if(!data.isMeasRPM())
-    {
-      for(int i = 0; i < trq.size(); i++)
+      catch (IndexOutOfBoundsException ex)
       {
-        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
+        schleppEnable = false;
+        LOG.info("No Towing Torque");
+        JOptionPane.showMessageDialog(this, "Berechnung erfolgt ohne Berücksichtigung des Schleppmoments", "Kein Schleppmoment", JOptionPane.INFORMATION_MESSAGE);
       }
-    }
-    else
-    {
-      for(int i = 0; i < trq.size(); i++)
+
+      //schleppmoment zu motormoment addieren, falls schleppmoment vorhanden ist
+      if(schleppEnable)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
+        trqSchl = new ArrayList<>(trq.subList(limitSchl, trq.size()));
+        omegaSchl = new ArrayList<>(omega.subList(limitSchl, omega.size()));
+//      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
+
+        for(int i2 = 0; i2 < limitSchl; i2++)
+        {
+          for(int i = 0; i < trqSchl.size(); i++)
+          {
+            if(omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
+            {
+              if(trqSchl.get(i) > 0)
+              {
+                break;
+              }
+              trq.set(i2, trq.get(i2) + trqSchl.get(i) * -1);
+              i2++;
+            }
+          }
+        }
+
+        trq = filterValuesOrder(trq, 0.13, 2);
       }
-    }
 
-    series1.clear();
-    series2.clear();
-
-    if(!data.isMeasRPM())
-    {
-      for(int i = 0; i < trq.size(); i++)
+      //leistung berechnen
+      if(!data.isMeasRPM())
       {
+        for(int i = 0; i < trq.size(); i++)
+        {
+          pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
+        }
+      }
+      else
+      {
+        for(int i = 0; i < trq.size(); i++)
+        {
+          pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
+        }
+      }
+
+      series1.clear();
+      series2.clear();
+
+      if(!data.isMeasRPM()||data.isAutomatic())
+      {
+        for(int i = 0; i < trq.size(); i++)
+        {
 //        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Geschwindigkeit: " + (omega.get(i) * 0.175 * 3.6));
-        if(i == getValMaxIndex(omega))
-        {
-          break;
-        }
-        series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
-        series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
+          if(i == getValMaxIndex(omega))
+          {
+            break;
+          }
+          series1.add(omega.get(i) * 0.175 * 3.6, pwr.get(i));
+          series2.add(omega.get(i) * 0.175 * 3.6, trq.get(i));
 
+        }
       }
-    }
-    else
-    {
-      for(int i = 0; i < trq.size(); i++)
+      else
       {
-//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
-        if(i == getValMaxIndex(rpm))
+        for(int i = 0; i < trq.size(); i++)
         {
-          break;
+//        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
+          if(i == getValMaxIndex(rpm))
+          {
+            break;
+          }
+
+          series1.add(rpm.get(i), pwr.get(i));
+          series2.add(rpm.get(i), trq.get(i));
+
         }
-
-        series1.add(rpm.get(i), pwr.get(i));
-        series2.add(rpm.get(i), trq.get(i));
-
       }
+
+      dataset1.removeSeries(seriesPower);
+      seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
+      dataset1.addSeries(seriesPower);
+
+      dataset2.removeSeries(seriesTorque);
+      seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
+      dataset2.addSeries(seriesTorque);
+      seriesTorque.setKey("Drehmoment [Nm]");
+
+      if(!data.isMeasRPM())
+        chart.getXYPlot().getDomainAxis().setLabel("Geschwindigkeit [km/h]");
+      else
+        chart.getXYPlot().getDomainAxis().setLabel("Motordrehzahl [U/m]");
+
+      chart.fireChartChanged();
+      updateChartLabels();
+
+      jSave.setEnabled(true);
+      jPrint.setEnabled(true);
+      jMenuSave.setEnabled(true);
+      jMenuPrint.setEnabled(true);
+      jMenuExport.setEnabled(true);
+
+      LOG.fine("done calculating");
+
     }
-
-    dataset1.removeSeries(seriesPower);
-    seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
-    dataset1.addSeries(seriesPower);
-
-    dataset2.removeSeries(seriesTorque);
-    seriesTorque = correctByFactor(series2, "Drehmoment", data.getCorrectionTorque());
-    dataset2.addSeries(seriesTorque);
-    seriesTorque.setKey("Drehmoment [Nm]");
-
-    if(!data.isMeasRPM())
-      chart.getXYPlot().getDomainAxis().setLabel("Geschwindigkeit [km/h]");
-    else
-      chart.getXYPlot().getDomainAxis().setLabel("Motordrehzahl [U/m]");
-
-    chart.fireChartChanged();
-    updateChartLabels();
-
-    jSave.setEnabled(true);
-    jPrint.setEnabled(true);
-    jMenuSave.setEnabled(true);
-    jMenuPrint.setEnabled(true);
-    jMenuExport.setEnabled(true);
-
-    LOG.fine("done calculating");
-
   }
-
-  /**
-   * Sets the Port and tries to connect to the Device.<br>
-   * Then updates the Ecosystem.
-   */
+  
+    /**
+     * Sets the Port and tries to connect to the Device.<br>
+     * Then updates the Ecosystem.
+     */
   private void connectDevice()
   {
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

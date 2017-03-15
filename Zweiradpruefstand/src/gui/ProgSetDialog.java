@@ -214,7 +214,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jWidth.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jWidth.setText("0000");
     jWidth.setToolTipText("Breite");
-    jWidth.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+    jWidth.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
     jWidth.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -286,8 +286,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanel7.setLayout(new java.awt.GridBagLayout());
 
     jSpinCorrectPower.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
-    jSpinCorrectPower.setName(""); // NOI18N
-    jSpinCorrectPower.setValue(1);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -311,8 +309,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanel7.add(jLabel6, gridBagConstraints);
 
     jSpinCorrectTorque.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
-    jSpinCorrectTorque.setName(""); // NOI18N
-    jSpinCorrectTorque.setValue(1);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;

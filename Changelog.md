@@ -78,10 +78,13 @@ Features without an ![d] are planned.
 * ![d] Bug fixes
 
 ####v0.9.9
-* ![d] Added Speed Tachometer during Measurement
+* ![d] Added Speed Tachometer
+* ![d] Added RPM Tachometer 
 * ![d] converted About and Guide to JDialog class
 * ![d] Small Design improvements
 * ![d] Request Focus of Buttons
+* ![d] fixed support for Linux
+* ![d] Added automatic/manual setting
 
 ##v1.0
 * Measurement with referential bike correct

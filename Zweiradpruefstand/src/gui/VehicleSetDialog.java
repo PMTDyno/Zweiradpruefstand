@@ -25,7 +25,6 @@ public class VehicleSetDialog extends javax.swing.JDialog
   /**
    * Creates the frame with the given values
    *
-   *
    * @param parent The parent Frame
    * @param modal  specifies whether dialog blocks user input to other top-level
    *               windows when shown.
@@ -373,7 +372,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
       //TAKT
       j2Takt.setSelected(twoStroke);
       j4Takt.setSelected(!twoStroke);
-      
+
       //TRANSMISSION
       jAutomatic.setSelected(automatic);
       jManual.setSelected(!automatic);
@@ -413,7 +412,6 @@ public class VehicleSetDialog extends javax.swing.JDialog
     return automatic;
   }
 
-  
   /**
    * @return true if the settings have changed
    */
@@ -435,7 +433,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     //TRANSMISSION
     automatic = jAutomatic.isSelected();
-    
+
     //MEASRPM
     measRpm = jMeasRpm.isSelected();
 

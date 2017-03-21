@@ -848,12 +848,20 @@ public class Gui extends javax.swing.JFrame
         calculate();
       }
     }
+    catch (NumberFormatException ex)
+    {
+//      ex.printStackTrace(System.err);
+      LOG.severe("Wrong number format!" + ex.getMessage(), ex);
+      showErrorMessage("Fehler", "Datei hat falsches Format. \n"
+                       + "Es dürfen keine Kommazahlen angegeben werden!");
+    }
     catch (Exception ex)
     {
-      ex.printStackTrace(System.err);
+//      ex.printStackTrace(System.err);
       LOG.severe("Error", ex);
       showErrorMessage("Error", ex.getMessage());
     }
+
   }
 
   private void exportFile()
@@ -1386,7 +1394,7 @@ public class Gui extends javax.swing.JFrame
         }
       }
     }
-    
+
     //index ermitteln, ab dem moment negativ ist und somit schleppmoment vorhanden ist
     int limitSchl = 0;
     try

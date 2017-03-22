@@ -891,7 +891,7 @@ public class Gui extends javax.swing.JFrame
       try (FileWriter writer = new FileWriter(file);)
       {
         writer.write("TIME,RPM,WSS\n");
-        
+
         //time - rpm - wss
         for(RawDatapoint rawDatapoint : data.getRawDataList())
         {
@@ -906,7 +906,7 @@ public class Gui extends javax.swing.JFrame
       }
       catch (IOException ex) //error with saving
       {
-        LOG.warning("Error saving .pmt", ex);
+        LOG.warning("Error saving file", ex);
         showErrorMessage("Fehler beim Exportieren", "Fehler beim Exportieren aufgetreten");
       }
       catch (NullPointerException ex)//error with path
@@ -917,7 +917,7 @@ public class Gui extends javax.swing.JFrame
       catch (Exception ex)
       {
         LOG.severe("Unsupported Exception", ex);
-        showErrorMessage("Unbekannter Fehler", "Es ist ein unbekannter Fehler aufgetreten.\n" + ex.toString());
+        showErrorMessage("Unbekannter Fehler", "Es ist folgender unbekannter Fehler aufgetreten.\n" + ex.toString());
       }
     }
   }
@@ -1250,7 +1250,7 @@ public class Gui extends javax.swing.JFrame
     maxPowerMarker.setValue(data.getMaxpower());
     maxTorqueMarker.setValue(data.getMaxtorque());
 
-    String strEco = String.format("Temperatur: %.1f° Luftfeuchtigkeit: %d%% Luftdruck: %.1fmbar vmax: %.1fkm/h",
+    String strEco = String.format("Temperatur: %.1f° Luftfeuchtigkeit: %d%% Luftdruck: %.1fhPa vmax: %.1fkm/h",
                                   data.getTemperature(),
                                   data.getHumidity(),
                                   data.getPressure(),

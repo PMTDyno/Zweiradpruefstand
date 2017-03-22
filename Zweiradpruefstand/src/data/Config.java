@@ -61,7 +61,7 @@ public class Config
     {
       if(home != null && home.exists())
       {
-        folder = new File(home + "/PMTDyno");
+        folder = new File(home + "/.PMTDyno");
         if(!folder.exists())
           if(!folder.mkdir())
             throw new Exception();
@@ -179,7 +179,7 @@ public class Config
     {
       if(home != null && home.exists())
       {
-        folder = new File(home + "/PMTDyno");
+        folder = new File(home + "/.PMTDyno");
         if(!folder.exists())
           if(!folder.mkdir())
             throw new Exception();

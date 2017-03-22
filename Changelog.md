@@ -87,6 +87,8 @@ Features without an ![d] are planned.
 * ![d] Added automatic/manual setting
 * ![d] Bugfix calculating
 * ![d] Changed .pmt to .csv file and added a header to the file
+* ![d] Config File now in hidden folder
+* ![d] Changed mbar to hPa
 
 
 ## v1.0

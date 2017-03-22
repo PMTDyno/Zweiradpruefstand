@@ -86,6 +86,8 @@ Features without an ![d] are planned.
 * ![d] fixed support for Linux
 * ![d] Added automatic/manual setting
 * ![d] Bugfix calculating
+* ![d] Changed .pmt to .csv file and added a header to the file
+
 
 ##v1.0
 * Measurement with referential bike correct

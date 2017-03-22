@@ -58,29 +58,29 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     taktButGroup = new javax.swing.ButtonGroup();
     transmissionButGroup = new javax.swing.ButtonGroup();
-    jPanel5 = new javax.swing.JPanel();
-    jPanel6 = new javax.swing.JPanel();
+    jPanMain = new javax.swing.JPanel();
+    jPanName = new javax.swing.JPanel();
     jVehicleName = new javax.swing.JTextField();
-    jLabel1 = new javax.swing.JLabel();
-    jPanel3 = new javax.swing.JPanel();
+    jLabelVehicleName = new javax.swing.JLabel();
+    jPanRpm = new javax.swing.JPanel();
     jMeasRpm = new javax.swing.JCheckBox();
-    jPanel4 = new javax.swing.JPanel();
+    jPanStroke = new javax.swing.JPanel();
     j2Takt = new javax.swing.JRadioButton();
     j4Takt = new javax.swing.JRadioButton();
-    jPanel8 = new javax.swing.JPanel();
+    jPanTransmission = new javax.swing.JPanel();
     jManual = new javax.swing.JRadioButton();
     jAutomatic = new javax.swing.JRadioButton();
-    jPanel7 = new javax.swing.JPanel();
-    jPanel1 = new javax.swing.JPanel();
+    jPanButtons = new javax.swing.JPanel();
+    jPanButons2 = new javax.swing.JPanel();
     jButCancel = new javax.swing.JButton();
     jButConfirm = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setResizable(false);
 
-    jPanel5.setLayout(new java.awt.GridBagLayout());
+    jPanMain.setLayout(new java.awt.GridBagLayout());
 
-    jPanel6.setLayout(new java.awt.GridBagLayout());
+    jPanName.setLayout(new java.awt.GridBagLayout());
 
     jVehicleName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jVehicleName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -98,19 +98,19 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridy = 1;
     gridBagConstraints.ipadx = 38;
     gridBagConstraints.weightx = 0.3;
-    jPanel6.add(jVehicleName, gridBagConstraints);
+    jPanName.add(jVehicleName, gridBagConstraints);
 
-    jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-    jLabel1.setText("Fahrzeugname");
+    jLabelVehicleName.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+    jLabelVehicleName.setText("Fahrzeugname");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-    jPanel6.add(jLabel1, gridBagConstraints);
+    jPanName.add(jLabelVehicleName, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.gridwidth = 2;
-    jPanel5.add(jPanel6, gridBagConstraints);
+    jPanMain.add(jPanName, gridBagConstraints);
 
     jMeasRpm.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jMeasRpm.setSelected(true);
@@ -122,16 +122,16 @@ public class VehicleSetDialog extends javax.swing.JDialog
         jMeasRpmActionPerformed(evt);
       }
     });
-    jPanel3.add(jMeasRpm);
+    jPanRpm.add(jMeasRpm);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.gridwidth = 2;
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanel5.add(jPanel3, gridBagConstraints);
+    jPanMain.add(jPanRpm, gridBagConstraints);
 
-    jPanel4.setLayout(new java.awt.GridBagLayout());
+    jPanStroke.setLayout(new java.awt.GridBagLayout());
 
     taktButGroup.add(j2Takt);
     j2Takt.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -143,7 +143,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
         j2TaktActionPerformed(evt);
       }
     });
-    jPanel4.add(j2Takt, new java.awt.GridBagConstraints());
+    jPanStroke.add(j2Takt, new java.awt.GridBagConstraints());
 
     taktButGroup.add(j4Takt);
     j4Takt.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -158,14 +158,14 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
-    jPanel4.add(j4Takt, gridBagConstraints);
+    jPanStroke.add(j4Takt, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
-    jPanel5.add(jPanel4, gridBagConstraints);
+    jPanMain.add(jPanStroke, gridBagConstraints);
 
-    jPanel8.setLayout(new java.awt.GridBagLayout());
+    jPanTransmission.setLayout(new java.awt.GridBagLayout());
 
     transmissionButGroup.add(jManual);
     jManual.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -180,7 +180,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    jPanel8.add(jManual, gridBagConstraints);
+    jPanTransmission.add(jManual, gridBagConstraints);
 
     transmissionButGroup.add(jAutomatic);
     jAutomatic.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -196,17 +196,17 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    jPanel8.add(jAutomatic, gridBagConstraints);
+    jPanTransmission.add(jAutomatic, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
     gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 0);
-    jPanel5.add(jPanel8, gridBagConstraints);
+    jPanMain.add(jPanTransmission, gridBagConstraints);
 
-    getContentPane().add(jPanel5, java.awt.BorderLayout.CENTER);
+    getContentPane().add(jPanMain, java.awt.BorderLayout.CENTER);
 
-    jPanel1.setLayout(new java.awt.GridLayout(1, 2, 10, 0));
+    jPanButons2.setLayout(new java.awt.GridLayout(1, 2, 10, 0));
 
     jButCancel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
     jButCancel.setText("Abbrechen");
@@ -218,7 +218,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
         jButCancelActionPerformed(evt);
       }
     });
-    jPanel1.add(jButCancel);
+    jPanButons2.add(jButCancel);
 
     jButConfirm.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
     jButConfirm.setText("Messung starten");
@@ -230,11 +230,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
         jButConfirmActionPerformed(evt);
       }
     });
-    jPanel1.add(jButConfirm);
+    jPanButons2.add(jButConfirm);
 
-    jPanel7.add(jPanel1);
+    jPanButtons.add(jPanButons2);
 
-    getContentPane().add(jPanel7, java.awt.BorderLayout.SOUTH);
+    getContentPane().add(jPanButtons, java.awt.BorderLayout.SOUTH);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
@@ -341,16 +341,16 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private javax.swing.JRadioButton jAutomatic;
   private javax.swing.JButton jButCancel;
   private javax.swing.JButton jButConfirm;
-  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabelVehicleName;
   private javax.swing.JRadioButton jManual;
   private javax.swing.JCheckBox jMeasRpm;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
-  private javax.swing.JPanel jPanel5;
-  private javax.swing.JPanel jPanel6;
-  private javax.swing.JPanel jPanel7;
-  private javax.swing.JPanel jPanel8;
+  private javax.swing.JPanel jPanButons2;
+  private javax.swing.JPanel jPanButtons;
+  private javax.swing.JPanel jPanMain;
+  private javax.swing.JPanel jPanName;
+  private javax.swing.JPanel jPanRpm;
+  private javax.swing.JPanel jPanStroke;
+  private javax.swing.JPanel jPanTransmission;
   private javax.swing.JTextField jVehicleName;
   private javax.swing.ButtonGroup taktButGroup;
   private javax.swing.ButtonGroup transmissionButGroup;

@@ -57,6 +57,7 @@ public class Data
 
   private boolean twoStroke = true;
   private boolean measRPM = true;
+  private boolean automatic = false;
 
   /*
    * ------------------------------------------------------------------------
@@ -81,6 +82,18 @@ public class Data
     this.rawDataList = rawDataList;
   }
 
+  public boolean isAutomatic()
+  {
+    return automatic;
+  }
+
+  public void setAutomatic(boolean automatic)
+  {
+    this.automatic = automatic;
+  }
+
+  
+  
   public int getStartRPM()
   {
     return startRPM;

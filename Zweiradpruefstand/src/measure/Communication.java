@@ -247,7 +247,7 @@ public class Communication
     }
     if(!isOpened())
     {
-      throw new CommunicationException("port not opened!");
+      throw new CommunicationException("port not open!");
     }
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();

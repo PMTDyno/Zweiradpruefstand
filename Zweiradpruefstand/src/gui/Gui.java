@@ -3,7 +3,7 @@ package gui;
 import data.Config;
 import data.Data;
 import data.RawDatapoint;
-import data.ReadPMT;
+import data.ReadCSV;
 import measure.MeasurementWorker;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import measure.Communication;
 import measure.CommunicationException;
-import org.jfree.JCommonInfo;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -46,12 +45,13 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.8
+ * @version 0.9.9
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.8";
+  private static final String VERSION = "0.9.9";
+
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
@@ -60,6 +60,8 @@ public class Gui extends javax.swing.JFrame
 
   private final ProgSetDialog progset;
   private final VehicleSetDialog vehicleset;
+  private final AboutDialog about;
+  private final GuideDialog guide;
 
   private final Data data = Data.getInstance();
 
@@ -70,8 +72,8 @@ public class Gui extends javax.swing.JFrame
   private ChartPanel chartPanel;
   private XYSeries seriesTorque = new XYSeries("Drehmoment");
   private XYSeries seriesPower = new XYSeries("Leistung");
-  private XYSeries series1 = new XYSeries("temp1 series");
-  private XYSeries series2 = new XYSeries("temp2 series");
+  private XYSeries series1 = new XYSeries("tempLeistung series");
+  private XYSeries series2 = new XYSeries("tempDrehmoment series");
   private XYSeriesCollection dataset1 = new XYSeriesCollection();
   private XYSeriesCollection dataset2 = new XYSeriesCollection();
 
@@ -93,22 +95,14 @@ public class Gui extends javax.swing.JFrame
       LOG.warning("Error reading Config file", ex);
       showErrorMessage("Fehler aufgetreten!", ex.getMessage() + "\n\n" + ex.getCause().toString());
     }
-    jLabelInfo.setText("<html>"
-            + "<b>Version: </b>PMT Dyno v" + VERSION + "<br>"
-            + "<b>Config Datei: </b>" + data.getFilePath() + "<br>"
-            + "<b>System: </b>" + System.getProperty("os.name") + "<br>"
-            + "<b>Benutzer: </b>" + System.getProperty("user.name") + "<br>"
-            + "<b>Java: </b>" + System.getProperty("java.version") + "<br>"
-            + "<b>JSSC: </b>" + jssc.SerialNativeInterface.getLibraryVersion() + "<br>"
-            + "<b>JCommon: </b>" + JCommonInfo.getInstance().getVersion() + "<br>"
-            + "<b>JFreeChart: </b>" + org.jfree.chart.JFreeChart.INFO.getVersion() + "<br></html>"
-    );
-    jLabelVersion.setText("v" + VERSION);
+
+    about = new AboutDialog(this, true);
+    guide = new GuideDialog(this, true);
 
     setIconImage(new ImageIcon(getClass().getResource("/icons/logo128.png")).getImage());
 
-    setTitle("PMT-DYNO v" + VERSION);
-    setMinimumSize(new Dimension(1000, 450));
+    setTitle("PMTDyno v" + VERSION);
+    setMinimumSize(new Dimension(800, 450));
     setSize(data.getWindowWidth(), data.getWindowHeight());
     setLocation(data.getWindowRelativeX(), data.getWindowRelativeY());
 
@@ -118,6 +112,8 @@ public class Gui extends javax.swing.JFrame
 
     initChart();
 
+    jComboBoxPort.requestFocusInWindow();
+
   }
 
   @SuppressWarnings("unchecked")
@@ -126,20 +122,6 @@ public class Gui extends javax.swing.JFrame
   {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    jFrameAbout = new javax.swing.JFrame();
-    jPanelLogo = new javax.swing.JPanel();
-    jLabel2 = new javax.swing.JLabel();
-    jLabelVersion = new javax.swing.JLabel();
-    jPanelInfo = new javax.swing.JPanel();
-    jLabelDevelopers = new javax.swing.JLabel();
-    jLabelInfo = new javax.swing.JLabel();
-    jLabelWarning = new javax.swing.JLabel();
-    jPanelInfo2 = new javax.swing.JPanel();
-    jLabelDate = new javax.swing.JLabel();
-    jLabelAuthor = new javax.swing.JLabel();
-    jFrameGuide = new javax.swing.JFrame();
-    jPanelMeasure = new javax.swing.JPanel();
-    jLabelGuideMeasure = new javax.swing.JLabel();
     jToolBar = new javax.swing.JToolBar();
     jStart = new javax.swing.JButton();
     jRefresh = new javax.swing.JButton();
@@ -153,9 +135,9 @@ public class Gui extends javax.swing.JFrame
     jpanEast = new javax.swing.JPanel();
     jComboBoxPort = new javax.swing.JComboBox<>();
     jpanSerialButtons = new javax.swing.JPanel();
-    jbutConnect = new javax.swing.JButton();
-    jbutDisconnect = new javax.swing.JButton();
-    jbutRefreshDevice = new javax.swing.JButton();
+    jConnect = new javax.swing.JButton();
+    jDisconnect = new javax.swing.JButton();
+    jRefreshDevice = new javax.swing.JButton();
     jLabelStatus = new javax.swing.JLabel();
     jChartPanel = new javax.swing.JPanel();
     jMenuBar = new javax.swing.JMenuBar();
@@ -172,99 +154,7 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
-
-    jFrameAbout.setTitle("Über...");
-    jFrameAbout.setLocation(new java.awt.Point(0, 0));
-    jFrameAbout.setMinimumSize(new java.awt.Dimension(500, 500));
-    jFrameAbout.setResizable(false);
-
-    jPanelLogo.setLayout(new java.awt.GridBagLayout());
-
-    jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
-    jLabel2.setText(" PMT Dyno");
-    jLabel2.setVerifyInputWhenFocusTarget(false);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-    jPanelLogo.add(jLabel2, gridBagConstraints);
-
-    jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-    jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabelVersion.setText("v");
-    jLabelVersion.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-    jLabelVersion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-    gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-    jPanelLogo.add(jLabelVersion, gridBagConstraints);
-
-    jFrameAbout.getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
-
-    jPanelInfo.setLayout(new java.awt.GridBagLayout());
-
-    jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-    jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelDevelopers.setText("<html>  <center> <b>Diplomanden: </b> <br>  Primus Christoph - Elektrotechnik<br>  Messing Levin - Programm<br>  Tinauer Robert - Mechanik<br>  </center>");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
-    jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
-
-    jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
-    jLabelInfo.setText("<html> <b>Version:</b> PMT Dyno 0.5 <br> <b>Config Datei:</b> Benutzerpfad\\.PMTDyno\\PMTDyno.config <br> <b>JSSC:</b> 2.8.0 <br> <b>JFreeChart:</b> 1.0.19 <br> "); // NOI18N
-    jLabelInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-    jLabelInfo.setOpaque(true);
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.ipadx = 5;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelInfo, gridBagConstraints);
-
-    jLabelWarning.setText("Die Nutzung des Prüfstandes erfolgt auf eigene Gefahr!");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelWarning, gridBagConstraints);
-
-    jFrameAbout.getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
-
-    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
-
-    jLabelDate.setText("2016-2017");
-    jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
-    {
-      public void mouseClicked(java.awt.event.MouseEvent evt)
-      {
-        jLabelDateMouseClicked(evt);
-      }
-    });
-    jPanelInfo2.add(jLabelDate);
-
-    jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-    jLabelAuthor.setText("Autor: Messing Levin");
-    jPanelInfo2.add(jLabelAuthor);
-
-    jFrameAbout.getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
-
-    jFrameGuide.setTitle("Anleitung");
-    jFrameGuide.setMinimumSize(new java.awt.Dimension(700, 600));
-    jFrameGuide.setResizable(false);
-
-    jPanelMeasure.setLayout(new java.awt.GridLayout(1, 0));
-
-    jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelGuideMeasure.setText("<html> TODO!!!<h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
-    jPanelMeasure.add(jLabelGuideMeasure);
-
-    jFrameGuide.getContentPane().add(jPanelMeasure, java.awt.BorderLayout.PAGE_START);
+    jMenuItem1 = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -360,37 +250,37 @@ public class Gui extends javax.swing.JFrame
 
     jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-    jbutConnect.setText("Verbinden");
-    jbutConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
-    jbutConnect.addActionListener(new java.awt.event.ActionListener()
+    jConnect.setText("Verbinden");
+    jConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
+    jConnect.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutConnectActionPerformed(evt);
+        jConnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutConnect);
+    jpanSerialButtons.add(jConnect);
 
-    jbutDisconnect.setText("Trennen");
-    jbutDisconnect.setEnabled(false);
-    jbutDisconnect.addActionListener(new java.awt.event.ActionListener()
+    jDisconnect.setText("Trennen");
+    jDisconnect.setEnabled(false);
+    jDisconnect.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutDisconnectActionPerformed(evt);
+        jDisconnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutDisconnect);
+    jpanSerialButtons.add(jDisconnect);
 
-    jbutRefreshDevice.setText("Aktualisieren");
-    jbutRefreshDevice.addActionListener(new java.awt.event.ActionListener()
+    jRefreshDevice.setText("Aktualisieren");
+    jRefreshDevice.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jbutRefreshDeviceActionPerformed(evt);
+        jRefreshDeviceActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jbutRefreshDevice);
+    jpanSerialButtons.add(jRefreshDevice);
 
     jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
 
@@ -427,7 +317,7 @@ public class Gui extends javax.swing.JFrame
 
     jMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
     jMenuSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save16.png"))); // NOI18N
-    jMenuSave.setText("Speichern...");
+    jMenuSave.setText("Als Bild speichern...");
     jMenuSave.setEnabled(false);
     jMenuSave.addActionListener(new java.awt.event.ActionListener()
     {
@@ -492,7 +382,7 @@ public class Gui extends javax.swing.JFrame
 
     jHelp.setText("Hilfe");
 
-    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
     jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
     jMenuGuide.setText("Anleitung");
     jMenuGuide.addActionListener(new java.awt.event.ActionListener()
@@ -505,7 +395,7 @@ public class Gui extends javax.swing.JFrame
     jHelp.add(jMenuGuide);
 
     jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
-    jMenuAbout.setText("Über...");
+    jMenuAbout.setText("Über");
     jMenuAbout.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -514,6 +404,16 @@ public class Gui extends javax.swing.JFrame
       }
     });
     jHelp.add(jMenuAbout);
+
+    jMenuItem1.setText("StartWorker");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuItem1);
 
     jMenuBar.add(jHelp);
 
@@ -541,13 +441,13 @@ public class Gui extends javax.swing.JFrame
       startProgSet();
     }//GEN-LAST:event_jProgSetActionPerformed
 
-    private void jbutConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutConnectActionPerformed
-    {//GEN-HEADEREND:event_jbutConnectActionPerformed
+    private void jConnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jConnectActionPerformed
+    {//GEN-HEADEREND:event_jConnectActionPerformed
       connectDevice();
-    }//GEN-LAST:event_jbutConnectActionPerformed
+    }//GEN-LAST:event_jConnectActionPerformed
 
-    private void jbutDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutDisconnectActionPerformed
-    {//GEN-HEADEREND:event_jbutDisconnectActionPerformed
+    private void jDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jDisconnectActionPerformed
+    {//GEN-HEADEREND:event_jDisconnectActionPerformed
       try
       {
         com.disconnect();
@@ -562,28 +462,31 @@ public class Gui extends javax.swing.JFrame
       {
         jStart.setEnabled(com.isConnected());
         jRefresh.setEnabled(com.isConnected());
-        jbutConnect.setEnabled(!com.isConnected());
-        jbutDisconnect.setEnabled(com.isConnected());
-        jbutRefreshDevice.setEnabled(!com.isConnected());
+        jConnect.setEnabled(!com.isConnected());
+        jDisconnect.setEnabled(com.isConnected());
+        jRefreshDevice.setEnabled(!com.isConnected());
         jComboBoxPort.setEnabled(!com.isConnected());
       }
-    }//GEN-LAST:event_jbutDisconnectActionPerformed
+    }//GEN-LAST:event_jDisconnectActionPerformed
 
-    private void jbutRefreshDeviceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutRefreshDeviceActionPerformed
-    {//GEN-HEADEREND:event_jbutRefreshDeviceActionPerformed
+    private void jRefreshDeviceActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jRefreshDeviceActionPerformed
+    {//GEN-HEADEREND:event_jRefreshDeviceActionPerformed
       refreshPorts();
-    }//GEN-LAST:event_jbutRefreshDeviceActionPerformed
+    }//GEN-LAST:event_jRefreshDeviceActionPerformed
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuAboutActionPerformed
     {//GEN-HEADEREND:event_jMenuAboutActionPerformed
-      jFrameAbout.setLocationRelativeTo(this);
-      jFrameAbout.setVisible(true);
+      about.setLocationRelativeTo(this);
+      about.setVisible(true);
+
+//      jFrameAbout.setLocationRelativeTo(this);
+//      jFrameAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void jMenuGuideActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuGuideActionPerformed
     {//GEN-HEADEREND:event_jMenuGuideActionPerformed
-      jFrameGuide.setLocationRelativeTo(this);
-      jFrameGuide.setVisible(true);
+      guide.setLocationRelativeTo(this);
+      guide.setVisible(true);
     }//GEN-LAST:event_jMenuGuideActionPerformed
 
     private void jRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRefreshActionPerformed
@@ -591,17 +494,6 @@ public class Gui extends javax.swing.JFrame
     }//GEN-LAST:event_jRefreshActionPerformed
 
   private int easterEgg = 0;
-    private void jLabelDateMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jLabelDateMouseClicked
-    {//GEN-HEADEREND:event_jLabelDateMouseClicked
-      easterEgg++;
-      if(easterEgg >= 6)
-      {
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
-        JOptionPane.showMessageDialog(this, "Primus du Wurst!", "Easter Egg", JOptionPane.PLAIN_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/icons/wurst.png")));
-        easterEgg = 0;
-      }
-    }//GEN-LAST:event_jLabelDateMouseClicked
-
   private void jMenuCloseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuCloseActionPerformed
   {//GEN-HEADEREND:event_jMenuCloseActionPerformed
     dispose();
@@ -631,6 +523,11 @@ public class Gui extends javax.swing.JFrame
   {//GEN-HEADEREND:event_jMenuOpenActionPerformed
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
+
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
+  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
+    start();
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
 
   /**
    * @param args the command line arguments
@@ -702,36 +599,26 @@ public class Gui extends javax.swing.JFrame
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel jChartPanel;
   private javax.swing.JComboBox<String> jComboBoxPort;
+  private javax.swing.JButton jConnect;
+  private javax.swing.JButton jDisconnect;
   private javax.swing.JMenu jFile;
-  private javax.swing.JFrame jFrameAbout;
-  private javax.swing.JFrame jFrameGuide;
   private javax.swing.JMenu jHelp;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabelAuthor;
-  private javax.swing.JLabel jLabelDate;
-  private javax.swing.JLabel jLabelDevelopers;
-  private javax.swing.JLabel jLabelGuideMeasure;
-  private javax.swing.JLabel jLabelInfo;
   private javax.swing.JLabel jLabelStatus;
-  private javax.swing.JLabel jLabelVersion;
-  private javax.swing.JLabel jLabelWarning;
   private javax.swing.JMenuItem jMenuAbout;
   private javax.swing.JMenuBar jMenuBar;
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuExport;
   private javax.swing.JMenuItem jMenuGuide;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
   private javax.swing.JPanel jPanSerial;
-  private javax.swing.JPanel jPanelInfo;
-  private javax.swing.JPanel jPanelInfo2;
-  private javax.swing.JPanel jPanelLogo;
-  private javax.swing.JPanel jPanelMeasure;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
   private javax.swing.JButton jRefresh;
+  private javax.swing.JButton jRefreshDevice;
   private javax.swing.JButton jSave;
   private javax.swing.JToolBar.Separator jSeparator1;
   private javax.swing.JToolBar.Separator jSeparator2;
@@ -741,9 +628,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPopupMenu.Separator jSeparator6;
   private javax.swing.JButton jStart;
   private javax.swing.JToolBar jToolBar;
-  private javax.swing.JButton jbutConnect;
-  private javax.swing.JButton jbutDisconnect;
-  private javax.swing.JButton jbutRefreshDevice;
   private javax.swing.JPanel jpanEast;
   private javax.swing.JPanel jpanSerialButtons;
   // End of variables declaration//GEN-END:variables
@@ -856,7 +740,7 @@ public class Gui extends javax.swing.JFrame
     chart.getXYPlot().mapDatasetToRangeAxis(0, 0);//1st dataset to 1st y-axis
     chart.getXYPlot().mapDatasetToRangeAxis(1, 1); //2nd dataset to 2nd y-axis
 
-    // Hinzufuegen von series1 zu der Datenmenge dataset
+    // Hinzufuegen von series zu der Datenmenge dataset
     dataset1.addSeries(seriesPower);
     dataset2.addSeries(seriesTorque);
 
@@ -909,9 +793,6 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
 
-    //jchartframe.setContentPane(chartPanel);
-    //jchartframe.pack();
-    //jchartframe.setVisible(true);
   }
 
   /**
@@ -919,10 +800,12 @@ public class Gui extends javax.swing.JFrame
    */
   private void start()
   {
-    MeasureDialog loading = new MeasureDialog(this, true);
-    loading.init(this, com);
+
     if(!startVehicleSet())
       return;
+
+    MeasureDialog loading = new MeasureDialog(this, true);
+    loading.init(this, com);
 
     enableCancelling();
 
@@ -945,7 +828,7 @@ public class Gui extends javax.swing.JFrame
 
       JFileChooser chooser = new JFileChooser();
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
-              "PMTDyno (*.pmt)", "pmt");
+              "Comma Seperated Values (*.csv)", "csv");
       chooser.setFileFilter(filter);
 
       int rv = chooser.showOpenDialog(this);
@@ -955,7 +838,7 @@ public class Gui extends javax.swing.JFrame
 
         //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
         //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
-        ReadPMT fr = new ReadPMT(file);
+        ReadCSV fr = new ReadCSV(file);
 
         data.setMeasureList(fr.read());
 
@@ -965,12 +848,20 @@ public class Gui extends javax.swing.JFrame
         calculate();
       }
     }
+    catch (NumberFormatException ex)
+    {
+//      ex.printStackTrace(System.err);
+      LOG.severe("Wrong number format!" + ex.getMessage(), ex);
+      showErrorMessage("Fehler", "Datei hat falsches Format. \n"
+                       + "Es dürfen keine Kommazahlen angegeben werden!");
+    }
     catch (Exception ex)
     {
-      ex.printStackTrace(System.err);
+//      ex.printStackTrace(System.err);
       LOG.severe("Error", ex);
       showErrorMessage("Error", ex.getMessage());
     }
+
   }
 
   private void exportFile()
@@ -985,20 +876,22 @@ public class Gui extends javax.swing.JFrame
 
     JFileChooser chooser = new JFileChooser();
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "PMTDyno (*.pmt)", "pmt");
+            "Comma Seperated Values (*.csv)", "csv");
     chooser.setFileFilter(filter);
     int rv = chooser.showSaveDialog(this);
     if(rv == JFileChooser.APPROVE_OPTION)
     {
       file = chooser.getSelectedFile();
 
-      if(!file.getName().endsWith(".pmt") && !file.getName().contains("."))
+      if(!file.getName().endsWith(".csv") && !file.getName().contains("."))
       {
-        file = new File(file.getPath() + ".pmt");
+        file = new File(file.getPath() + ".csv");
       }
 
       try (FileWriter writer = new FileWriter(file);)
       {
+        writer.write("TIME,RPM,WSS\n");
+        
         //time - rpm - wss
         for(RawDatapoint rawDatapoint : data.getRawDataList())
         {
@@ -1006,17 +899,17 @@ public class Gui extends javax.swing.JFrame
           String rpm = String.valueOf(rawDatapoint.getRpm());
           String wss = String.valueOf(rawDatapoint.getWss());
 
-          String line = time + ':' + rpm + ':' + wss + '\n';
+          String line = time + ',' + rpm + ',' + wss + '\n';
           writer.write(line);
         }
         writer.close();
       }
-      catch (IOException ex) //Fehler beim Speichern
+      catch (IOException ex) //error with saving
       {
         LOG.warning("Error saving .pmt", ex);
         showErrorMessage("Fehler beim Exportieren", "Fehler beim Exportieren aufgetreten");
       }
-      catch (NullPointerException ex)//Fehler beim Pfad
+      catch (NullPointerException ex)//error with path
       {
         LOG.warning("Error with path", ex);
         showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");
@@ -1217,9 +1110,11 @@ public class Gui extends javax.swing.JFrame
     {
       //TAKT
       if(data.isTwoStroke() != vehicleset.isTwoStroke())
-      {
         data.setTwoStroke(vehicleset.isTwoStroke());
-      }
+
+      //TRANSMISSION
+      if(data.isAutomatic() != vehicleset.isAutomatic())
+        data.setAutomatic(vehicleset.isAutomatic());
 
       //MEASrpm
       if(data.isMeasRPM() != vehicleset.isMeasRpm())
@@ -1254,11 +1149,11 @@ public class Gui extends javax.swing.JFrame
   {
     if(com.getAvailablePorts() == null || com.getAvailablePorts().length == 0)
     {
-      jbutConnect.setEnabled(false);
+      jConnect.setEnabled(false);
     }
     else
     {
-      jbutConnect.setEnabled(true);
+      jConnect.setEnabled(true);
     }
 
     jComboBoxPort.removeAllItems();
@@ -1420,9 +1315,9 @@ public class Gui extends javax.swing.JFrame
    */
   private void calculate()
   {
+
     //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
     //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
-
     LOG.fine("calculating...");
 
     double inertia = data.getInertia();
@@ -1474,29 +1369,31 @@ public class Gui extends javax.swing.JFrame
     //drehmoment roller
     if(!data.isMeasRPM())
     {
+
       for(int i = 0; i < alpha.size(); i++)
       {
         trq.add(alpha.get(i) * inertia);  //M=dOmega/dt * J
+
       }
     }
     else//drehmoment kein roller
     {
+
       rpm = filterValuesOrder(rpm, 0.09, 3);
       //uebersetzungsverhaeltnis:
-      try
-      {
-        n = ((omega.get(30) / (rpm.get(30) / 60 * 2 * 3.14)) + (omega.get(10) / (rpm.get(10) / 60 * 2 * Math.PI))) / 2;
-      }
-      catch (IndexOutOfBoundsException ex)
-      {
-        showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
-        return;
-      }
 
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
-        trq.add(alpha.get(i) * inertia * n);  //M=dOmega/dt * J
+        try
+        {
+          trq.add(alpha.get(i) * inertia * ((omega.get(i) / (rpm.get(i) / 60 * 2 * 3.14)) + (omega.get(i + 1) / (rpm.get(i + 1) / 60 * 2 * Math.PI))) / 2);  //M=dOmega/dt * J
+        }
+        catch (IndexOutOfBoundsException ex)
+        {
+          showErrorMessage("Fehler", "Zu wenig Messwerte! (" + omega.size() + ')');
+          return;
+        }
       }
     }
 
@@ -1564,7 +1461,7 @@ public class Gui extends javax.swing.JFrame
     series1.clear();
     series2.clear();
 
-    if(!data.isMeasRPM())
+    if(!data.isMeasRPM() || data.isAutomatic())
     {
       for(int i = 0; i < trq.size(); i++)
       {
@@ -1610,13 +1507,13 @@ public class Gui extends javax.swing.JFrame
 
     chart.fireChartChanged();
     updateChartLabels();
-    
+
     jSave.setEnabled(true);
     jPrint.setEnabled(true);
     jMenuSave.setEnabled(true);
     jMenuPrint.setEnabled(true);
     jMenuExport.setEnabled(true);
-    
+
     LOG.fine("done calculating");
 
   }
@@ -1662,9 +1559,9 @@ public class Gui extends javax.swing.JFrame
       setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
-    jbutDisconnect.setEnabled(com.isConnected());
-    jbutConnect.setEnabled(!com.isConnected());
-    jbutRefreshDevice.setEnabled(!com.isConnected());
+    jDisconnect.setEnabled(com.isConnected());
+    jConnect.setEnabled(!com.isConnected());
+    jRefreshDevice.setEnabled(!com.isConnected());
     jRefresh.setEnabled(com.isConnected());
     jComboBoxPort.setEnabled(!com.isConnected());
     jStart.setEnabled(com.isConnected());
@@ -1778,6 +1675,11 @@ public class Gui extends javax.swing.JFrame
       showErrorMessage("Unbekannter Fehler", "Ein unbekannter Fehler ist aufgetreten! " + ex);
     }
 
+  }
+
+  public static String getVERSION()
+  {
+    return VERSION;
   }
 
 }

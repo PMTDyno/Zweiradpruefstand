@@ -2,12 +2,22 @@ package gui;
 
 import data.Data;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.List;
 import java.util.logging.Level;
+import javax.swing.JInternalFrame;
 import logging.Logger;
 import javax.swing.JOptionPane;
 import measure.Communication;
 import measure.MeasurementWorker;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.dial.DialPlot;
+import org.jfree.chart.plot.dial.DialPointer;
+import org.jfree.chart.plot.dial.DialTextAnnotation;
+import org.jfree.chart.plot.dial.StandardDialFrame;
+import org.jfree.chart.plot.dial.StandardDialScale;
+import org.jfree.data.general.DefaultValueDataset;
 
 /**
  *
@@ -19,6 +29,9 @@ public class MeasureDialog extends javax.swing.JDialog
   private static final Logger LOG = Logger.getLogger(MeasureDialog.class.getName());
 
   private final Data data = Data.getInstance();
+  private final DefaultValueDataset kmh = new DefaultValueDataset(0);
+  private final DefaultValueDataset rpm = new DefaultValueDataset(0);
+
   private Gui gui;
   private Measure worker;
 
@@ -35,9 +48,21 @@ public class MeasureDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     setTitle("Messung läuft...");
     setResizable(false);
-    setMinimumSize(new Dimension(250, 150));
+    setMinimumSize(new Dimension(620, 400));
 
     initComponents();
+    createDial(kmh, "km/h", jFrameSpeed, 0, 100, 10);
+
+    if(data.isMeasRPM())
+    {
+      createDial(rpm, "U/min x 1000", jFrameRpm, 0, 10, 1);
+    }
+    else
+    {
+      jPanelDial.remove(jFrameRpm);
+      setMinimumSize(new Dimension(310, 400));
+      setSize(new Dimension(310, 400));
+    }
 
   }
 
@@ -57,79 +82,84 @@ public class MeasureDialog extends javax.swing.JDialog
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
-    java.awt.GridBagConstraints gridBagConstraints;
 
     jPanelButtons = new javax.swing.JPanel();
-    jButton1 = new javax.swing.JButton();
-    jButton3 = new javax.swing.JButton();
+    jbutCancel = new javax.swing.JButton();
+    jbutFinish = new javax.swing.JButton();
     jPanelInfo = new javax.swing.JPanel();
-    jProgressBar = new javax.swing.JProgressBar();
-    jLabelStatus = new javax.swing.JLabel();
+    jPanelDial = new javax.swing.JPanel();
+    jFrameSpeed = new javax.swing.JInternalFrame();
+    jFrameRpm = new javax.swing.JInternalFrame();
+    jPanelStatus = new javax.swing.JPanel();
     jLabel = new javax.swing.JLabel();
+    jProgressBar = new javax.swing.JProgressBar();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setResizable(false);
 
-    jButton1.setText("Abbrechen");
-    jButton1.addActionListener(new java.awt.event.ActionListener()
+    jbutCancel.setText("Abbrechen");
+    jbutCancel.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jButton1ActionPerformed(evt);
+        jbutCancelActionPerformed(evt);
       }
     });
-    jPanelButtons.add(jButton1);
+    jPanelButtons.add(jbutCancel);
 
-    jButton3.setText("Messung fertigstellen");
-    jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jButton3.addActionListener(new java.awt.event.ActionListener()
+    jbutFinish.setText("Messung fertigstellen");
+    jbutFinish.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jbutFinish.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
       {
-        jButton3ActionPerformed(evt);
+        jbutFinishActionPerformed(evt);
       }
     });
-    jPanelButtons.add(jButton3);
+    jPanelButtons.add(jbutFinish);
 
     getContentPane().add(jPanelButtons, java.awt.BorderLayout.SOUTH);
 
-    jPanelInfo.setLayout(new java.awt.GridBagLayout());
+    jPanelInfo.setLayout(new java.awt.BorderLayout());
 
-    jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-    jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-    jPanelInfo.add(jProgressBar, gridBagConstraints);
+    jPanelDial.setLayout(new java.awt.GridLayout(1, 1));
 
-    jLabelStatus.setText("0");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    jPanelInfo.add(jLabelStatus, gridBagConstraints);
+    jFrameSpeed.setVisible(true);
+    jFrameSpeed.getContentPane().setLayout(new java.awt.GridLayout(1, 1));
+    jPanelDial.add(jFrameSpeed);
+
+    jFrameRpm.setVisible(true);
+    jPanelDial.add(jFrameRpm);
+
+    jPanelInfo.add(jPanelDial, java.awt.BorderLayout.CENTER);
 
     jLabel.setText("Anzahl der Messpunkte: ");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    jPanelInfo.add(jLabel, gridBagConstraints);
+    jPanelStatus.add(jLabel);
+
+    jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
+    jProgressBar.setToolTipText("Anzahl der Messpunkte");
+    jProgressBar.setIndeterminate(true);
+    jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
+    jProgressBar.setString("0");
+    jProgressBar.setStringPainted(true);
+    jPanelStatus.add(jProgressBar);
+
+    jPanelInfo.add(jPanelStatus, java.awt.BorderLayout.PAGE_START);
 
     getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
-  {//GEN-HEADEREND:event_jButton1ActionPerformed
+  private void jbutCancelActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutCancelActionPerformed
+  {//GEN-HEADEREND:event_jbutCancelActionPerformed
     abort();
-  }//GEN-LAST:event_jButton1ActionPerformed
+  }//GEN-LAST:event_jbutCancelActionPerformed
 
-  private void jButton3ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton3ActionPerformed
-  {//GEN-HEADEREND:event_jButton3ActionPerformed
+  private void jbutFinishActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jbutFinishActionPerformed
+  {//GEN-HEADEREND:event_jbutFinishActionPerformed
     finish();
-  }//GEN-LAST:event_jButton3ActionPerformed
+  }//GEN-LAST:event_jbutFinishActionPerformed
 
   /**
    * @param args the command line arguments
@@ -166,16 +196,20 @@ public class MeasureDialog extends javax.swing.JDialog
 
       dialog.setVisible(true);
     });
+
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton1;
-  private javax.swing.JButton jButton3;
+  private javax.swing.JInternalFrame jFrameRpm;
+  private javax.swing.JInternalFrame jFrameSpeed;
   private javax.swing.JLabel jLabel;
-  private javax.swing.JLabel jLabelStatus;
   private javax.swing.JPanel jPanelButtons;
+  private javax.swing.JPanel jPanelDial;
   private javax.swing.JPanel jPanelInfo;
+  private javax.swing.JPanel jPanelStatus;
   private javax.swing.JProgressBar jProgressBar;
+  private javax.swing.JButton jbutCancel;
+  private javax.swing.JButton jbutFinish;
   // End of variables declaration//GEN-END:variables
 
   private void abort()
@@ -198,6 +232,29 @@ public class MeasureDialog extends javax.swing.JDialog
     super.dispose();
   }
 
+  private void createDial(DefaultValueDataset set, String title, JInternalFrame frame, int min, int max, int tick)
+  {
+
+    DialPlot plot = new DialPlot(set);
+    plot.setDialFrame(new StandardDialFrame());
+    plot.addLayer(new DialPointer.Pointer());
+    DialTextAnnotation annotation = new DialTextAnnotation(title);
+    annotation.setFont(new Font(null, Font.BOLD, 17));
+    plot.addLayer(annotation);
+
+    StandardDialScale scale = new StandardDialScale(min, max,
+                                                    -120, -300, tick, 4);
+
+    scale.setTickRadius(0.88);
+    scale.setTickLabelOffset(0.20);
+    plot.addScale(0, scale);
+
+    frame.setUI(null);
+    frame.add(new ChartPanel(new JFreeChart(plot)));
+    frame.pack();
+    frame.setSize(500, 500);
+  }
+
   @Override
   public void dispose()
   {
@@ -212,6 +269,8 @@ public class MeasureDialog extends javax.swing.JDialog
   {
     worker.execute();
     jProgressBar.setIndeterminate(true);
+    jbutFinish.requestFocusInWindow();
+
   }
 
   /**
@@ -226,12 +285,14 @@ public class MeasureDialog extends javax.swing.JDialog
     }
 
     @Override
-    protected void process(List<Integer> chunks)
+    protected void process(List<Double> chunks)
     {
-      for(Integer chunk : chunks)
-      {
-        jLabelStatus.setText(String.valueOf(chunk));
-      }
+
+      jProgressBar.setString(String.valueOf(chunks.get(0).intValue()));
+      kmh.setValue(chunks.get(1));
+
+      if(data.isMeasRPM())
+        rpm.setValue(chunks.get(2) / 1000);
     }
 
     @Override

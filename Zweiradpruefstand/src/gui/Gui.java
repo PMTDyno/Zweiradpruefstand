@@ -3,7 +3,7 @@ package gui;
 import data.Config;
 import data.Data;
 import data.RawDatapoint;
-import data.ReadPMT;
+import data.ReadCSV;
 import measure.MeasurementWorker;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -828,7 +828,7 @@ public class Gui extends javax.swing.JFrame
 
       JFileChooser chooser = new JFileChooser();
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
-              "PMTDyno (*.pmt)", "pmt");
+              "Comma Seperated Values (*.csv)", "csv");
       chooser.setFileFilter(filter);
 
       int rv = chooser.showOpenDialog(this);
@@ -838,7 +838,7 @@ public class Gui extends javax.swing.JFrame
 
         //ReadCSV fr = new ReadCSV("/home/levin/Desktop/measure.csv");
         //ReadCSV fr = new ReadCSV("/home/robert/Schreibtisch/measure.csv");
-        ReadPMT fr = new ReadPMT(file);
+        ReadCSV fr = new ReadCSV(file);
 
         data.setMeasureList(fr.read());
 
@@ -876,20 +876,22 @@ public class Gui extends javax.swing.JFrame
 
     JFileChooser chooser = new JFileChooser();
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "PMTDyno (*.pmt)", "pmt");
+            "Comma Seperated Values (*.csv)", "csv");
     chooser.setFileFilter(filter);
     int rv = chooser.showSaveDialog(this);
     if(rv == JFileChooser.APPROVE_OPTION)
     {
       file = chooser.getSelectedFile();
 
-      if(!file.getName().endsWith(".pmt") && !file.getName().contains("."))
+      if(!file.getName().endsWith(".csv") && !file.getName().contains("."))
       {
-        file = new File(file.getPath() + ".pmt");
+        file = new File(file.getPath() + ".csv");
       }
 
       try (FileWriter writer = new FileWriter(file);)
       {
+        writer.write("TIME,RPM,WSS\n");
+        
         //time - rpm - wss
         for(RawDatapoint rawDatapoint : data.getRawDataList())
         {
@@ -897,17 +899,17 @@ public class Gui extends javax.swing.JFrame
           String rpm = String.valueOf(rawDatapoint.getRpm());
           String wss = String.valueOf(rawDatapoint.getWss());
 
-          String line = time + ':' + rpm + ':' + wss + '\n';
+          String line = time + ',' + rpm + ',' + wss + '\n';
           writer.write(line);
         }
         writer.close();
       }
-      catch (IOException ex) //Fehler beim Speichern
+      catch (IOException ex) //error with saving
       {
         LOG.warning("Error saving .pmt", ex);
         showErrorMessage("Fehler beim Exportieren", "Fehler beim Exportieren aufgetreten");
       }
-      catch (NullPointerException ex)//Fehler beim Pfad
+      catch (NullPointerException ex)//error with path
       {
         LOG.warning("Error with path", ex);
         showErrorMessage("Fehler beim Pfad", "Fehler beim Pfad aufgetreten");

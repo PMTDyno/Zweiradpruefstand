@@ -45,7 +45,7 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.8
+ * @version 0.9.9
  */
 public class Gui extends javax.swing.JFrame
 {

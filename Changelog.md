@@ -85,6 +85,7 @@ Features without an ![d] are planned.
 * ![d] Request Focus of Buttons
 * ![d] fixed support for Linux
 * ![d] Added automatic/manual setting
+* ![d] Bugfix calculating
 
 ##v1.0
 * Measurement with referential bike correct

@@ -6,7 +6,7 @@ This program can measure the data from a µC which is connected to the Dyno.
 To be able to use this programm [Java](https://java.com/en/download/) has to be installed on the Computer.
 
 ### For beginners
-To use the programm just download the [PMTDyno.jar](https://github.com/PMTDyno/Zweiradpruefstand/raw/master/PMTDyno.jar) on the parent directory. This file can be executed.
+To use the programm just download the [PMTDyno.jar](https://github.com/PMTDyno/Zweiradpruefstand/raw/master/PMTDyno.jar) which can be found in the main directory. This file can be executed.
 
 ### For Programmers
 To compile the programm from the sources, you have to clone the project first.  

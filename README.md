@@ -1,7 +1,7 @@
-# Zweiradpruefstand
-PC Interface for the Dyno  
+# PMTDyno
+This program can measure the data from a µC which is connected to the Dyno.  
   
-  
+
 # How to Install
 To be able to use this programm [Java](https://java.com/en/download/) has to be installed on the Computer.
 

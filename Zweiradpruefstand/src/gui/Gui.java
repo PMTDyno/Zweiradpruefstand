@@ -2,6 +2,7 @@ package gui;
 
 import data.Config;
 import data.Data;
+import data.Datapoint;
 import data.RawDatapoint;
 import data.ReadCSV;
 import measure.MeasurementWorker;
@@ -1298,7 +1299,7 @@ public class Gui extends javax.swing.JFrame
    */
   private void calculate()
   {
- 
+
     LOG.fine("calculating...");
 
     double inertia = data.getInertia();
@@ -1317,6 +1318,26 @@ public class Gui extends javax.swing.JFrame
 
     double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
 
+    int removeCount = 0;
+
+    //removing datapoints over 20000rpm 
+    ArrayList<Datapoint> tempList = data.getMeasureList();
+    for(int i = 0; i < tempList.size(); i++)
+    {
+      if(tempList.get(i).getRpm() > 20000)
+      {
+        tempList.remove(i);
+        removeCount++;
+        i--;
+      }
+    }
+    
+    data.setMeasureList(tempList);
+
+    if(removeCount > 1)
+      LOG.info("Removed " + removeCount + " Datapoints which are over 20000Rpm");
+
+//    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
       omega.add(data.getMeasureList().get(i).getWss());
@@ -1360,9 +1381,8 @@ public class Gui extends javax.swing.JFrame
     else//drehmoment kein roller
     {
 
-      rpm = filterValuesOrder(rpm, 0.09, 3);
+      rpm = filterValuesOrder(rpm, 0.19, 2);
       //uebersetzungsverhaeltnis:
-
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
@@ -1463,11 +1483,12 @@ public class Gui extends javax.swing.JFrame
 //        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
         if(i == getValMaxIndex(rpm))
         {
-          break;
+         break;
         }
 
-        series1.add(rpm.get(i), pwr.get(i));
-        series2.add(rpm.get(i), trq.get(i));
+       
+     series1.add(rpm.get(i), pwr.get(i));
+      series2.add(rpm.get(i), trq.get(i));
 
       }
     }

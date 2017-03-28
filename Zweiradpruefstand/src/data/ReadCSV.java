@@ -85,12 +85,12 @@ public class ReadCSV
         String[] numbers = tmp.split(",");
         // time - rpm - wss
         double rpm;
-        double wss = (1 / ((Integer.parseInt(numbers[2]) / 1000000.0) * 26)) * 2 * Math.PI;
+        double wss = (1.0 / ((Integer.parseInt(numbers[2]) / 1000000.0) * 26.0)) * 2.0 * Math.PI;
 
         if(data.isTwoStroke())
-          rpm = 1 / (Integer.parseInt(numbers[1]) / 1000000.0) * 60;
+          rpm = 1.0 / (Integer.parseInt(numbers[1]) / 1000000.0) * 60.0;
         else
-          rpm = (1 / (Integer.parseInt(numbers[1]) / 1000000.0) * 60) * 2;
+          rpm = (1.0 / (Integer.parseInt(numbers[1]) / 1000000.0) * 60.0) * 2.0;
 
         double time = Integer.parseInt(numbers[0]) / 1000000.0;
 

@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 {
 
+  private boolean measRPM = false;
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(Communication.class.getName());
 
@@ -40,12 +41,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
   private RawDatapoint getNextDatapoint() throws CommunicationException,
                                                  TimeoutException
   {
+
     String wss, rpm, time;
 
     String[] tmp = com.getFrameData();
 
     wss = tmp[0];
-    if(data.isMeasRPM())
+    if(measRPM)
     {
       rpm = tmp[1];
       time = tmp[2];
@@ -65,6 +67,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
                                                          Exception
   {
     LOG.fine("Worker gestartet");
+    measRPM = data.isMeasRPM();
 
     //WSS - RPM - TIME
 //    int cnt = 0;
@@ -92,7 +95,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 //
 //      Thread.sleep(data.getPeriodTimeMs());
 //    }
-
     try
     {
       RawDatapoint dp;
@@ -108,14 +110,14 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
           return null;
         }
 
-        if(data.isMeasRPM())
+        if(measRPM)
           com.sendFrame(Communication.Request.START);
         else
           com.sendFrame(Communication.Request.STARTNORPM);
 
         dp = getNextDatapoint();
 
-        if(data.isMeasRPM())
+        if(measRPM)
         {
           //converting to U/min 
           rpm = toUmin(Integer.parseInt(dp.getRpm()));
@@ -131,29 +133,26 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
         //automatic starting of measurement when rpm is higher than...
       } while(rpm < data.getStartRPM());
-      
+
       count++;
-      
+
       rawList.add(dp);
       addAndPublish(dp, count);
-      
-      
+
       LOG.fine("Collecting data...");
       while(true)
       {
-        
-        if(data.isMeasRPM())
+
+        if(measRPM)
           com.sendFrame(Communication.Request.MEASURE);
         else
           com.sendFrame(Communication.Request.MEASURENORPM);
 
-        
         dp = getNextDatapoint();
         count++;
         rawList.add(dp);
         addAndPublish(dp, count);
-        
-        
+
         if(isCancelled())
         {
           LOG.finest("Cancel triggered!");
@@ -162,11 +161,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         if(stopRequest.get())
         {
           LOG.finest("Stop Request triggered!");
-
+          data.setRawDataList(rawList);
           LOG.info(measureList.size() + " Datensätze erfasst");
+
           return measureList;
         }
-        
+
         Thread.sleep(data.getPeriodTimeMs());
       }
     }
@@ -204,9 +204,9 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
   private double toUmin(int rpm)
   {
     if(data.isTwoStroke())
-      return (1 / toSec(rpm) * 60);
+      return (1.0 / toSec(rpm) * 60.0);
     else
-      return (1 / toSec(rpm) * 60) * 2;
+      return (1.0 / toSec(rpm) * 60.0) * 2.0;
   }
 
   /**
@@ -217,7 +217,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
    */
   private double toRads(int wss)
   {
-    return (1 / (toSec(wss) * 26) * 2 * Math.PI);
+    return (1.0 / (toSec(wss) * 26.0) * 2.0 * Math.PI);
   }
 
   /**
@@ -239,32 +239,38 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
    */
   private double toSec(int µs)
   {
-    return (µs / 1000000);
+    return (µs / 1000000.0);
   }
 
   /**
    * Converts the RawDatapoint and adds it to the list<Datapoint> <br>
    * Also publishes the chunks for the dials.
+   *
    * @param dp
-   * @param count 
+   * @param count
    */
   private void addAndPublish(RawDatapoint dp, int count)
   {
+
+    LOG.finest("raw data: rpm=" + dp.getRpm() + "µs wss=" + dp.getWss() + "µs time=" + dp.getTime() + "µs");
     double rpm = 0.0;
     double rad = toRads(Integer.parseInt(dp.getWss()));
     double kmh = toKmh(rad);
     double time = toSec(Integer.parseInt(dp.getTime()));
-    
-    if(data.isMeasRPM())
+
+    if(measRPM)
       rpm = toUmin(Integer.parseInt(dp.getRpm()));
-    
+
     measureList.add(new Datapoint(rad, rpm, time));
-    
+
     //count - kmh - rpm
-    Double[] chunks = {count*1.0, kmh, rpm};
-    
+    Double[] chunks =
+    {
+      count * 1.0, kmh, rpm
+    };
+
     publish(chunks);
-    
+
     LOG.finest("published(" + chunks[0] + "count " + chunks[1] + "km/h " + chunks[2] + "rpm)");
   }
 

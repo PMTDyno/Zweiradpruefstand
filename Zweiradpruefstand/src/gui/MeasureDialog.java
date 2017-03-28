@@ -291,9 +291,13 @@ public class MeasureDialog extends javax.swing.JDialog
 
       jProgressBar.setString(String.valueOf(chunks.get(0).intValue()));
       kmh.setValue(chunks.get(1));
+      LOG.finest("Dial set to " + chunks.get(1) + "km/h");
 
       if(data.isMeasRPM())
+      {
         rpm.setValue(chunks.get(2) / 1000);
+        LOG.finest("Dial set to " + chunks.get(2) + "rpm");
+      }
     }
 
     @Override

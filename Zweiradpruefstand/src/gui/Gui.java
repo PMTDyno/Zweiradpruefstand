@@ -1298,9 +1298,7 @@ public class Gui extends javax.swing.JFrame
    */
   private void calculate()
   {
-
-    //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
-    //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
+ 
     LOG.fine("calculating...");
 
     double inertia = data.getInertia();

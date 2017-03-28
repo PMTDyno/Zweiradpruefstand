@@ -264,6 +264,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     Double[] chunks = {count*1.0, kmh, rpm};
     
     publish(chunks);
+    
+    LOG.finest("published(" + chunks[0] + "count " + chunks[1] + "km/h " + chunks[2] + "rpm)");
   }
 
 }

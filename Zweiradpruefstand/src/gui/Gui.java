@@ -1331,7 +1331,7 @@ public class Gui extends javax.swing.JFrame
         i--;
       }
     }
-    
+
     data.setMeasureList(tempList);
 
     if(removeCount > 1)
@@ -1483,12 +1483,11 @@ public class Gui extends javax.swing.JFrame
 //        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
         if(i == getValMaxIndex(rpm))
         {
-         break;
+          break;
         }
 
-       
-     series1.add(rpm.get(i), pwr.get(i));
-      series2.add(rpm.get(i), trq.get(i));
+        series1.add(rpm.get(i), pwr.get(i));
+        series2.add(rpm.get(i), trq.get(i));
 
       }
     }

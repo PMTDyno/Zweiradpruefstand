@@ -29,8 +29,8 @@ public class Data
   {
   }
 
-  private String filePath = "Error im Benutzerpfad beheben";
-  private String vehicle = "Honda CWF 125";
+  private String filePath = "Error im Benutzerverzeichnis beheben";
+  private String vehicle = "Puch M50 SG";
   private String powerunit = "PS";
 
   private double inertia = 3.7017;

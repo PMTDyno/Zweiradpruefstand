@@ -34,14 +34,14 @@ public class AboutDialog extends javax.swing.JDialog
   {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    jPanelLogo = new javax.swing.JPanel();
-    jLabel2 = new javax.swing.JLabel();
+    jPanLogo = new javax.swing.JPanel();
+    jLabelLogo = new javax.swing.JLabel();
     jLabelVersion = new javax.swing.JLabel();
-    jPanelInfo = new javax.swing.JPanel();
+    jPanInfo = new javax.swing.JPanel();
     jLabelDevelopers = new javax.swing.JLabel();
     jLabelInfo = new javax.swing.JLabel();
     jLabelWarning = new javax.swing.JLabel();
-    jPanelInfo2 = new javax.swing.JPanel();
+    jPanInfo2 = new javax.swing.JPanel();
     jLabelDate = new javax.swing.JLabel();
     jLabelAuthor = new javax.swing.JLabel();
 
@@ -52,17 +52,17 @@ public class AboutDialog extends javax.swing.JDialog
     setResizable(false);
     setSize(new java.awt.Dimension(500, 500));
 
-    jPanelLogo.setLayout(new java.awt.GridBagLayout());
+    jPanLogo.setLayout(new java.awt.GridBagLayout());
 
-    jLabel2.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
-    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
-    jLabel2.setText(" PMT Dyno");
-    jLabel2.setVerifyInputWhenFocusTarget(false);
+    jLabelLogo.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+    jLabelLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo128.png"))); // NOI18N
+    jLabelLogo.setText(" PMT Dyno");
+    jLabelLogo.setVerifyInputWhenFocusTarget(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
-    jPanelLogo.add(jLabel2, gridBagConstraints);
+    jPanLogo.add(jLabelLogo, gridBagConstraints);
 
     jLabelVersion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
     jLabelVersion.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
@@ -74,11 +74,11 @@ public class AboutDialog extends javax.swing.JDialog
     gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
     gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-    jPanelLogo.add(jLabelVersion, gridBagConstraints);
+    jPanLogo.add(jLabelVersion, gridBagConstraints);
 
-    getContentPane().add(jPanelLogo, java.awt.BorderLayout.NORTH);
+    getContentPane().add(jPanLogo, java.awt.BorderLayout.NORTH);
 
-    jPanelInfo.setLayout(new java.awt.GridBagLayout());
+    jPanInfo.setLayout(new java.awt.GridBagLayout());
 
     jLabelDevelopers.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jLabelDevelopers.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -87,7 +87,7 @@ public class AboutDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
-    jPanelInfo.add(jLabelDevelopers, gridBagConstraints);
+    jPanInfo.add(jLabelDevelopers, gridBagConstraints);
 
     jLabelInfo.setBackground(new java.awt.Color(255, 255, 255));
     jLabelInfo.setText("<html>"
@@ -108,18 +108,18 @@ public class AboutDialog extends javax.swing.JDialog
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.ipadx = 5;
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelInfo, gridBagConstraints);
+    jPanInfo.add(jLabelInfo, gridBagConstraints);
 
     jLabelWarning.setText("Die Nutzung des Prüfstandes erfolgt auf eigene Gefahr!");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
     gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-    jPanelInfo.add(jLabelWarning, gridBagConstraints);
+    jPanInfo.add(jLabelWarning, gridBagConstraints);
 
-    getContentPane().add(jPanelInfo, java.awt.BorderLayout.CENTER);
+    getContentPane().add(jPanInfo, java.awt.BorderLayout.CENTER);
 
-    jPanelInfo2.setLayout(new java.awt.GridLayout(1, 0));
+    jPanInfo2.setLayout(new java.awt.GridLayout(1, 0));
 
     jLabelDate.setText("2016-2017");
     jLabelDate.addMouseListener(new java.awt.event.MouseAdapter()
@@ -129,13 +129,13 @@ public class AboutDialog extends javax.swing.JDialog
         jLabelDateMouseClicked(evt);
       }
     });
-    jPanelInfo2.add(jLabelDate);
+    jPanInfo2.add(jLabelDate);
 
     jLabelAuthor.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
     jLabelAuthor.setText("Autor: Messing Levin");
-    jPanelInfo2.add(jLabelAuthor);
+    jPanInfo2.add(jLabelAuthor);
 
-    getContentPane().add(jPanelInfo2, java.awt.BorderLayout.SOUTH);
+    getContentPane().add(jPanInfo2, java.awt.BorderLayout.SOUTH);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
@@ -210,15 +210,15 @@ public class AboutDialog extends javax.swing.JDialog
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabelAuthor;
   private javax.swing.JLabel jLabelDate;
   private javax.swing.JLabel jLabelDevelopers;
   private javax.swing.JLabel jLabelInfo;
+  private javax.swing.JLabel jLabelLogo;
   private javax.swing.JLabel jLabelVersion;
   private javax.swing.JLabel jLabelWarning;
-  private javax.swing.JPanel jPanelInfo;
-  private javax.swing.JPanel jPanelInfo2;
-  private javax.swing.JPanel jPanelLogo;
+  private javax.swing.JPanel jPanInfo;
+  private javax.swing.JPanel jPanInfo2;
+  private javax.swing.JPanel jPanLogo;
   // End of variables declaration//GEN-END:variables
 }

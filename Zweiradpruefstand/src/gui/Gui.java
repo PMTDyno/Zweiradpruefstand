@@ -2,6 +2,7 @@ package gui;
 
 import data.Config;
 import data.Data;
+import data.Datapoint;
 import data.RawDatapoint;
 import data.ReadCSV;
 import measure.MeasurementWorker;
@@ -131,10 +132,10 @@ public class Gui extends javax.swing.JFrame
     jPrint = new javax.swing.JButton();
     jSave = new javax.swing.JButton();
     jSeparator3 = new javax.swing.JToolBar.Separator();
+    jPanRight = new javax.swing.JPanel();
     jPanSerial = new javax.swing.JPanel();
-    jpanEast = new javax.swing.JPanel();
     jComboBoxPort = new javax.swing.JComboBox<>();
-    jpanSerialButtons = new javax.swing.JPanel();
+    jPanSerialButtons = new javax.swing.JPanel();
     jConnect = new javax.swing.JButton();
     jDisconnect = new javax.swing.JButton();
     jRefreshDevice = new javax.swing.JButton();
@@ -154,7 +155,6 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
-    jMenuItem1 = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -238,17 +238,17 @@ public class Gui extends javax.swing.JFrame
     jToolBar.add(jSave);
     jToolBar.add(jSeparator3);
 
-    jPanSerial.setLayout(new java.awt.BorderLayout());
+    jPanRight.setLayout(new java.awt.BorderLayout());
 
-    jpanEast.setLayout(new java.awt.GridBagLayout());
+    jPanSerial.setLayout(new java.awt.GridBagLayout());
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.ipadx = 20;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-    jpanEast.add(jComboBoxPort, gridBagConstraints);
+    jPanSerial.add(jComboBoxPort, gridBagConstraints);
 
-    jpanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
+    jPanSerialButtons.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
     jConnect.setText("Verbinden");
     jConnect.setMargin(new java.awt.Insets(3, 3, 3, 3));
@@ -259,7 +259,7 @@ public class Gui extends javax.swing.JFrame
         jConnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jConnect);
+    jPanSerialButtons.add(jConnect);
 
     jDisconnect.setText("Trennen");
     jDisconnect.setEnabled(false);
@@ -270,7 +270,7 @@ public class Gui extends javax.swing.JFrame
         jDisconnectActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jDisconnect);
+    jPanSerialButtons.add(jDisconnect);
 
     jRefreshDevice.setText("Aktualisieren");
     jRefreshDevice.addActionListener(new java.awt.event.ActionListener()
@@ -280,20 +280,20 @@ public class Gui extends javax.swing.JFrame
         jRefreshDeviceActionPerformed(evt);
       }
     });
-    jpanSerialButtons.add(jRefreshDevice);
+    jPanSerialButtons.add(jRefreshDevice);
 
-    jpanEast.add(jpanSerialButtons, new java.awt.GridBagConstraints());
+    jPanSerial.add(jPanSerialButtons, new java.awt.GridBagConstraints());
 
     jLabelStatus.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
     jLabelStatus.setForeground(java.awt.Color.gray);
     jLabelStatus.setText("getrennt");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-    jpanEast.add(jLabelStatus, gridBagConstraints);
+    jPanSerial.add(jLabelStatus, gridBagConstraints);
 
-    jPanSerial.add(jpanEast, java.awt.BorderLayout.WEST);
+    jPanRight.add(jPanSerial, java.awt.BorderLayout.WEST);
 
-    jToolBar.add(jPanSerial);
+    jToolBar.add(jPanRight);
 
     getContentPane().add(jToolBar, java.awt.BorderLayout.PAGE_START);
 
@@ -405,16 +405,6 @@ public class Gui extends javax.swing.JFrame
     });
     jHelp.add(jMenuAbout);
 
-    jMenuItem1.setText("StartWorker");
-    jMenuItem1.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jMenuItem1ActionPerformed(evt);
-      }
-    });
-    jHelp.add(jMenuItem1);
-
     jMenuBar.add(jHelp);
 
     setJMenuBar(jMenuBar);
@@ -524,11 +514,6 @@ public class Gui extends javax.swing.JFrame
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
-  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuItem1ActionPerformed
-  {//GEN-HEADEREND:event_jMenuItem1ActionPerformed
-    start();
-  }//GEN-LAST:event_jMenuItem1ActionPerformed
-
   /**
    * @param args the command line arguments
    */
@@ -609,12 +594,13 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuExport;
   private javax.swing.JMenuItem jMenuGuide;
-  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
+  private javax.swing.JPanel jPanRight;
   private javax.swing.JPanel jPanSerial;
+  private javax.swing.JPanel jPanSerialButtons;
   private javax.swing.JButton jPrint;
   private javax.swing.JButton jProgSet;
   private javax.swing.JButton jRefresh;
@@ -628,8 +614,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JPopupMenu.Separator jSeparator6;
   private javax.swing.JButton jStart;
   private javax.swing.JToolBar jToolBar;
-  private javax.swing.JPanel jpanEast;
-  private javax.swing.JPanel jpanSerialButtons;
   // End of variables declaration//GEN-END:variables
 
 
@@ -1316,8 +1300,6 @@ public class Gui extends javax.swing.JFrame
   private void calculate()
   {
 
-    //Einzufuegen:Druck und Temperaturwerte, Einstellung ob Darstellung über Geschwindigkeit
-    //oder RPM, richtige X-Achsenbeschriftung für Roller-Modus (km/h),  
     LOG.fine("calculating...");
 
     double inertia = data.getInertia();
@@ -1336,6 +1318,26 @@ public class Gui extends javax.swing.JFrame
 
     double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
 
+    int removeCount = 0;
+
+    //removing datapoints over 20000rpm 
+    ArrayList<Datapoint> tempList = data.getMeasureList();
+    for(int i = 0; i < tempList.size(); i++)
+    {
+      if(tempList.get(i).getRpm() > 20000)
+      {
+        tempList.remove(i);
+        removeCount++;
+        i--;
+      }
+    }
+    
+    data.setMeasureList(tempList);
+
+    if(removeCount > 1)
+      LOG.info("Removed " + removeCount + " Datapoints which are over 20000Rpm");
+
+//    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
       omega.add(data.getMeasureList().get(i).getWss());
@@ -1379,9 +1381,8 @@ public class Gui extends javax.swing.JFrame
     else//drehmoment kein roller
     {
 
-      rpm = filterValuesOrder(rpm, 0.09, 3);
+      rpm = filterValuesOrder(rpm, 0.19, 2);
       //uebersetzungsverhaeltnis:
-
       for(int i = 0; i < alpha.size(); i++)
       {
         //moment
@@ -1482,11 +1483,12 @@ public class Gui extends javax.swing.JFrame
 //        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
         if(i == getValMaxIndex(rpm))
         {
-          break;
+         break;
         }
 
-        series1.add(rpm.get(i), pwr.get(i));
-        series2.add(rpm.get(i), trq.get(i));
+       
+     series1.add(rpm.get(i), pwr.get(i));
+      series2.add(rpm.get(i), trq.get(i));
 
       }
     }

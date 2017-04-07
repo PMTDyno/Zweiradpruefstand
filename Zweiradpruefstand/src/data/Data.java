@@ -42,6 +42,7 @@ public class Data
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
 
+  private int startKMH = 5;
   private int startRPM = 2000;
   private int pngWidth = 800;
   private int pngHeight = 600;
@@ -90,6 +91,16 @@ public class Data
   public void setAutomatic(boolean automatic)
   {
     this.automatic = automatic;
+  }
+
+  public int getStartKMH()
+  {
+    return startKMH;
+  }
+
+  public void setStartKMH(int startKMH)
+  {
+    this.startKMH = startKMH;
   }
 
   

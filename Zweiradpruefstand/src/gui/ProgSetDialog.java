@@ -30,6 +30,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private double inertia = 3.7017;
   private int periodTimeMs = 40;
   private int startRpm = 2000;
+  private int startKmh = 5;
 
   /**
    * Creates the frame with the given values
@@ -57,7 +58,8 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.correctionTorque = data.getCorrectionTorque();
     this.periodTimeMs = data.getPeriodTimeMs();
     this.startRpm = data.getStartRPM();
-
+    this.startKmh = data.getStartKMH();
+    
     switch (data.getPngWidth())
     {
       case 640:
@@ -157,6 +159,9 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelPeriod = new javax.swing.JLabel();
     jSpinPeriod = new javax.swing.JSpinner();
     jLabelPeriod2 = new javax.swing.JLabel();
+    jLabelStartKmh = new javax.swing.JLabel();
+    jSpinStartKmh = new javax.swing.JSpinner();
+    jLabelStartKmh2 = new javax.swing.JLabel();
     jLabelStartRpm = new javax.swing.JLabel();
     jSpinStartRpm = new javax.swing.JSpinner();
     jLabelStartRpm2 = new javax.swing.JLabel();
@@ -373,7 +378,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(4, 5, 6, 0);
+    gridBagConstraints.insets = new java.awt.Insets(4, 5, 4, 0);
     jPanSerialButtons.add(jSpinPeriod, gridBagConstraints);
 
     jLabelPeriod2.setText("ms");
@@ -384,10 +389,34 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelPeriod2, gridBagConstraints);
 
-    jLabelStartRpm.setText("Startmotordrehzahl");
+    jLabelStartKmh.setText("Startgeschwindigkeit");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanSerialButtons.add(jLabelStartKmh, gridBagConstraints);
+
+    jSpinStartKmh.setModel(new javax.swing.SpinnerNumberModel(5, 1, 100, 5));
+    jSpinStartKmh.setToolTipText("Die Geschwindigkeit ab der die Messung gestartet werden soll");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 4, 0);
+    jPanSerialButtons.add(jSpinStartKmh, gridBagConstraints);
+
+    jLabelStartKmh2.setText("Km/h");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanSerialButtons.add(jLabelStartKmh2, gridBagConstraints);
+
+    jLabelStartRpm.setText("Startmotordrehzahl");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanSerialButtons.add(jLabelStartRpm, gridBagConstraints);
 
@@ -395,15 +424,15 @@ public class ProgSetDialog extends javax.swing.JDialog
     jSpinStartRpm.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(0, 5, 2, 0);
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 4, 0);
     jPanSerialButtons.add(jSpinStartRpm, gridBagConstraints);
 
     jLabelStartRpm2.setText("U/min");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelStartRpm2, gridBagConstraints);
@@ -417,7 +446,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     getContentPane().add(jPanMain, java.awt.BorderLayout.CENTER);
 
-    jPanButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 40, 5));
+    jPanButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 20, 5));
 
     jButCancel.setText("Abbrechen");
     jButCancel.addActionListener(new java.awt.event.ActionListener()
@@ -554,6 +583,7 @@ public class ProgSetDialog extends javax.swing.JDialog
       //SERIALPORT
       jSpinPeriod.setValue(periodTimeMs);
       jSpinStartRpm.setValue(startRpm);
+      jSpinStartKmh.setValue(startKmh);
 
     }
 
@@ -653,6 +683,20 @@ public class ProgSetDialog extends javax.swing.JDialog
     return periodTimeMs;
   }
 
+  public int getStartRpm()
+  {
+    return startRpm;
+  }
+
+  public int getStartKmh()
+  {
+    return startKmh;
+  }
+
+  
+  
+  
+  
   /*---PRIVATE METHODS-------------------------------------*/
   /**
    * Checks if all the values are correct and saves the changed values. Then
@@ -766,7 +810,8 @@ public class ProgSetDialog extends javax.swing.JDialog
     //SERIALPORT
     periodTimeMs = (int) jSpinPeriod.getValue();
     startRpm = (int) jSpinStartRpm.getValue();
-
+    startKmh = (int) jSpinStartKmh.getValue();
+    
     if(!error)
     {
       settingsChanged = true;
@@ -788,6 +833,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JLabel jLabelPeriod;
   private javax.swing.JLabel jLabelPeriod2;
   private javax.swing.JLabel jLabelPower;
+  private javax.swing.JLabel jLabelStartKmh;
+  private javax.swing.JLabel jLabelStartKmh2;
   private javax.swing.JLabel jLabelStartRpm;
   private javax.swing.JLabel jLabelStartRpm2;
   private javax.swing.JLabel jLabelTorque;
@@ -807,6 +854,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JSpinner jSpinCorrectPower;
   private javax.swing.JSpinner jSpinCorrectTorque;
   private javax.swing.JSpinner jSpinPeriod;
+  private javax.swing.JSpinner jSpinStartKmh;
   private javax.swing.JSpinner jSpinStartRpm;
   private javax.swing.JTextField jTextFieldInertia;
   private javax.swing.JTextField jWidth;

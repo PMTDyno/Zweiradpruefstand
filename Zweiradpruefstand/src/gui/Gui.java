@@ -1007,7 +1007,7 @@ public class Gui extends javax.swing.JFrame
       //update
       if(data.getMeasureList() != null)
       {
-        switch (updateLevel) //don't insert break!
+        switch (updateLevel) //do not insert break!
         {
           case 3:
             LOG.finest("entering level 3");
@@ -1063,6 +1063,10 @@ public class Gui extends javax.swing.JFrame
       data.setPngWidth(progset.getPNGResolution().width);
       data.setPngHeight(progset.getPNGResolution().height);
 
+      //SERIAL PORT
+      data.setStartRPM(progset.getStartRpm());
+      data.setStartKMH(progset.getStartKmh());
+      
       try
       {
         //safe config File

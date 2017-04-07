@@ -95,11 +95,14 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 //
 //      Thread.sleep(data.getPeriodTimeMs());
 //    }
+
     try
     {
       RawDatapoint dp;
 
-      double rpm;   // U/min
+      double rpm = 0;   // U/min
+      double kmh = 0;   // Km/h
+      
       int count = 0;
 
       do
@@ -124,15 +127,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         }
         else
         {
-          //todo start when speed achieved
-          //currently starting imediately if not measuring rpm 
-          Thread.sleep(data.getPeriodTimeMs());
-          break;
+          kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
         }
+        
         Thread.sleep(data.getPeriodTimeMs());
 
         //automatic starting of measurement when rpm is higher than...
-      } while(rpm < data.getStartRPM());
+      } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
 
       count++;
 
@@ -152,7 +153,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         count++;
         rawList.add(dp);
         addAndPublish(dp, count);
-
+        
+        
         if(isCancelled())
         {
           LOG.finest("Cancel triggered!");
@@ -263,6 +265,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     measureList.add(new Datapoint(rad, rpm, time));
 
+    if(measRPM && rpm < data.getStartRPM())
+      stopRequest.set(true);
+    
+    if(!measRPM && kmh < data.getStartKMH())
+      stopRequest.set(true);
+    
+    
     //count - kmh - rpm
     Double[] chunks =
     {

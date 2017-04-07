@@ -1295,7 +1295,7 @@ public class Gui extends javax.swing.JFrame
   /**
    * calculates Power and Torque and updates the Chart
    *
-   * @author Robert Tinauer
+   * @author Levin Messing
    */
   private void calculate()
   {
@@ -1485,7 +1485,7 @@ public class Gui extends javax.swing.JFrame
         {
           break;
         }
-
+        
         series1.add(rpm.get(i), pwr.get(i));
         series2.add(rpm.get(i), trq.get(i));
 

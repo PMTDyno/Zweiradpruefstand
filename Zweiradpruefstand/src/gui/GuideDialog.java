@@ -43,7 +43,7 @@ public class GuideDialog extends javax.swing.JDialog
     jPanMain.setLayout(new java.awt.GridLayout(1, 0));
 
     jLabelGuideMeasure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabelGuideMeasure.setText("<html><h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas <br><br> 7. Bei maximaler Motordrehzahl klicken Sie auf <i>Stop</i><br> <br>  </h2>"); // NOI18N
+    jLabelGuideMeasure.setText("<html><h2>   1. Motorrad auf den Prüfstand stellen und befestigen <br><br> 2. Prüfstand mit USB verbinden <br><br> 3. Klicken Sie auf <i>Verbinden</i> <br><br>  4. Starten Sie das Motorrad <br><br> 5. Klicken Sie auf <i>Start</i> <br><br> 6. Beschleunigen Sie mit Vollgas bis die Höchstgeschwindigkeit erreicht ist. <br><br> 7. Programm stoppt automatisch <br> <br>  </h2>"); // NOI18N
     jPanMain.add(jLabelGuideMeasure);
 
     getContentPane().add(jPanMain, java.awt.BorderLayout.CENTER);

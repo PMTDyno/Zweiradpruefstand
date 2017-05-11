@@ -841,9 +841,9 @@ public class Gui extends javax.swing.JFrame
     }
     catch (Exception ex)
     {
-//      ex.printStackTrace(System.err);
+      ex.printStackTrace(System.err);
       LOG.severe("Error", ex);
-      showErrorMessage("Error", ex.getMessage());
+      showErrorMessage("Error", ex.getMessage() + '\n' + ex.getCause());
     }
 
   }

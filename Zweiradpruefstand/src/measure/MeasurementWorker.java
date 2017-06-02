@@ -95,14 +95,13 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 //
 //      Thread.sleep(data.getPeriodTimeMs());
 //    }
-
     try
     {
       RawDatapoint dp;
 
       double rpm = 0;   // U/min
       double kmh = 0;   // Km/h
-      
+
       int count = 0;
 
       do
@@ -129,7 +128,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         {
           kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
         }
-        
+
         Thread.sleep(data.getPeriodTimeMs());
 
         //automatic starting of measurement when rpm is higher than...
@@ -144,17 +143,38 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       while(true)
       {
 
-        if(measRPM)
-          com.sendFrame(Communication.Request.MEASURE);
-        else
-          com.sendFrame(Communication.Request.MEASURENORPM);
+        int stopCount = 0;
+        do
+        {
+          if(measRPM)
+            com.sendFrame(Communication.Request.MEASURE);
+          else
+            com.sendFrame(Communication.Request.MEASURENORPM);
 
-        dp = getNextDatapoint();
+          dp = getNextDatapoint();
+
+          if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM())
+            stopCount++;
+          else
+            stopCount = 0;
+
+          if(stopCount >= 5)
+          {
+            LOG.finest("Automatic stopping triggered!");
+            data.setRawDataList(rawList);
+            LOG.info(measureList.size() + " Datensätze erfasst");
+
+            return measureList;
+          }
+
+          Thread.sleep(data.getPeriodTimeMs());
+          
+        } while(stopCount >= 1);
+
         count++;
         rawList.add(dp);
         addAndPublish(dp, count);
-        
-        
+
         if(isCancelled())
         {
           LOG.finest("Cancel triggered!");
@@ -267,11 +287,10 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     if(measRPM && rpm < data.getStartRPM())
       stopRequest.set(true);
-    
+
     if(!measRPM && kmh < data.getStartKMH())
       stopRequest.set(true);
-    
-    
+
     //count - kmh - rpm
     Double[] chunks =
     {

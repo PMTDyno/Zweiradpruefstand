@@ -285,8 +285,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     measureList.add(new Datapoint(rad, rpm, time));
 
-    if(measRPM && rpm < data.getStartRPM())
-      stopRequest.set(true);
+//    if(measRPM && rpm < data.getStartRPM())
+//      stopRequest.set(true);
 
     if(!measRPM && kmh < data.getStartKMH())
       stopRequest.set(true);

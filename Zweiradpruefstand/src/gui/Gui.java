@@ -1341,7 +1341,8 @@ public class Gui extends javax.swing.JFrame
     if(removeCount > 1)
       LOG.info("Removed " + removeCount + " Datapoints which are over 20000Rpm");
 
-//    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
+    //add values and filter wss
+    //    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
       omega.add(data.getMeasureList().get(i).getWss());
@@ -1354,6 +1355,7 @@ public class Gui extends javax.swing.JFrame
     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
 
     //alpha berechnen
+    //aenderung der drehzahl zur zeit
     for(int i = 0; i < omega.size() - 1; i++)
     {
       alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
@@ -1361,15 +1363,15 @@ public class Gui extends javax.swing.JFrame
     alpha = filterValuesOrder(alpha, 0.1, 2);
 
     //faktor fuer berechnungseinheit
-    double factor;
+    double unitFactor;
 
     if(data.getPowerunit().contains("PS"))
     {
-      factor = 1.36;
+      unitFactor = 1.36;
     }
     else
     {
-      factor = 1;
+      unitFactor = 1;
     }
 
     //drehmoment roller
@@ -1452,14 +1454,14 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
+        pwr.add((trq.get(i) * omega.get(i) / 1000) * unitFactor * tempFactor);
       }
     }
     else
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * unitFactor * tempFactor);
       }
     }
 

@@ -830,6 +830,7 @@ public class Gui extends javax.swing.JFrame
         series2.clear();
 
         calculate();
+        showResults();
       }
     }
     catch (NumberFormatException ex)
@@ -1648,6 +1649,7 @@ public class Gui extends javax.swing.JFrame
       data.setMeasureList(worker.get());
       calculate();
       enableStarting();
+      showResults();
     }
     catch (ExecutionException ex)
     {
@@ -1687,6 +1689,20 @@ public class Gui extends javax.swing.JFrame
   public static String getVERSION()
   {
     return VERSION;
+  }
+
+  private void showResults()
+  {
+    ResultDialog resultDialog = new ResultDialog(this, true);
+    
+    resultDialog.setRPM(data.getMeasureList().get(data.getMeasureList().size()-1).getRpm());
+    if(data.getPowerunit().equals("PS"))
+      resultDialog.setPS(data.getMaxpower());
+    else
+      resultDialog.setKW(data.getMaxpower());
+    
+    resultDialog.update();
+    resultDialog.setVisible(true);
   }
 
 }

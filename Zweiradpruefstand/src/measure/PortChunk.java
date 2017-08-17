@@ -19,7 +19,7 @@ public class PortChunk implements Iterable<Byte>
     {
       throw new NullPointerException();
     }
-
+    
     this.data = data;
     singleByteValue = 0;
   }

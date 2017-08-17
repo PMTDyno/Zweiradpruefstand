@@ -90,13 +90,6 @@ Features without an ![d] are planned.
 * ![d] Config File now in hidden folder
 * ![d] Changed mbar to hPa
 
-#### v0.9.10
-* PS/rpm Notification when measure complete  
-* max rpm increased to 13000  
-* max speed increased to 150kmh  
-* schleppleistung button enable/disable  
-* rpm at configurable value for a few seconds, then automatic starting the measurement  
-  
 
 ## v1.0
 * Measurement with referential bike correct

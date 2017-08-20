@@ -9,10 +9,12 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" value="Programmeinstellungen"/>
     <Property name="location" type="java.awt.Point" editor="org.netbeans.beaninfo.editors.PointEditor">
       <Point value="[0, 0]"/>
     </Property>
     <Property name="locationByPlatform" type="boolean" value="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
@@ -69,7 +71,8 @@
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="resolutionGroup"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Vordefinierte Aufl&#xf6;sung"/>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Vordefinierte Aufl&#xf6;sung des Bildes"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -88,6 +91,7 @@
                         <StringItem index="3" value="HD1080 (1920x1080)"/>
                       </StringArray>
                     </Property>
+                    <Property name="selectedIndex" type="int" value="1"/>
                     <Property name="name" type="java.lang.String" value="" noResource="true"/>
                   </Properties>
                   <Events>
@@ -281,6 +285,7 @@
                 <Component class="javax.swing.JLabel" name="jLabelInertia">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tr&#xe4;gheitsmoment"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Tr&#xe4;gheitsmoment der Rolle.&lt;br&gt;Standartwert: 3,7017kgm&#xb2;"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -292,7 +297,7 @@
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="0"/>
                     <Property name="text" type="java.lang.String" value="3,7017"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Tr&#xe4;gheitsmoment der Welle"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Tr&#xe4;gheitsmoment der Rolle.&lt;br&gt;Standartwert: 3,7017kgm&#xb2;"/>
                     <Property name="name" type="java.lang.String" value="" noResource="true"/>
                   </Properties>
                   <Events>
@@ -341,6 +346,7 @@
                 <Component class="javax.swing.JLabel" name="jLabelPeriod">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Zeitintervall"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Der Zeitabstand zwischen Messpunkten.&lt;br&gt;Kleinerer Wert bedeutet genauere Messung."/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -351,9 +357,9 @@
                 <Component class="javax.swing.JSpinner" name="jSpinPeriod">
                   <Properties>
                     <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                      <SpinnerModel initial="10" maximum="100" minimum="5" numberType="java.lang.Integer" stepSize="1" type="number"/>
+                      <SpinnerModel initial="40" maximum="100" minimum="5" numberType="java.lang.Integer" stepSize="1" type="number"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Der Zeitabstand zwischen einzelne Pakete"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Der Zeitabstand zwischen Messpunkten.&lt;br&gt;Kleinerer Wert bedeutet genauere Messung."/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -374,6 +380,7 @@
                 <Component class="javax.swing.JLabel" name="jLabelStartKmh">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Startgeschwindigkeit"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Geschwindigkeit erreicht wurde.&lt;br&gt;Wird nur verwendet falls&lt;br&gt;Motordrehzahl nicht gemessen wird"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -386,7 +393,7 @@
                     <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
                       <SpinnerModel initial="5" maximum="100" minimum="1" numberType="java.lang.Integer" stepSize="5" type="number"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Die Geschwindigkeit ab der die Messung gestartet werden soll"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Geschwindigkeit erreicht wurde.&lt;br&gt;Wird nur verwendet falls&lt;br&gt;Motordrehzahl nicht gemessen wird"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -404,13 +411,49 @@
                     </Constraint>
                   </Constraints>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabelStartRpm">
+                <Component class="javax.swing.JLabel" name="jLabelIdleRpm">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Startmotordrehzahl"/>
+                    <Property name="text" type="java.lang.String" value="Motordrehzahl wenn bereit"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Wenn diese Motordrehzahl einige Sekunden konstant bleibt&lt;br&gt;kann die Messung gestartet werden"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                       <GridBagConstraints gridX="0" gridY="3" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="21" weightX="0.0" weightY="0.0"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JSpinner" name="jSpinIdleRpm">
+                  <Properties>
+                    <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
+                      <SpinnerModel initial="1600" maximum="20000" minimum="100" numberType="java.lang.Integer" stepSize="100" type="number"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Wenn diese Motordrehzahl einige Sekunden konstant bleibt&lt;br&gt;kann die Messung gestartet werden"/>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+                      <GridBagConstraints gridX="1" gridY="3" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabelIdleRpm2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="U/min"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+                      <GridBagConstraints gridX="2" gridY="3" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="3" insetsBottom="2" insetsRight="0" anchor="21" weightX="0.0" weightY="0.0"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabelStartRpm">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Startmotordrehzahl"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Motordrehzahl erreicht wurde"/>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+                      <GridBagConstraints gridX="0" gridY="4" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="21" weightX="0.0" weightY="0.0"/>
                     </Constraint>
                   </Constraints>
                 </Component>
@@ -419,11 +462,11 @@
                     <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
                       <SpinnerModel initial="2000" maximum="20000" minimum="100" numberType="java.lang.Integer" stepSize="100" type="number"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Die Motordrehzahl ab der gestartet werden soll"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Motordrehzahl erreicht wurde"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-                      <GridBagConstraints gridX="1" gridY="3" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
+                      <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
                     </Constraint>
                   </Constraints>
                 </Component>
@@ -433,7 +476,7 @@
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-                      <GridBagConstraints gridX="2" gridY="3" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="3" insetsBottom="2" insetsRight="0" anchor="21" weightX="0.0" weightY="0.0"/>
+                      <GridBagConstraints gridX="2" gridY="4" gridWidth="1" gridHeight="1" fill="0" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="3" insetsBottom="2" insetsRight="0" anchor="21" weightX="0.0" weightY="0.0"/>
                     </Constraint>
                   </Constraints>
                 </Component>

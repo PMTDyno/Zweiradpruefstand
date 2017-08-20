@@ -44,6 +44,7 @@ public class Data
 
   private int startKMH = 5;
   private int startRPM = 2000;
+  private int idleRPM = 1600;
   private int pngWidth = 800;
   private int pngHeight = 600;
   private int windowWidth = 1200;
@@ -72,6 +73,16 @@ public class Data
   public void setMeasureList(ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;
+  }
+
+  public int getIdleRPM()
+  {
+    return idleRPM;
+  }
+
+  public void setIdleRPM(int idleRPM)
+  {
+    this.idleRPM = idleRPM;
   }
 
   public ArrayList<RawDatapoint> getRawDataList()

@@ -45,7 +45,6 @@ public class VehicleSetDialog extends javax.swing.JDialog
     this.measRpm = data.isMeasRPM();
 
     jButConfirm.requestFocusInWindow();
-
   }
 
   /**

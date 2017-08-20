@@ -28,9 +28,11 @@ public class ProgSetDialog extends javax.swing.JDialog
   private double correctionPower = 1.0;
   private double correctionTorque = 1.0;
   private double inertia = 3.7017;
+  //COMMUNICATION
   private int periodTimeMs = 40;
-  private int startRpm = 2000;
   private int startKmh = 5;
+  private int startRpm = 2000;
+  private int idleRpm = 1600;
 
   /**
    * Creates the frame with the given values
@@ -44,9 +46,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     super(parent, modal);
     initComponents();
 
-    setTitle("Programmeinstellungen");
     setSize(new Dimension(600, 350));
-    setResizable(false);
 
     this.inertia = data.getInertia();
 
@@ -59,6 +59,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.periodTimeMs = data.getPeriodTimeMs();
     this.startRpm = data.getStartRPM();
     this.startKmh = data.getStartKMH();
+    this.idleRpm = data.getIdleRPM();
     
     switch (data.getPngWidth())
     {
@@ -162,6 +163,9 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelStartKmh = new javax.swing.JLabel();
     jSpinStartKmh = new javax.swing.JSpinner();
     jLabelStartKmh2 = new javax.swing.JLabel();
+    jLabelIdleRpm = new javax.swing.JLabel();
+    jSpinIdleRpm = new javax.swing.JSpinner();
+    jLabelIdleRpm2 = new javax.swing.JLabel();
     jLabelStartRpm = new javax.swing.JLabel();
     jSpinStartRpm = new javax.swing.JSpinner();
     jLabelStartRpm2 = new javax.swing.JLabel();
@@ -170,8 +174,10 @@ public class ProgSetDialog extends javax.swing.JDialog
     jButConfirm = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setTitle("Programmeinstellungen");
     setLocation(new java.awt.Point(0, 0));
     setLocationByPlatform(true);
+    setResizable(false);
 
     jPanMain.setLayout(new java.awt.GridLayout(2, 2));
 
@@ -181,7 +187,8 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanPNGButtons.setLayout(new java.awt.GridBagLayout());
 
     resolutionGroup.add(jButRadioPng);
-    jButRadioPng.setToolTipText("Vordefinierte Auflösung");
+    jButRadioPng.setSelected(true);
+    jButRadioPng.setToolTipText("Vordefinierte Auflösung des Bildes");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -190,6 +197,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jPNGResolutionCombo.setMaximumRowCount(4);
     jPNGResolutionCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "VGA (640x480)", "SVGA (800x600)", "HD720 (1280x720)", "HD1080 (1920x1080)" }));
+    jPNGResolutionCombo.setSelectedIndex(1);
     jPNGResolutionCombo.setName(""); // NOI18N
     jPNGResolutionCombo.addActionListener(new java.awt.event.ActionListener()
     {
@@ -319,6 +327,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanCorrectionButtons.add(jSpinCorrectTorque, gridBagConstraints);
 
     jLabelInertia.setText("Trägheitsmoment");
+    jLabelInertia.setToolTipText("<html>Trägheitsmoment der Rolle.<br>Standartwert: 3,7017kgm²");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -327,7 +336,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jTextFieldInertia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jTextFieldInertia.setText("3,7017");
-    jTextFieldInertia.setToolTipText("Trägheitsmoment der Welle");
+    jTextFieldInertia.setToolTipText("<html>Trägheitsmoment der Rolle.<br>Standartwert: 3,7017kgm²");
     jTextFieldInertia.setName(""); // NOI18N
     jTextFieldInertia.addActionListener(new java.awt.event.ActionListener()
     {
@@ -366,14 +375,15 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanSerialButtons.setLayout(new java.awt.GridBagLayout());
 
     jLabelPeriod.setText("Zeitintervall");
+    jLabelPeriod.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanSerialButtons.add(jLabelPeriod, gridBagConstraints);
 
-    jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(10, 5, 100, 1));
-    jSpinPeriod.setToolTipText("Der Zeitabstand zwischen einzelne Pakete");
+    jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(40, 5, 100, 1));
+    jSpinPeriod.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -390,6 +400,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanSerialButtons.add(jLabelPeriod2, gridBagConstraints);
 
     jLabelStartKmh.setText("Startgeschwindigkeit");
+    jLabelStartKmh.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Geschwindigkeit erreicht wurde.<br>Wird nur verwendet falls<br>Motordrehzahl nicht gemessen wird");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -397,7 +408,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanSerialButtons.add(jLabelStartKmh, gridBagConstraints);
 
     jSpinStartKmh.setModel(new javax.swing.SpinnerNumberModel(5, 1, 100, 5));
-    jSpinStartKmh.setToolTipText("Die Geschwindigkeit ab der die Messung gestartet werden soll");
+    jSpinStartKmh.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Geschwindigkeit erreicht wurde.<br>Wird nur verwendet falls<br>Motordrehzahl nicht gemessen wird");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -413,18 +424,45 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelStartKmh2, gridBagConstraints);
 
-    jLabelStartRpm.setText("Startmotordrehzahl");
+    jLabelIdleRpm.setText("Motordrehzahl wenn bereit");
+    jLabelIdleRpm.setToolTipText("<html>Wenn diese Motordrehzahl einige Sekunden konstant bleibt<br>kann die Messung gestartet werden");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    jPanSerialButtons.add(jLabelStartRpm, gridBagConstraints);
+    jPanSerialButtons.add(jLabelIdleRpm, gridBagConstraints);
 
-    jSpinStartRpm.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
-    jSpinStartRpm.setToolTipText("Die Motordrehzahl ab der gestartet werden soll");
+    jSpinIdleRpm.setModel(new javax.swing.SpinnerNumberModel(1600, 100, 20000, 100));
+    jSpinIdleRpm.setToolTipText("<html>Wenn diese Motordrehzahl einige Sekunden konstant bleibt<br>kann die Messung gestartet werden");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 4, 0);
+    jPanSerialButtons.add(jSpinIdleRpm, gridBagConstraints);
+
+    jLabelIdleRpm2.setText("U/min");
+    jLabelIdleRpm2.setToolTipText("");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanSerialButtons.add(jLabelIdleRpm2, gridBagConstraints);
+
+    jLabelStartRpm.setText("Startmotordrehzahl");
+    jLabelStartRpm.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Motordrehzahl erreicht wurde");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 4;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanSerialButtons.add(jLabelStartRpm, gridBagConstraints);
+
+    jSpinStartRpm.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
+    jSpinStartRpm.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Motordrehzahl erreicht wurde");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 4, 0);
     jPanSerialButtons.add(jSpinStartRpm, gridBagConstraints);
@@ -432,7 +470,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelStartRpm2.setText("U/min");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelStartRpm2, gridBagConstraints);
@@ -580,10 +618,11 @@ public class ProgSetDialog extends javax.swing.JDialog
       //INERTIA
       jTextFieldInertia.setText(String.format("%.4f", inertia));
 
-      //SERIALPORT
+      //COMMUNICATION
       jSpinPeriod.setValue(periodTimeMs);
       jSpinStartRpm.setValue(startRpm);
       jSpinStartKmh.setValue(startKmh);
+      jSpinIdleRpm.setValue(idleRpm);
 
     }
 
@@ -693,7 +732,10 @@ public class ProgSetDialog extends javax.swing.JDialog
     return startKmh;
   }
 
-  
+  public int getIdleRpm()
+  {
+    return idleRpm;
+  }
   
   
   
@@ -811,6 +853,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     periodTimeMs = (int) jSpinPeriod.getValue();
     startRpm = (int) jSpinStartRpm.getValue();
     startKmh = (int) jSpinStartKmh.getValue();
+    idleRpm = (int) jSpinIdleRpm.getValue();
     
     if(!error)
     {
@@ -828,6 +871,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JRadioButton jButRadioUnitPS;
   private javax.swing.JRadioButton jButRadioUnitkW;
   private javax.swing.JTextField jHeight;
+  private javax.swing.JLabel jLabelIdleRpm;
+  private javax.swing.JLabel jLabelIdleRpm2;
   private javax.swing.JLabel jLabelInertia;
   private javax.swing.JLabel jLabelInertia2;
   private javax.swing.JLabel jLabelPeriod;
@@ -853,6 +898,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanSerialButtons;
   private javax.swing.JSpinner jSpinCorrectPower;
   private javax.swing.JSpinner jSpinCorrectTorque;
+  private javax.swing.JSpinner jSpinIdleRpm;
   private javax.swing.JSpinner jSpinPeriod;
   private javax.swing.JSpinner jSpinStartKmh;
   private javax.swing.JSpinner jSpinStartRpm;

@@ -1319,7 +1319,7 @@ public class Gui extends javax.swing.JFrame
     ArrayList<Double> omega = new ArrayList<>();
     ArrayList<Double> omegaSchl = new ArrayList<>();
 
-    boolean schleppEnable = true;
+    boolean schleppEnable = data.isSchleppEnable();
 
     double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
 

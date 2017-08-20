@@ -59,6 +59,7 @@ public class Data
   private boolean twoStroke = true;
   private boolean measRPM = true;
   private boolean automatic = false;
+  private boolean schleppEnable = true;
 
   /*
    * ------------------------------------------------------------------------
@@ -113,6 +114,16 @@ public class Data
   public void setStartRPM(int startRPM)
   {
     this.startRPM = startRPM;
+  }
+
+  public boolean isSchleppEnable()
+  {
+    return schleppEnable;
+  }
+
+  public void setSchleppEnable(boolean schleppEnable)
+  {
+    this.schleppEnable = schleppEnable;
   }
 
   public boolean isMeasRPM()

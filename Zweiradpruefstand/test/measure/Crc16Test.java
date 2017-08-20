@@ -14,46 +14,46 @@ import org.junit.Test;
  */
 public class Crc16Test extends TestCase
 {
-  
+
   public Crc16Test(String testName)
   {
     super(testName);
-    
+
   }
 
   @Test
   public void testCheckCRC()
   {
     System.out.println("measure.Crc16: checkCRC()");
-            
-    assertEquals(true, Crc16.checkCRC("123456789", "29B1"));
-    assertEquals(true, Crc16.checkCRC("abcdefghi", "1E7C"));
-    assertEquals(true, Crc16.checkCRC("0,0226:0,0061=", "96BC"));
-    assertEquals(true, Crc16.checkCRC("0,0:0,0=", "FCBD"));
-    assertEquals(true, Crc16.checkCRC("5000,0:9000,0=", "D25A"));
-    assertEquals(true, Crc16.checkCRC(",.:=-/*", "3FE6"));
-    
-    assertEquals(false, Crc16.checkCRC("123456789", "29B2"));
-    assertEquals(false, Crc16.checkCRC("abcdefghi", "1E7X"));
-    assertEquals(false, Crc16.checkCRC("0,0226:0,0061=", "936BC"));
-    assertEquals(false, Crc16.checkCRC("0,0:0,0=", "0xFCBD"));
-    assertEquals(false, Crc16.checkCRC("5000,0:9000,0", "D25A"));
-    assertEquals(false, Crc16.checkCRC(",.:=-/*", "3FE6"));
-    
+
+    assertTrue(Crc16.checkCRC("123456789", "29B1"));
+    assertTrue(Crc16.checkCRC("abcdefghi", "1E7C"));
+    assertTrue(Crc16.checkCRC("0,0226:0,0061=", "96BC"));
+    assertTrue(Crc16.checkCRC("0,0:0,0=", "FCBD"));
+    assertTrue(Crc16.checkCRC("5000,0:9000,0=", "D25A"));
+    assertTrue(Crc16.checkCRC(",.:=-/*", "3FE6"));
+
+    assertFalse(Crc16.checkCRC("123456789", "29B2"));
+    assertFalse(Crc16.checkCRC("abcdefghi", "1E7X"));
+    assertFalse(Crc16.checkCRC("0,0226:0,0061=", "936BC"));
+    assertFalse(Crc16.checkCRC("0,0:0,0=", "0xFCBD"));
+    assertFalse(Crc16.checkCRC("5000,0:9000,0", "D25A"));
+    assertFalse(Crc16.checkCRC(",.:=-/*", "3FE6"));
+
   }
 
-  /**
-   * Test of getCRC method, of class Crc16.
-   */
+  @Test
   public void testGetCRC()
   {
-//    System.out.println("getCRC");
-//    String data = "";
-//    String expResult = "";
-//    String result = Crc16.getCRC(data);
-//    assertEquals(expResult, result);
-//    // TODO review the generated test code and remove the default call to fail.
-//    fail("The test case is a prototype.");
+    System.out.println("measure.Crc16: getCRC()");
+
+    assertEquals("29B1", Crc16.getCRC("123456789"));
+    assertEquals("1E7C", Crc16.getCRC("abcdefghi"));
+    assertEquals("96BC", Crc16.getCRC("0,0226:0,0061="));
+    assertEquals("FCBD", Crc16.getCRC("0,0:0,0="));
+    assertEquals("D25A", Crc16.getCRC("5000,0:9000,0="));
+    assertEquals("3FE6", Crc16.getCRC(",.:=-/*"));
+
   }
-  
+
 }

@@ -1695,6 +1695,8 @@ public class Gui extends javax.swing.JFrame
   {
     return VERSION;
   }
+  
+
 
   private void showResults()
   {

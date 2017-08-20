@@ -104,7 +104,7 @@ public class Crc16
         str = "0" + str;
       }
 
-      return str;
+      return str.toUpperCase();
     }
     catch (Exception ex)
     {

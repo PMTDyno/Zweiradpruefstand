@@ -91,10 +91,10 @@ Features without an ![d] are planned.
 * ![d] Changed mbar to hPa
 
 #### v0.9.10  
-* PS/RPM Notification when measure complete  
-* max rpm increased to 13000  
-* max speed increased to 150 kmh  
-* schleppleistung button enable/disable  
+* ![d] PS/RPM Notification when measure complete  
+* ![d] max rpm increased to 13000  
+* ![d] max speed increased to 150 kmh  
+* ![d] schleppleistung button enable/disable  
 * rpm at configurable value for a few seconds, then measurement starts automatically  
   
 

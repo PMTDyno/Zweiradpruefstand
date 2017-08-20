@@ -1105,9 +1105,13 @@ public class Gui extends javax.swing.JFrame
       if(data.isAutomatic() != vehicleset.isAutomatic())
         data.setAutomatic(vehicleset.isAutomatic());
 
-      //MEASrpm
+      //MEASRPM
       if(data.isMeasRPM() != vehicleset.isMeasRpm())
         data.setMeasRPM(vehicleset.isMeasRpm());
+      
+      //SCHLEPPENABLE
+      if(data.isSchleppEnable() != vehicleset.isSchleppEnable())
+        data.setSchleppEnable(vehicleset.isSchleppEnable());
 
       //VEHICLENAME
       data.setVehicle(vehicleset.getVehicleName());

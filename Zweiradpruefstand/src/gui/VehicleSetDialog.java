@@ -16,10 +16,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(VehicleSetDialog.class.getName());
 
-  private boolean measRpm = false;
+  private boolean measRpm;
   private boolean confirmed = false;
   private boolean twoStroke;
   private boolean automatic;
+  private boolean schleppEnable;
   private String vehicleName;
 
   /**
@@ -40,6 +41,8 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     this.vehicleName = data.getVehicle();
     this.twoStroke = data.isTwoStroke();
+    this.schleppEnable = data.isSchleppEnable();
+    this.measRpm = data.isMeasRPM();
 
     jButConfirm.requestFocusInWindow();
 
@@ -400,6 +403,12 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
       //VEHICLENAME
       jVehicleName.setText(vehicleName);
+      
+      //MEASRPM
+      jMeasRpm.setSelected(measRpm);
+      
+      //SCHLEPPENABLE
+      jSchleppEnable.setSelected(schleppEnable);
 
     }
 
@@ -432,6 +441,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
   {
     return automatic;
   }
+  
+  public boolean isSchleppEnable()
+  {
+    return schleppEnable;
+  }
 
   /**
    * @return true if the settings have changed
@@ -457,6 +471,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     //MEASRPM
     measRpm = jMeasRpm.isSelected();
+    
+    //SCHLEPPENABLE
+    schleppEnable = jSchleppEnable.isSelected();
 
     //VEHICLENAME
     if(jVehicleName.getText().length() >= 25)

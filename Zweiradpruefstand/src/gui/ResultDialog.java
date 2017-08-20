@@ -41,17 +41,13 @@ public class ResultDialog extends javax.swing.JDialog
   private void initComponents()
   {
 
-    jLabel1 = new javax.swing.JLabel();
     jPanelSouth = new javax.swing.JPanel();
     jbutConfirm = new javax.swing.JButton();
+    jPanel1 = new javax.swing.JPanel();
+    jLabel1 = new javax.swing.JLabel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-    jLabel1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
-    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-    jLabel1.setText("ERROR");
-    jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    getContentPane().add(jLabel1, java.awt.BorderLayout.CENTER);
+    setResizable(false);
 
     jbutConfirm.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jbutConfirm.setText("OK");
@@ -65,6 +61,17 @@ public class ResultDialog extends javax.swing.JDialog
     jPanelSouth.add(jbutConfirm);
 
     getContentPane().add(jPanelSouth, java.awt.BorderLayout.SOUTH);
+
+    jPanel1.setLayout(new java.awt.GridBagLayout());
+
+    jLabel1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    jLabel1.setText("ERROR");
+    jLabel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+    jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    jPanel1.add(jLabel1, new java.awt.GridBagConstraints());
+
+    getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
@@ -173,6 +180,7 @@ public class ResultDialog extends javax.swing.JDialog
   
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel jLabel1;
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanelSouth;
   private javax.swing.JButton jbutConfirm;
   // End of variables declaration//GEN-END:variables

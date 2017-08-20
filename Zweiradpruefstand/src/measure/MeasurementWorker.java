@@ -124,7 +124,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
    * will be higher than startRpm. After that it will return the latest
    * RawDatapoint.
    *
-   * @return
+   * @return RawDatapoint
    * @throws CommunicationException
    * @throws TimeoutException
    * @throws InterruptedException
@@ -170,6 +170,14 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     return dp;
   }
 
+  /**
+   * This method is responsible for the main measurement.
+   *
+   * @return ArrayList of Datapoint
+   * @throws CommunicationException
+   * @throws TimeoutException
+   * @throws InterruptedException
+   */
   private ArrayList<Datapoint> collectData() throws CommunicationException,
                                                     TimeoutException,
                                                     InterruptedException
@@ -321,7 +329,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     LOG.finest("raw data: rpm=" + dp.getRpm()
             + "µs wss=" + dp.getWss()
             + "µs time=" + dp.getTime() + "µs");
-    
+
     double rpm = 0.0;
     double rad = toRads(Integer.parseInt(dp.getWss()));
     double kmh = toKmh(rad);

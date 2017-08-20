@@ -1067,6 +1067,7 @@ public class Gui extends javax.swing.JFrame
       //SERIAL PORT
       data.setStartRPM(progset.getStartRpm());
       data.setStartKMH(progset.getStartKmh());
+      data.setIdleRPM(progset.getIdleRpm());
       
       try
       {

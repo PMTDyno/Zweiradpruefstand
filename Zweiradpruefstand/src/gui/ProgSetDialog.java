@@ -2,6 +2,7 @@ package gui;
 
 import data.Data;
 import java.awt.Dimension;
+import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.JOptionPane;
 
@@ -44,6 +45,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   public ProgSetDialog(java.awt.Frame parent, boolean modal)
   {
     super(parent, modal);
+    LOG.setLevel(Level.ALL);
     initComponents();
 
     setSize(new Dimension(600, 350));
@@ -51,7 +53,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.inertia = data.getInertia();
 
     powerunitPS = data.getPowerunit().equals("PS");
-
     jButRadioUnitPS.setSelected(powerunitPS);
 
     this.correctionPower = data.getCorrectionPower();
@@ -625,9 +626,8 @@ public class ProgSetDialog extends javax.swing.JDialog
       jSpinIdleRpm.setValue(idleRpm);
 
     }
-
+    
     super.setVisible(b);
-    LOG.finest("ProgSetDialog visible");
   }
 
   /**

@@ -2,6 +2,7 @@ package gui;
 
 import data.Data;
 import java.awt.Dimension;
+import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.JOptionPane;
 
@@ -33,6 +34,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   public VehicleSetDialog(java.awt.Frame parent, boolean modal)
   {
     super(parent, modal);
+    LOG.setLevel(Level.ALL);
     initComponents();
 
     setTitle("Fahrzeugeinstellungen");

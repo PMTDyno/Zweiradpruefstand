@@ -8,6 +8,7 @@ import logging.Logger;
 import javax.swing.SwingWorker;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 /**
  * starts the measurement and collects all the data
@@ -30,6 +31,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
   public MeasurementWorker(Communication com)
   {
+    LOG.setLevel(Level.ALL);
     this.com = com;
   }
 

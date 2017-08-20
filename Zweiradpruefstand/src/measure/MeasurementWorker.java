@@ -18,6 +18,7 @@ import java.util.logging.Level;
 public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 {
 
+  private int count;
   private boolean measRPM = false;
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(Communication.class.getName());
@@ -72,127 +73,26 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     measRPM = data.isMeasRPM();
 
     //WSS - RPM - TIME
-//    int cnt = 0;
-//    double power = 0;
-//    double umin = 0;
-//    while(true)
-//    {
-//      Double[] val =
-//      {
-//        cnt * 1.0, power, umin
-//      };
-//
-//      publish(val);
-//
-//      power = Math.sin(cnt / 180.0 * Math.PI) * 20 + 30;
-//      umin = power * 100;
-//
-//      cnt++;
-//
-//      if(cnt >= 360)
-//        cnt = 0;
-//
-//      if(cnt > 10000 || isCancelled() || stopRequest.get())
-//        break;
-//
-//      Thread.sleep(data.getPeriodTimeMs());
-//    }
+    simLoop(false);
+
+    count = 0;
+
     try
     {
-      RawDatapoint dp;
 
-      double rpm = 0;   // U/min
-      double kmh = 0;   // Km/h
+      RawDatapoint dp = waitUntilStart();
 
-      int count = 0;
-
-      do
-      {
-        if(isCancelled())
-        {
-          LOG.finest("Cancel triggered!");
-          return null;
-        }
-
-        if(measRPM)
-          com.sendFrame(Communication.Request.START);
-        else
-          com.sendFrame(Communication.Request.STARTNORPM);
-
-        dp = getNextDatapoint();
-
-        if(measRPM)
-        {
-          //converting to U/min 
-          rpm = toUmin(Integer.parseInt(dp.getRpm()));
-        }
-        else
-        {
-          kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
-        }
-
-        Thread.sleep(data.getPeriodTimeMs());
-
-        //automatic starting of measurement when rpm is higher than...
-      } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
+      if(dp == null)
+        return null;
 
       count++;
 
       rawList.add(dp);
-      addAndPublish(dp, count);
+      addAndPublish(dp);
 
       LOG.fine("Collecting data...");
-      while(true)
-      {
 
-        int stopCount = 0;
-        do
-        {
-          if(measRPM)
-            com.sendFrame(Communication.Request.MEASURE);
-          else
-            com.sendFrame(Communication.Request.MEASURENORPM);
-
-          dp = getNextDatapoint();
-
-          if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM())
-            stopCount++;
-          else
-            stopCount = 0;
-
-          if(stopCount >= 5)
-          {
-            LOG.finest("Automatic stopping triggered!");
-            data.setRawDataList(rawList);
-            LOG.info(measureList.size() + " Datensätze erfasst");
-
-            return measureList;
-          }
-
-          Thread.sleep(data.getPeriodTimeMs());
-          
-        } while(stopCount >= 1);
-
-        count++;
-        rawList.add(dp);
-        addAndPublish(dp, count);
-
-        if(isCancelled())
-        {
-          LOG.finest("Cancel triggered!");
-          return null;
-        }
-        if(stopRequest.get())
-        {
-          LOG.finest("Stop Request triggered!");
-          data.setRawDataList(rawList);
-          LOG.info(measureList.size() + " Datensätze erfasst");
-
-          return measureList;
-        }
-
-        Thread.sleep(data.getPeriodTimeMs());
-      }
+      return collectData();
     }
     catch (CommunicationException ex)
     {
@@ -216,6 +116,149 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     finally
     {
       LOG.info("MeasurementWorker done!");
+    }
+  }
+
+  /**
+   * Checks if rpm is constant at a given value. If it is it will check when it
+   * will be higher than startRpm. After that it will return the latest
+   * RawDatapoint.
+   *
+   * @return
+   * @throws CommunicationException
+   * @throws TimeoutException
+   * @throws InterruptedException
+   */
+  private RawDatapoint waitUntilStart() throws CommunicationException,
+                                               TimeoutException,
+                                               InterruptedException
+  {
+    RawDatapoint dp;
+    double rpm = 0;   // U/min
+    double kmh = 0;   // Km/h
+
+    do
+    {
+      if(isCancelled())
+      {
+        LOG.finest("Cancel triggered!");
+        return null;
+      }
+
+      if(measRPM)
+        com.sendFrame(Communication.Request.START);
+      else
+        com.sendFrame(Communication.Request.STARTNORPM);
+
+      dp = getNextDatapoint();
+
+      if(measRPM)
+      {
+        //converting to U/min 
+        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+      }
+      else
+      {
+        kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
+      }
+
+      Thread.sleep(data.getPeriodTimeMs());
+
+      //automatic starting of measurement when rpm is higher than...
+    } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
+
+    return dp;
+  }
+
+  private ArrayList<Datapoint> collectData() throws CommunicationException,
+                                                    TimeoutException,
+                                                    InterruptedException
+  {
+    RawDatapoint dp;
+
+    while(true)
+    {
+
+      int stopCount = 0;
+      do
+      {
+        if(measRPM)
+          com.sendFrame(Communication.Request.MEASURE);
+        else
+          com.sendFrame(Communication.Request.MEASURENORPM);
+
+        dp = getNextDatapoint();
+
+        if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM() + 50)
+          stopCount++;
+        else
+          stopCount = 0;
+
+        if(stopCount >= 5)
+        {
+          LOG.finest("Automatic stopping triggered!");
+          data.setRawDataList(rawList);
+          LOG.info(measureList.size() + " Datensätze erfasst");
+
+          return measureList;
+        }
+
+        Thread.sleep(data.getPeriodTimeMs());
+
+      } while(stopCount >= 1);
+
+      count++;
+      rawList.add(dp);
+      addAndPublish(dp);
+
+      if(isCancelled())
+      {
+        LOG.finest("Cancel triggered!");
+        return null;
+      }
+      if(stopRequest.get())
+      {
+        LOG.finest("Stop Request triggered!");
+        data.setRawDataList(rawList);
+        LOG.info(measureList.size() + " Datensätze erfasst");
+
+        return measureList;
+      }
+
+      Thread.sleep(data.getPeriodTimeMs());
+    }
+  }
+
+  private void simLoop(boolean start) throws InterruptedException
+  {
+    if(start)
+    {
+      LOG.fine("Starting endless simulation loop");
+      int cnt = 0;
+      double power = 0;
+      double umin = 0;
+      while(true)
+      {
+        Double[] val =
+        {
+          cnt * 1.0, power, umin
+        };
+
+        publish(val);
+
+        power = Math.sin(cnt / 180.0 * Math.PI) * 20 + 30;
+        umin = power * 100;
+
+        cnt++;
+
+        if(cnt >= 360)
+          cnt = 0;
+
+        if(cnt > 10000 || isCancelled() || stopRequest.get())
+          break;
+
+        Thread.sleep(data.getPeriodTimeMs());
+      }
     }
   }
 
@@ -271,12 +314,14 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
    * Also publishes the chunks for the dials.
    *
    * @param dp
-   * @param count
    */
-  private void addAndPublish(RawDatapoint dp, int count)
+  private void addAndPublish(RawDatapoint dp)
   {
 
-    LOG.finest("raw data: rpm=" + dp.getRpm() + "µs wss=" + dp.getWss() + "µs time=" + dp.getTime() + "µs");
+    LOG.finest("raw data: rpm=" + dp.getRpm()
+            + "µs wss=" + dp.getWss()
+            + "µs time=" + dp.getTime() + "µs");
+    
     double rpm = 0.0;
     double rad = toRads(Integer.parseInt(dp.getWss()));
     double kmh = toKmh(rad);
@@ -289,7 +334,6 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
 //    if(measRPM && rpm < data.getStartRPM())
 //      stopRequest.set(true);
-
     if(!measRPM && kmh < data.getStartKMH())
       stopRequest.set(true);
 

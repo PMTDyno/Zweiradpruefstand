@@ -1068,6 +1068,7 @@ public class Gui extends javax.swing.JFrame
       data.setStartRPM(progset.getStartRpm());
       data.setStartKMH(progset.getStartKmh());
       data.setIdleRPM(progset.getIdleRpm());
+      data.setHysteresis(progset.getHysteresis());
       
       try
       {
@@ -1702,7 +1703,7 @@ public class Gui extends javax.swing.JFrame
   {
     ResultDialog resultDialog = new ResultDialog(this, true);
     
-    resultDialog.setRPM(data.getMeasureList().get(data.getMeasureList().size()-1).getRpm());
+    resultDialog.setKMH(data.getVmax());
     if(data.getPowerunit().equals("PS"))
       resultDialog.setPS(data.getMaxpower());
     else

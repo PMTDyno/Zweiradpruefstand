@@ -53,6 +53,7 @@ public class Data
   private int windowRelativeY = 0;
   private int periodTimeMs = 40;
   private int humidity = 40;
+  private int hysteresis = 200;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = new ArrayList<>();
@@ -78,6 +79,16 @@ public class Data
   public int getIdleRPM()
   {
     return idleRPM;
+  }
+
+  public int getHysteresis()
+  {
+    return hysteresis;
+  }
+
+  public void setHysteresis(int hysteresis)
+  {
+    this.hysteresis = hysteresis;
   }
 
   public void setIdleRPM(int idleRPM)
@@ -115,8 +126,6 @@ public class Data
     this.startKMH = startKMH;
   }
 
-  
-  
   public int getStartRPM()
   {
     return startRPM;

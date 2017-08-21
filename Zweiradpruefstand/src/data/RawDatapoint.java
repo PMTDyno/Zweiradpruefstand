@@ -24,36 +24,58 @@ public class RawDatapoint
     this.time = time;
   }
 
+  /**
+   *
+   * @return wss in us
+   */
   public String getWss()
   {
     return wss;
   }
 
+  /**
+   *
+   * @return rpm in us
+   */
   public String getRpm()
   {
     return rpm;
   }
 
+  /**
+   *
+   * @return time in us
+   */
   public String getTime()
   {
     return time;
   }
 
+  /**
+   *
+   * @param time time in us
+   */
   public void setTime(String time)
   {
     this.time = time;
   }
 
+  /**
+   *
+   * @param wss wss in us
+   */
   public void setWss(String wss)
   {
     this.wss = wss;
   }
 
+  /**
+   *
+   * @param rpm rpm in us
+   */
   public void setRpm(String rpm)
   {
     this.rpm = rpm;
   }
-  
-  
 
 }

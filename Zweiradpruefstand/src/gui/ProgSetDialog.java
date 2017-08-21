@@ -34,6 +34,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private int startKmh = 5;
   private int startRpm = 2000;
   private int idleRpm = 1600;
+  private int hysteresis = 200;
 
   /**
    * Creates the frame with the given values
@@ -61,6 +62,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.startRpm = data.getStartRPM();
     this.startKmh = data.getStartKMH();
     this.idleRpm = data.getIdleRPM();
+    this.hysteresis = data.getHysteresis();
     
     switch (data.getPngWidth())
     {
@@ -341,7 +343,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     jTextFieldInertia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
     jTextFieldInertia.setText("3,7017");
     jTextFieldInertia.setToolTipText("<html>Trägheitsmoment der Rolle.<br>Standartwert: 3,7017kgm²");
-    jTextFieldInertia.setName(""); // NOI18N
     jTextFieldInertia.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -353,7 +354,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.ipady = 9;
+    gridBagConstraints.ipady = 6;
     gridBagConstraints.insets = new java.awt.Insets(2, 5, 0, 3);
     jPanCorrectionButtons.add(jTextFieldInertia, gridBagConstraints);
 
@@ -651,7 +652,8 @@ public class ProgSetDialog extends javax.swing.JDialog
       jSpinStartRpm.setValue(startRpm);
       jSpinStartKmh.setValue(startKmh);
       jSpinIdleRpm.setValue(idleRpm);
-
+      jSpinHysteresisRpm.setValue(hysteresis);
+      
     }
     
     super.setVisible(b);
@@ -763,6 +765,12 @@ public class ProgSetDialog extends javax.swing.JDialog
   {
     return idleRpm;
   }
+
+  public int getHysteresis()
+  {
+    return hysteresis;
+  }
+  
   
   
   
@@ -881,6 +889,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     startRpm = (int) jSpinStartRpm.getValue();
     startKmh = (int) jSpinStartKmh.getValue();
     idleRpm = (int) jSpinIdleRpm.getValue();
+    hysteresis = (int) jSpinHysteresisRpm.getValue();
     
     if(!error)
     {

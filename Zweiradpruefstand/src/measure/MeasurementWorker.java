@@ -133,9 +133,78 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
                                                TimeoutException,
                                                InterruptedException
   {
+
     RawDatapoint dp;
-    double rpm = 0;   // U/min
-    double kmh = 0;   // Km/h
+    double rpm = 0;             // U/min
+    double kmh = 0;             // Km/h
+    double hysteresisTime = 3000;  // ms
+
+    double tmp = hysteresisTime / data.getPeriodTimeMs();
+    int hysteresisCount = (int) tmp;
+    int hysteresisMin = data.getIdleRPM() - data.getHysteresis();
+    int hysteresisMax = data.getIdleRPM() + data.getHysteresis();
+    int accepted = 0;
+
+    if(measRPM)
+    {
+
+      //wait until high rpm is reached once
+      do
+      {
+        if(isCancelled())
+        {
+          LOG.finest("Cancel triggered!");
+          return null;
+        }
+        com.sendFrame(Communication.Request.START);
+        dp = getNextDatapoint();
+        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+        Thread.sleep(data.getPeriodTimeMs());
+
+      } while(rpm < 2000);
+
+      LOG.info("High RPM reached once");
+      LOG.info("Entering Hysteresis Loop now...");
+
+      //rpm hysteresis for hysteresisTime seconds then ready
+      do
+      {
+        if(isCancelled())
+        {
+          LOG.finest("Cancel triggered!");
+          return null;
+        }
+        com.sendFrame(Communication.Request.START);
+        dp = getNextDatapoint();
+        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+        if(rpm > hysteresisMin && rpm < hysteresisMax)
+        {
+          accepted++;
+          if((accepted % 10) == 0)
+            LOG.fine("Accepted Hysteresis " + accepted + " of " + hysteresisCount);
+        }
+        else
+        {
+          if(accepted != 0)
+            LOG.fine("Resetting Accepted Hysteresis");
+
+          accepted = 0;
+        }
+        Thread.sleep(data.getPeriodTimeMs());
+
+      } while(accepted >= hysteresisCount);
+
+      LOG.info("Hysteresis finished - ready for start");
+
+    }
+    else
+    {
+      //todo
+    }
+    
+    
 
     do
     {
@@ -146,25 +215,21 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       }
 
       if(measRPM)
-        com.sendFrame(Communication.Request.START);
-      else
-        com.sendFrame(Communication.Request.STARTNORPM);
-
-      dp = getNextDatapoint();
-
-      if(measRPM)
       {
-        //converting to U/min 
+        com.sendFrame(Communication.Request.START);
+        dp = getNextDatapoint();
         rpm = toUmin(Integer.parseInt(dp.getRpm()));
       }
       else
       {
+        com.sendFrame(Communication.Request.STARTNORPM);
+        dp = getNextDatapoint();
         kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
       }
 
       Thread.sleep(data.getPeriodTimeMs());
 
-      //automatic starting of measurement when rpm is higher than...
+      
     } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
 
     return dp;

@@ -414,7 +414,6 @@ public class VehicleSetDialog extends javax.swing.JDialog
     }
 
     super.setVisible(b);
-    LOG.finest("VehicleSetDialog visible");
   }
 
   /**

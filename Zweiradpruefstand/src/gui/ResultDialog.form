@@ -69,7 +69,7 @@
                     <LineBorder thickness="3"/>
                   </Border>
                   <Border PropertyName="inside" info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                    <EmptyBorder bottom="5" left="5" right="5" top="5"/>
+                    <EmptyBorder bottom="10" left="10" right="10" top="10"/>
                   </Border>
                 </CompoundBorder>
               </Border>

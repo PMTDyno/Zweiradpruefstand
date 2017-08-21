@@ -16,14 +16,14 @@ public class ResultDialog extends javax.swing.JDialog
 
   private double kw;
   private double ps;
-  private double rpm;
-  
+  private double kmh;
+
   /**
    * Creates new form ResultDialog
    */
   public ResultDialog(java.awt.Frame parent, boolean modal)
   {
-    
+
     super(parent, modal);
     setTitle("Maximalwerte");
     setMinimumSize(new Dimension(350, 300));
@@ -67,7 +67,7 @@ public class ResultDialog extends javax.swing.JDialog
     jLabel1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
     jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     jLabel1.setText("ERROR");
-    jLabel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+    jLabel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3), javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)));
     jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     jPanel1.add(jLabel1, new java.awt.GridBagConstraints());
 
@@ -147,37 +147,28 @@ public class ResultDialog extends javax.swing.JDialog
   {
     this.ps = ps;
   }
-  
-  public void setRPM(double rpm)
+
+  public void setKMH(double kmh)
   {
-    this.rpm = rpm;
+    this.kmh = kmh;
   }
-  
+
   public void setKW(double kw)
   {
     this.kw = kw;
   }
-  
+
   public void update()
   {
-    if(rpm == 0)
-    {
-      if(kw == 0)
-        jLabel1.setText(ps + "PS");
-      else
-        jLabel1.setText(kw + "kW");
-    }
+
+    if(kw == 0)
+      jLabel1.setText(String.format("<html>%.2f PS<br/>%.1f Km/h</html>", ps, kmh));
     else
-    {
-      if(kw == 0)
-        jLabel1.setText(String.format("<html>%.2f PS<br/>%.0f U/min</html>", ps, rpm));
-      else
-        jLabel1.setText(String.format("<html>%.2f kW<br/>%.0f U/min</html>", kw, rpm));
-    }
-    
+      jLabel1.setText(String.format("<html>%.2f kW<br/>%.1f Km/h</html>", kw, kmh));
+
   }
-  
-  
+
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel jLabel1;
   private javax.swing.JPanel jPanel1;

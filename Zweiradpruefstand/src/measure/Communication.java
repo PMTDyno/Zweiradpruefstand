@@ -1,6 +1,7 @@
 package measure;
 
 import data.Data;
+import gui.MeasureDialog;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -31,6 +32,7 @@ public class Communication
   public static final byte EOT = 3; //0x03
 
   private PortCom port;
+  private MeasureDialog dialog;
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
   private long refreshLock = 0;
@@ -50,6 +52,16 @@ public class Communication
     port = new PortCom();
   }
 
+  public void setMeasureDialog(MeasureDialog dialog)
+  {
+    this.dialog = dialog;
+  }
+  
+  public void setStatus(String status)
+  {
+    dialog.setStatus(status);
+  }
+  
   public void connect(String serialPort) throws CommunicationException,
                                                 TimeoutException
   {

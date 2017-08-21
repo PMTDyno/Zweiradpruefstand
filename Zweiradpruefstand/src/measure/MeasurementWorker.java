@@ -141,10 +141,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     double tmp = hysteresisTime / data.getPeriodTimeMs();
     int hysteresisCount = (int) tmp;
-    int hysteresisMin = data.getIdleRPM() - data.getHysteresis();
-    int hysteresisMax = data.getIdleRPM() + data.getHysteresis();
+    int hysteresisMin = data.getIdleRPM() - data.getHysteresisRPM();
+    int hysteresisMax = data.getIdleRPM() + data.getHysteresisRPM();
     int accepted = 0;
 
+    com.setStatus("HOCHSCHALTEN");
+    
     if(measRPM)
     {
 
@@ -167,6 +169,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       LOG.info("High RPM reached once");
       LOG.info("Entering Hysteresis Loop now...");
 
+      com.setStatus("WARTEN");
+      
       //rpm hysteresis for hysteresisTime seconds then ready
       do
       {
@@ -204,7 +208,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       //todo
     }
     
-    
+    com.setStatus("BEREIT");
 
     do
     {
@@ -232,6 +236,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       
     } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
 
+    com.setStatus("LÄUFT");
+    
     return dp;
   }
 

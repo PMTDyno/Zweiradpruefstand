@@ -1068,7 +1068,9 @@ public class Gui extends javax.swing.JFrame
       data.setStartRPM(progset.getStartRpm());
       data.setStartKMH(progset.getStartKmh());
       data.setIdleRPM(progset.getIdleRpm());
-      data.setHysteresis(progset.getHysteresis());
+      data.setIdleKMH(progset.getIdleKmh());
+      data.setHysteresisRPM(progset.getHysteresisRpm());
+      data.setHysteresisKMH(progset.getHysteresisKmh());
       
       try
       {

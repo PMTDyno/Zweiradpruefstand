@@ -31,10 +31,12 @@ public class ProgSetDialog extends javax.swing.JDialog
   private double inertia = 3.7017;
   //COMMUNICATION
   private int periodTimeMs = 40;
-  private int startKmh = 5;
+  private int startKmh = 10;
+  private int idleKmh = 4;
+  private int hysteresisKmh = 2;
   private int startRpm = 2000;
   private int idleRpm = 1600;
-  private int hysteresis = 200;
+  private int hysteresisRpm = 200;
 
   /**
    * Creates the frame with the given values
@@ -62,7 +64,9 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.startRpm = data.getStartRPM();
     this.startKmh = data.getStartKMH();
     this.idleRpm = data.getIdleRPM();
-    this.hysteresis = data.getHysteresis();
+    this.idleKmh = data.getIdleKMH();
+    this.hysteresisRpm = data.getHysteresisRPM();
+    this.hysteresisKmh = data.getHysteresisKMH();
     
     switch (data.getPngWidth())
     {
@@ -734,10 +738,12 @@ public class ProgSetDialog extends javax.swing.JDialog
       jSpinStartRpm.setValue(startRpm);
       jSpinStartKmh.setValue(startKmh);
       jSpinIdleRpm.setValue(idleRpm);
-      jSpinHysteresisRpm.setValue(hysteresis);
-      
+      jSpinIdleKmh.setValue(idleKmh);
+      jSpinHysteresisRpm.setValue(hysteresisRpm);
+      jSpinHysteresisKmh.setValue(hysteresisKmh);
+
     }
-    
+
     super.setVisible(b);
   }
 
@@ -838,6 +844,16 @@ public class ProgSetDialog extends javax.swing.JDialog
     return startRpm;
   }
 
+  public int getIdleKmh()
+  {
+    return idleKmh;
+  }
+
+  public int getHysteresisKmh()
+  {
+    return hysteresisKmh;
+  }
+
   public int getStartKmh()
   {
     return startKmh;
@@ -848,14 +864,11 @@ public class ProgSetDialog extends javax.swing.JDialog
     return idleRpm;
   }
 
-  public int getHysteresis()
+  public int getHysteresisRpm()
   {
-    return hysteresis;
+    return hysteresisRpm;
   }
-  
-  
-  
-  
+
   /*---PRIVATE METHODS-------------------------------------*/
   /**
    * Checks if all the values are correct and saves the changed values. Then
@@ -971,8 +984,10 @@ public class ProgSetDialog extends javax.swing.JDialog
     startRpm = (int) jSpinStartRpm.getValue();
     startKmh = (int) jSpinStartKmh.getValue();
     idleRpm = (int) jSpinIdleRpm.getValue();
-    hysteresis = (int) jSpinHysteresisRpm.getValue();
-    
+    idleKmh = (int) jSpinIdleKmh.getValue();
+    hysteresisRpm = (int) jSpinHysteresisRpm.getValue();
+    hysteresisKmh = (int) jSpinHysteresisKmh.getValue();
+
     if(!error)
     {
       settingsChanged = true;

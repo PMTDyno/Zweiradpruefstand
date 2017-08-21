@@ -42,8 +42,9 @@ public class Data
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
 
-  private int startKMH = 5;
+  private int startKMH = 10;
   private int startRPM = 2000;
+  private int idleKMH = 4;
   private int idleRPM = 1600;
   private int pngWidth = 800;
   private int pngHeight = 600;
@@ -53,7 +54,8 @@ public class Data
   private int windowRelativeY = 0;
   private int periodTimeMs = 40;
   private int humidity = 40;
-  private int hysteresis = 200;
+  private int hysteresisRPM = 200;
+  private int hysteresisKMH = 2;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = new ArrayList<>();
@@ -81,14 +83,34 @@ public class Data
     return idleRPM;
   }
 
-  public int getHysteresis()
+  public int getHysteresisRPM()
   {
-    return hysteresis;
+    return hysteresisRPM;
   }
 
-  public void setHysteresis(int hysteresis)
+  public int getIdleKMH()
   {
-    this.hysteresis = hysteresis;
+    return idleKMH;
+  }
+
+  public void setIdleKMH(int idleKMH)
+  {
+    this.idleKMH = idleKMH;
+  }
+
+  public int getHysteresisKMH()
+  {
+    return hysteresisKMH;
+  }
+
+  public void setHysteresisKMH(int hysteresisKMH)
+  {
+    this.hysteresisKMH = hysteresisKMH;
+  }
+
+  public void setHysteresisRPM(int hysteresisRPM)
+  {
+    this.hysteresisRPM = hysteresisRPM;
   }
 
   public void setIdleRPM(int idleRPM)

@@ -1,6 +1,7 @@
 package gui;
 
 import data.Data;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
@@ -70,6 +71,7 @@ public class MeasureDialog extends javax.swing.JDialog
   {
     this.gui = gui;
     worker = new Measure(com);
+    com.setMeasureDialog(this);
     setLocationRelativeTo(gui);
   }
 
@@ -87,6 +89,8 @@ public class MeasureDialog extends javax.swing.JDialog
     jPanStatus = new javax.swing.JPanel();
     jLabelCount = new javax.swing.JLabel();
     jProgressBar = new javax.swing.JProgressBar();
+    jLabel = new javax.swing.JLabel();
+    jLabelStatus = new javax.swing.JLabel();
     jPanDial = new javax.swing.JPanel();
     jFrameSpeed = new javax.swing.JInternalFrame();
     jFrameRpm = new javax.swing.JInternalFrame();
@@ -110,6 +114,15 @@ public class MeasureDialog extends javax.swing.JDialog
     jProgressBar.setStringPainted(true);
     jPanStatus.add(jProgressBar);
 
+    jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jLabel.setText("Status:");
+    jLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
+    jPanStatus.add(jLabel);
+
+    jLabelStatus.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jLabelStatus.setText("HOCHSCHALTEN");
+    jPanStatus.add(jLabelStatus);
+
     jPanMain.add(jPanStatus, java.awt.BorderLayout.PAGE_START);
 
     jPanDial.setLayout(new java.awt.GridLayout(1, 1));
@@ -119,7 +132,7 @@ public class MeasureDialog extends javax.swing.JDialog
     jPanDial.add(jFrameSpeed);
 
     jFrameRpm.setVisible(true);
-    jFrameRpm.getContentPane().setLayout(new java.awt.GridLayout());
+    jFrameRpm.getContentPane().setLayout(new java.awt.GridLayout(1, 0));
     jPanDial.add(jFrameRpm);
 
     jPanMain.add(jPanDial, java.awt.BorderLayout.CENTER);
@@ -195,7 +208,37 @@ public class MeasureDialog extends javax.swing.JDialog
 
       });
 
+//      new Thread(
+//              new Runnable()
+//      {
+//
+//        @Override
+//        public void run()
+//        {
+//          while(true)
+//          {
+//            try
+//            {
+//              dialog.setStatus("HOCHSCHALTEN");
+//              Thread.sleep(1000);
+//              dialog.setStatus("WARTEN");
+//              Thread.sleep(1000);
+//              dialog.setStatus("BEREIT");
+//              Thread.sleep(1000);
+//              dialog.setStatus("LÄUFT");
+//              Thread.sleep(1000);
+//            }
+//            catch (InterruptedException ex)
+//            {
+//              java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//          }
+//        }
+//
+//      }).start();
+
       dialog.setVisible(true);
+
     });
 
   }
@@ -203,7 +246,9 @@ public class MeasureDialog extends javax.swing.JDialog
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JInternalFrame jFrameRpm;
   private javax.swing.JInternalFrame jFrameSpeed;
+  private javax.swing.JLabel jLabel;
   private javax.swing.JLabel jLabelCount;
+  private javax.swing.JLabel jLabelStatus;
   private javax.swing.JPanel jPanButtons;
   private javax.swing.JPanel jPanDial;
   private javax.swing.JPanel jPanMain;
@@ -220,6 +265,31 @@ public class MeasureDialog extends javax.swing.JDialog
       worker.cancel(true);
       close();
     }
+  }
+
+  /**
+   *
+   * @param status HOCHSCHALTEN, WARTEN, BEREIT, LÄUFT
+   */
+  public void setStatus(String status)
+  {
+    switch (status)
+    {
+      case "HOCHSCHALTEN":
+        jLabelStatus.setForeground(Color.RED);
+        break;
+      case "WARTEN":
+        jLabelStatus.setForeground(Color.ORANGE);
+        break;
+      case "BEREIT":
+        jLabelStatus.setForeground(Color.GREEN);
+        break;
+
+      default:
+        jLabelStatus.setForeground(Color.BLACK);
+    }
+
+    jLabelStatus.setText(status);
   }
 
   private void finish()

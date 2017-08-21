@@ -111,7 +111,7 @@ public class Communication
    *
    * @param timeout
    * @param unit
-   * @return
+   * @return the Frame
    * @throws CommunicationException
    * @throws TimeoutException
    * @throws InterruptedException
@@ -361,7 +361,7 @@ public class Communication
                 frame.update(b);
                 LOG.info(String.format("Frame received: %s",
                                        new String(frame.getFrameBytes(), "utf-8")));
-                
+
                 synchronized (receivedFrameList)
                 {
                   receivedFrameList.add(new Frame(frame));

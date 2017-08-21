@@ -48,7 +48,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     initComponents();
 
-    setSize(new Dimension(600, 350));
+    setSize(new Dimension(550, 450));
 
     this.inertia = data.getInertia();
 
@@ -170,6 +170,9 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelStartRpm = new javax.swing.JLabel();
     jSpinStartRpm = new javax.swing.JSpinner();
     jLabelStartRpm2 = new javax.swing.JLabel();
+    jLabelHysteresisRpm = new javax.swing.JLabel();
+    jSpinHysteresisRpm = new javax.swing.JSpinner();
+    jLabelHysteresisRpm2 = new javax.swing.JLabel();
     jPanButtons = new javax.swing.JPanel();
     jButCancel = new javax.swing.JButton();
     jButConfirm = new javax.swing.JButton();
@@ -184,7 +187,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jPanPNG.setLayout(new java.awt.GridBagLayout());
 
-    jPanPNGButtons.setBorder(javax.swing.BorderFactory.createTitledBorder("PNG Auflösung"));
+    jPanPNGButtons.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)), "PNG Auflösung"));
     jPanPNGButtons.setLayout(new java.awt.GridBagLayout());
 
     resolutionGroup.add(jButRadioPng);
@@ -264,7 +267,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jPanPower.setLayout(new java.awt.GridBagLayout());
 
-    jPanPowerButtons.setBorder(javax.swing.BorderFactory.createTitledBorder("Leistungseinheit"));
+    jPanPowerButtons.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)), "Leistungseinheit"));
     jPanPowerButtons.setLayout(new java.awt.GridBagLayout());
 
     powerunitGroup.add(jButRadioUnitPS);
@@ -294,7 +297,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jPanCorrection.setLayout(new java.awt.GridBagLayout());
 
-    jPanCorrectionButtons.setBorder(javax.swing.BorderFactory.createTitledBorder("Korrekturfaktoren"));
+    jPanCorrectionButtons.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)), "Korrekturfaktoren"));
     jPanCorrectionButtons.setLayout(new java.awt.GridBagLayout());
 
     jSpinCorrectPower.setModel(new javax.swing.SpinnerNumberModel(1.0d, 0.5d, 2.0d, 0.1d));
@@ -372,7 +375,7 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jPanSerial.setLayout(new java.awt.GridBagLayout());
 
-    jPanSerialButtons.setBorder(javax.swing.BorderFactory.createTitledBorder("Kommunikation"));
+    jPanSerialButtons.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)), "Kommunikation"));
     jPanSerialButtons.setLayout(new java.awt.GridBagLayout());
 
     jLabelPeriod.setText("Zeitintervall");
@@ -443,7 +446,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanSerialButtons.add(jSpinIdleRpm, gridBagConstraints);
 
     jLabelIdleRpm2.setText("U/min");
-    jLabelIdleRpm2.setToolTipText("");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 3;
@@ -475,6 +477,31 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelStartRpm2, gridBagConstraints);
+
+    jLabelHysteresisRpm.setText("Hysterese +/-");
+    jLabelHysteresisRpm.setToolTipText("<html>Hysterese für die Motordrehzahl wenn bereit.<br>Der eingestellte Wert gilt für + als auch -");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanSerialButtons.add(jLabelHysteresisRpm, gridBagConstraints);
+
+    jSpinHysteresisRpm.setModel(new javax.swing.SpinnerNumberModel(200, 25, 5000, 50));
+    jSpinHysteresisRpm.setToolTipText("<html>Hysterese für die Motordrehzahl wenn bereit.<br>Der eingestellte Wert gilt für + als auch -");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 4, 0);
+    jPanSerialButtons.add(jSpinHysteresisRpm, gridBagConstraints);
+
+    jLabelHysteresisRpm2.setText("U/min");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanSerialButtons.add(jLabelHysteresisRpm2, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.ipadx = 10;
@@ -871,6 +898,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JRadioButton jButRadioUnitPS;
   private javax.swing.JRadioButton jButRadioUnitkW;
   private javax.swing.JTextField jHeight;
+  private javax.swing.JLabel jLabelHysteresisRpm;
+  private javax.swing.JLabel jLabelHysteresisRpm2;
   private javax.swing.JLabel jLabelIdleRpm;
   private javax.swing.JLabel jLabelIdleRpm2;
   private javax.swing.JLabel jLabelInertia;
@@ -898,6 +927,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanSerialButtons;
   private javax.swing.JSpinner jSpinCorrectPower;
   private javax.swing.JSpinner jSpinCorrectTorque;
+  private javax.swing.JSpinner jSpinHysteresisRpm;
   private javax.swing.JSpinner jSpinIdleRpm;
   private javax.swing.JSpinner jSpinPeriod;
   private javax.swing.JSpinner jSpinStartKmh;

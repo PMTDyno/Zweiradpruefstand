@@ -16,44 +16,41 @@ public class Frame
   private String frame;
   private String data;
 
-
-  public Frame (FrameBytes bytes) throws CommunicationException
+  public Frame(FrameBytes bytes) throws CommunicationException
   {
     LOG.setLevel(Level.ALL);
     this.bytes = bytes;
     checkFrame();
   }
 
-
-  public String getData ()
+  public String getData()
   {
     return data;
   }
 
-
-  private void checkFrame () throws CommunicationException
+  private void checkFrame() throws CommunicationException
   {
     try
     {
       //FRAME AVAILABLE?
-      if (bytes == null)
+      if(bytes == null)
       {
         throw new CommunicationException("no frame captured");
       }
 
-      if (bytes.getFrameBytes().length < 1)
+      if(bytes.getFrameBytes().length < 1)
       {
         throw new CommunicationException("no frame captured");
       }
 
       //START STOP
       frame = new String(bytes.getFrameBytes(), "utf-8");
-      if (frame.charAt(0) != Communication.SOT)
+      if(frame.charAt(0) != Communication.SOT)
       {
         throw new CommunicationException("frame not starting with SOT");
       }
 
-      if (frame.charAt(frame.length() - 1) != Communication.EOT)
+      if(frame.charAt(frame.length() - 1) != Communication.EOT)
       {
         throw new CommunicationException("frame not ending with EOT");
       }
@@ -62,33 +59,32 @@ public class Frame
 
       //DATA AVAILABLE?
       int index = frame.indexOf('=');
-      if (index < 0)
+      if(index < 0)
       {
         throw new CommunicationException("missing seperator '='");
       }
 
       data = frame.substring(1, index);
-      if (data == null || data.isEmpty())
+      if(data == null || data.isEmpty())
       {
         throw new CommunicationException("no data available");
       }
 
-      if (data.split(":").length != 3 && data.split(":").length != 2)
+      if(data.split(":").length != 3 && data.split(":").length != 2)
       {
-        throw new CommunicationException("wrong format! Wrong number of '-'");
+        throw new CommunicationException("Wrong format! Wrong number of ':'");
       }
 
       LOG.fine("DATA AVAILABLE");
 
       //CHECKSUM
       String checksum = frame.substring(index + 1, frame.indexOf(Communication.EOT));
-      if (!Crc16.checkCRC(frame.substring(0, index + 1), checksum))
+      if(!Crc16.checkCRC(frame.substring(0, index + 1), checksum))
       {
         throw new CommunicationException("checksum not matching");
       }
 
       LOG.fine("CHECKSUM MATCHING");
-
 
       LOG.info("Frame correct!");
     }

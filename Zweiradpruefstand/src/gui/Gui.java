@@ -46,12 +46,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.9
+ * @version 0.9.10
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.9";
+  private static final String VERSION = "0.9.10";
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());

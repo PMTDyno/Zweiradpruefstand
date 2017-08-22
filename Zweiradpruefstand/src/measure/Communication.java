@@ -41,7 +41,7 @@ public class Communication
   private long refreshLock = 0;
   private ArrayList<Datapoint> simData = null;
   private int simCount = 0;
-  private boolean simEnable = false;
+  private final boolean simEnable = false;
 
   public enum Request
   {

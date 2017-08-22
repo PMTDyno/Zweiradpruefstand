@@ -110,6 +110,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     }
     catch (Exception ex)
     {
+      ex.printStackTrace(System.err);
       LOG.severe(ex);
       throw ex;
     }
@@ -137,18 +138,19 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
     RawDatapoint dp;
     double rpm = 0;             // U/min
     double kmh = 0;             // Km/h
-    double hysteresisTime = 3000;  // ms
+    double hysteresisTime = data.getHysteresisTIME();  // ms
 
     double tmp = hysteresisTime / data.getPeriodTimeMs();
     int hysteresisCount = (int) tmp;
-    int hysteresisMin = data.getIdleRPM() - data.getHysteresisRPM();
-    int hysteresisMax = data.getIdleRPM() + data.getHysteresisRPM();
+
     int accepted = 0;
 
     com.setStatus("HOCHSCHALTEN");
-    
+
     if(measRPM)
     {
+      int hysteresisMin = data.getIdleRPM() - data.getHysteresisRPM();
+      int hysteresisMax = data.getIdleRPM() + data.getHysteresisRPM();
 
       //wait until high rpm is reached once
       do
@@ -160,7 +162,12 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         }
         com.sendFrame(Communication.Request.START);
         dp = getNextDatapoint();
-        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+        if(Integer.parseInt(dp.getRpm()) != 0)
+          rpm = toUmin(Integer.parseInt(dp.getRpm()));
+        else
+          rpm = 0;
+
+        setDials(dp);
 
         Thread.sleep(data.getPeriodTimeMs());
 
@@ -170,7 +177,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       LOG.info("Entering Hysteresis Loop now...");
 
       com.setStatus("WARTEN");
-      
+
       //rpm hysteresis for hysteresisTime seconds then ready
       do
       {
@@ -181,7 +188,11 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         }
         com.sendFrame(Communication.Request.START);
         dp = getNextDatapoint();
-        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+        if(Integer.parseInt(dp.getRpm()) != 0)
+          rpm = toUmin(Integer.parseInt(dp.getRpm()));
+        else
+          rpm = 0;
 
         if(rpm > hysteresisMin && rpm < hysteresisMax)
         {
@@ -197,17 +208,83 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
           accepted = 0;
         }
         Thread.sleep(data.getPeriodTimeMs());
+        setDials(dp);
 
-      } while(accepted >= hysteresisCount);
+      } while(accepted <= hysteresisCount);
 
       LOG.info("Hysteresis finished - ready for start");
 
     }
     else
     {
-      //todo
+
+      int hysteresisMin = data.getIdleKMH() - data.getHysteresisKMH();
+      int hysteresisMax = data.getIdleKMH() + data.getHysteresisKMH();
+
+      //wait until high kmh is reached once
+      do
+      {
+        if(isCancelled())
+        {
+          LOG.finest("Cancel triggered!");
+          return null;
+        }
+        com.sendFrame(Communication.Request.STARTNORPM);
+        dp = getNextDatapoint();
+
+        if(Integer.parseInt(dp.getWss()) != 0)
+          kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
+        else
+          kmh = 0;
+
+        setDials(dp);
+
+        Thread.sleep(data.getPeriodTimeMs());
+
+      } while(kmh < 8);
+
+      LOG.info("High Speed(8Km/h) reached once");
+      LOG.info("Entering Hysteresis Loop now...");
+
+      com.setStatus("WARTEN");
+
+      //kmh hysteresis for hysteresisTime seconds then ready
+      do
+      {
+        if(isCancelled())
+        {
+          LOG.finest("Cancel triggered!");
+          return null;
+        }
+        com.sendFrame(Communication.Request.STARTNORPM);
+        dp = getNextDatapoint();
+
+        if(Integer.parseInt(dp.getWss()) != 0)
+          kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
+        else
+          kmh = 0;
+
+        if(kmh > hysteresisMin && kmh < hysteresisMax)
+        {
+          accepted++;
+          if((accepted % 10) == 0)
+            LOG.fine("Accepted Hysteresis " + accepted + " of " + hysteresisCount);
+        }
+        else
+        {
+          if(accepted != 0)
+            LOG.fine("Resetting Accepted Hysteresis");
+
+          accepted = 0;
+        }
+        Thread.sleep(data.getPeriodTimeMs());
+        setDials(dp);
+
+      } while(accepted >= hysteresisCount);
+
+      LOG.info("Hysteresis finished - ready for start");
     }
-    
+
     com.setStatus("BEREIT");
 
     do
@@ -222,22 +299,32 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
       {
         com.sendFrame(Communication.Request.START);
         dp = getNextDatapoint();
-        rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+        if(Integer.parseInt(dp.getRpm()) != 0)
+          rpm = toUmin(Integer.parseInt(dp.getRpm()));
+        else
+          rpm = 0;
+
       }
       else
       {
         com.sendFrame(Communication.Request.STARTNORPM);
         dp = getNextDatapoint();
-        kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
+
+        if(Integer.parseInt(dp.getWss()) != 0)
+          kmh = toKmh(toRads(Integer.parseInt(dp.getWss())));
+        else
+          kmh = 0;
+
       }
 
       Thread.sleep(data.getPeriodTimeMs());
+      setDials(dp);
 
-      
     } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
 
     com.setStatus("LÄUFT");
-    
+
     return dp;
   }
 
@@ -268,7 +355,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
         dp = getNextDatapoint();
 
-        if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM() + 50)
+        if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM())
           stopCount++;
         else
           stopCount = 0;
@@ -424,7 +511,30 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     publish(chunks);
 
-    LOG.finest("published(" + chunks[0] + "count " + chunks[1] + "km/h " + chunks[2] + "rpm)");
+  }
+
+  private void setDials(RawDatapoint dp)
+  {
+
+    double rpm = 0.0;
+    double rad = toRads(Integer.parseInt(dp.getWss()));
+    double kmh = toKmh(rad);
+    double time = toSec(Integer.parseInt(dp.getTime()));
+
+    if(Integer.parseInt(dp.getWss()) == 0)
+      kmh = 0;
+
+    if(measRPM && Integer.parseInt(dp.getRpm()) != 0)
+      rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+    Double[] chunks =
+    {
+      0.0, kmh, rpm
+    };
+
+    publish(chunks);
+
+    //LOG.finest("published(" + chunks[0] + "count " + chunks[1] + "km/h " + chunks[2] + "rpm)");
   }
 
 }

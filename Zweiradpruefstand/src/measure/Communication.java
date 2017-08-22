@@ -1,9 +1,12 @@
 package measure;
 
 import data.Data;
+import data.Datapoint;
+import data.ReadCSV;
 import gui.MeasureDialog;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -36,6 +39,9 @@ public class Communication
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
   private long refreshLock = 0;
+  private ArrayList<Datapoint> simData = null;
+  private int simCount = 0;
+  private boolean simEnable = true;
 
   public enum Request
   {
@@ -56,12 +62,12 @@ public class Communication
   {
     this.dialog = dialog;
   }
-  
+
   public void setStatus(String status)
   {
     dialog.setStatus(status);
   }
-  
+
   public void connect(String serialPort) throws CommunicationException,
                                                 TimeoutException
   {
@@ -100,6 +106,33 @@ public class Communication
    */
   public String[] getFrameData() throws CommunicationException, TimeoutException
   {
+
+    if(simEnable)
+    {
+      try
+      {
+        if(simData == null)
+          simData = new ReadCSV("C:\\Users\\Levin\\Desktop\\SimulationData.csv").read();
+
+        Datapoint dp = simData.get(simCount);
+        String[] string =
+        {
+          String.format("%.0f", ((1 / (dp.getWss() / 2.0 / Math.PI )) / 26.0) * 1000000.0),
+          String.format("%.0f", 1 / (dp.getRpm() / 60) * 1000000.0),
+          String.format("%.0f", dp.getTime() * 1000000.0)
+        };
+        simCount++;
+        //LOG.fine("Simulation returned(" + simCount + "): " + string[0] + ':' + string[1] + ':' + string[2]);
+
+        return string;
+
+      }
+      catch (Exception ex)
+      {
+        throw new CommunicationException("Simulation Error:" + ex.getMessage());
+      }
+    }
+
     try
     {
       return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split(":");
@@ -253,6 +286,9 @@ public class Communication
                                                 TimeoutException,
                                                 IllegalArgumentException
   {
+    if(simEnable)
+      return;
+
     if(port == null)
     {
       throw new CommunicationException("port not initialized!");

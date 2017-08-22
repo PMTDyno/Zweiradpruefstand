@@ -46,12 +46,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.10
+ * @version 0.9.11
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.10";
+  private static final String VERSION = "0.9.11";
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
@@ -155,6 +155,7 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
+    jMenuStartSim = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -405,6 +406,16 @@ public class Gui extends javax.swing.JFrame
     });
     jHelp.add(jMenuAbout);
 
+    jMenuStartSim.setText("Start Simulation");
+    jMenuStartSim.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuStartSimActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuStartSim);
+
     jMenuBar.add(jHelp);
 
     setJMenuBar(jMenuBar);
@@ -514,6 +525,11 @@ public class Gui extends javax.swing.JFrame
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
+  private void jMenuStartSimActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuStartSimActionPerformed
+  {//GEN-HEADEREND:event_jMenuStartSimActionPerformed
+    start();
+  }//GEN-LAST:event_jMenuStartSimActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -598,6 +614,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
+  private javax.swing.JMenuItem jMenuStartSim;
   private javax.swing.JPanel jPanRight;
   private javax.swing.JPanel jPanSerial;
   private javax.swing.JPanel jPanSerialButtons;
@@ -1071,7 +1088,8 @@ public class Gui extends javax.swing.JFrame
       data.setIdleKMH(progset.getIdleKmh());
       data.setHysteresisRPM(progset.getHysteresisRpm());
       data.setHysteresisKMH(progset.getHysteresisKmh());
-      
+      data.setHysteresisTIME(progset.getHysteresisTime());
+
       try
       {
         //safe config File
@@ -1112,7 +1130,7 @@ public class Gui extends javax.swing.JFrame
       //MEASRPM
       if(data.isMeasRPM() != vehicleset.isMeasRpm())
         data.setMeasRPM(vehicleset.isMeasRpm());
-      
+
       //SCHLEPPENABLE
       if(data.isSchleppEnable() != vehicleset.isSchleppEnable())
         data.setSchleppEnable(vehicleset.isSchleppEnable());
@@ -1500,7 +1518,7 @@ public class Gui extends javax.swing.JFrame
         {
           break;
         }
-        
+
         series1.add(rpm.get(i), pwr.get(i));
         series2.add(rpm.get(i), trq.get(i));
 
@@ -1698,19 +1716,17 @@ public class Gui extends javax.swing.JFrame
   {
     return VERSION;
   }
-  
-
 
   private void showResults()
   {
     ResultDialog resultDialog = new ResultDialog(this, true);
-    
+
     resultDialog.setKMH(data.getVmax());
     if(data.getPowerunit().equals("PS"))
       resultDialog.setPS(data.getMaxpower());
     else
       resultDialog.setKW(data.getMaxpower());
-    
+
     resultDialog.update();
     resultDialog.setVisible(true);
   }

@@ -37,6 +37,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private int startRpm = 2000;
   private int idleRpm = 1600;
   private int hysteresisRpm = 200;
+  private int hysteresisTime = 3000;
 
   /**
    * Creates the frame with the given values
@@ -67,7 +68,8 @@ public class ProgSetDialog extends javax.swing.JDialog
     this.idleKmh = data.getIdleKMH();
     this.hysteresisRpm = data.getHysteresisRPM();
     this.hysteresisKmh = data.getHysteresisKMH();
-    
+    this.hysteresisTime = data.getHysteresisTIME();
+
     switch (data.getPngWidth())
     {
       case 640:
@@ -169,6 +171,9 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelPeriod = new javax.swing.JLabel();
     jSpinPeriod = new javax.swing.JSpinner();
     jLabelPeriod2 = new javax.swing.JLabel();
+    jLabelHysteresisTime = new javax.swing.JLabel();
+    jSpinHysteresisTime = new javax.swing.JSpinner();
+    jLabelHysteresisTime2 = new javax.swing.JLabel();
     jLabelStartKmh = new javax.swing.JLabel();
     jSpinStartKmh = new javax.swing.JSpinner();
     jLabelStartKmh2 = new javax.swing.JLabel();
@@ -413,15 +418,15 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelPeriod.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanSerialButtons.add(jLabelPeriod, gridBagConstraints);
 
-    jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(40, 5, 100, 1));
+    jSpinPeriod.setModel(new javax.swing.SpinnerNumberModel(40, 5, 2000, 1));
     jSpinPeriod.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(4, 5, 4, 0);
     jPanSerialButtons.add(jSpinPeriod, gridBagConstraints);
@@ -429,10 +434,35 @@ public class ProgSetDialog extends javax.swing.JDialog
     jLabelPeriod2.setText("ms");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
     jPanSerialButtons.add(jLabelPeriod2, gridBagConstraints);
+
+    jLabelHysteresisTime.setText("Hysterese Zeitspanne");
+    jLabelHysteresisTime.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    jPanSerialButtons.add(jLabelHysteresisTime, gridBagConstraints);
+
+    jSpinHysteresisTime.setModel(new javax.swing.SpinnerNumberModel(3000, 100, 30000, 100));
+    jSpinHysteresisTime.setToolTipText("<html>Der Zeitabstand zwischen Messpunkten.<br>Kleinerer Wert bedeutet genauere Messung.");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(4, 5, 4, 0);
+    jPanSerialButtons.add(jSpinHysteresisTime, gridBagConstraints);
+
+    jLabelHysteresisTime2.setText("ms");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 2, 0);
+    jPanSerialButtons.add(jLabelHysteresisTime2, gridBagConstraints);
 
     jLabelStartKmh.setText("Startgeschwindigkeit");
     jLabelStartKmh.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Geschwindigkeit erreicht wurde<br>Wird nur verwendet falls<br>Motordrehzahl nicht gemessen wird");
@@ -741,6 +771,7 @@ public class ProgSetDialog extends javax.swing.JDialog
       jSpinIdleKmh.setValue(idleKmh);
       jSpinHysteresisRpm.setValue(hysteresisRpm);
       jSpinHysteresisKmh.setValue(hysteresisKmh);
+      jSpinHysteresisTime.setValue(hysteresisTime);
 
     }
 
@@ -852,6 +883,11 @@ public class ProgSetDialog extends javax.swing.JDialog
   public int getHysteresisKmh()
   {
     return hysteresisKmh;
+  }
+
+  public int getHysteresisTime()
+  {
+    return hysteresisTime;
   }
 
   public int getStartKmh()
@@ -987,6 +1023,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     idleKmh = (int) jSpinIdleKmh.getValue();
     hysteresisRpm = (int) jSpinHysteresisRpm.getValue();
     hysteresisKmh = (int) jSpinHysteresisKmh.getValue();
+    hysteresisTime = (int) jSpinHysteresisTime.getValue();
 
     if(!error)
     {
@@ -1008,6 +1045,8 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JLabel jLabelHysteresisKmh2;
   private javax.swing.JLabel jLabelHysteresisRpm;
   private javax.swing.JLabel jLabelHysteresisRpm2;
+  private javax.swing.JLabel jLabelHysteresisTime;
+  private javax.swing.JLabel jLabelHysteresisTime2;
   private javax.swing.JLabel jLabelIdleKmh;
   private javax.swing.JLabel jLabelIdleKmh2;
   private javax.swing.JLabel jLabelIdleRpm;
@@ -1041,6 +1080,7 @@ public class ProgSetDialog extends javax.swing.JDialog
   private javax.swing.JSpinner jSpinCorrectTorque;
   private javax.swing.JSpinner jSpinHysteresisKmh;
   private javax.swing.JSpinner jSpinHysteresisRpm;
+  private javax.swing.JSpinner jSpinHysteresisTime;
   private javax.swing.JSpinner jSpinIdleKmh;
   private javax.swing.JSpinner jSpinIdleRpm;
   private javax.swing.JSpinner jSpinPeriod;

@@ -56,9 +56,10 @@ public class Data
   private int humidity = 40;
   private int hysteresisRPM = 200;
   private int hysteresisKMH = 2;
+  private int hysteresisTIME = 3000;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
-  private ArrayList<Datapoint> measureList = new ArrayList<>();
+  private ArrayList<Datapoint> measureList = null;
 
   private boolean twoStroke = true;
   private boolean measRPM = true;
@@ -82,6 +83,17 @@ public class Data
   {
     return idleRPM;
   }
+
+  public int getHysteresisTIME()
+  {
+    return hysteresisTIME;
+  }
+
+  public void setHysteresisTIME(int hysteresisTIME)
+  {
+    this.hysteresisTIME = hysteresisTIME;
+  }
+  
 
   public int getHysteresisRPM()
   {

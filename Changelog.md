@@ -102,7 +102,7 @@ Features without an ![d] are planned.
 * ![d] added Hysteresis setting  
 * ![d] added IdleRpm setting  
 * ![d] added visual status labels  
-* measurement starts automatically  
+* ![d] measurement starts automatically  
   
 
 ## v1.0

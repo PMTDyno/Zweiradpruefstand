@@ -46,12 +46,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.9
+ * @version 0.9.11
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.9";
+  private static final String VERSION = "0.9.11";
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
@@ -155,6 +155,7 @@ public class Gui extends javax.swing.JFrame
     jHelp = new javax.swing.JMenu();
     jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
+    jMenuStartSim = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setIconImages(null);
@@ -405,6 +406,16 @@ public class Gui extends javax.swing.JFrame
     });
     jHelp.add(jMenuAbout);
 
+    jMenuStartSim.setText("Start Simulation");
+    jMenuStartSim.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jMenuStartSimActionPerformed(evt);
+      }
+    });
+    jHelp.add(jMenuStartSim);
+
     jMenuBar.add(jHelp);
 
     setJMenuBar(jMenuBar);
@@ -514,6 +525,11 @@ public class Gui extends javax.swing.JFrame
     openMeasureFile();
   }//GEN-LAST:event_jMenuOpenActionPerformed
 
+  private void jMenuStartSimActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuStartSimActionPerformed
+  {//GEN-HEADEREND:event_jMenuStartSimActionPerformed
+    start();
+  }//GEN-LAST:event_jMenuStartSimActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -598,6 +614,7 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;
   private javax.swing.JMenuItem jMenuSettings;
+  private javax.swing.JMenuItem jMenuStartSim;
   private javax.swing.JPanel jPanRight;
   private javax.swing.JPanel jPanSerial;
   private javax.swing.JPanel jPanSerialButtons;
@@ -830,6 +847,7 @@ public class Gui extends javax.swing.JFrame
         series2.clear();
 
         calculate();
+        showResults();
       }
     }
     catch (NumberFormatException ex)
@@ -841,9 +859,9 @@ public class Gui extends javax.swing.JFrame
     }
     catch (Exception ex)
     {
-//      ex.printStackTrace(System.err);
+      ex.printStackTrace(System.err);
       LOG.severe("Error", ex);
-      showErrorMessage("Error", ex.getMessage());
+      showErrorMessage("Error", ex.getMessage() + '\n' + ex.getCause());
     }
 
   }
@@ -1007,7 +1025,7 @@ public class Gui extends javax.swing.JFrame
       //update
       if(data.getMeasureList() != null)
       {
-        switch (updateLevel) //don't insert break!
+        switch (updateLevel) //do not insert break!
         {
           case 3:
             LOG.finest("entering level 3");
@@ -1063,6 +1081,15 @@ public class Gui extends javax.swing.JFrame
       data.setPngWidth(progset.getPNGResolution().width);
       data.setPngHeight(progset.getPNGResolution().height);
 
+      //SERIAL PORT
+      data.setStartRPM(progset.getStartRpm());
+      data.setStartKMH(progset.getStartKmh());
+      data.setIdleRPM(progset.getIdleRpm());
+      data.setIdleKMH(progset.getIdleKmh());
+      data.setHysteresisRPM(progset.getHysteresisRpm());
+      data.setHysteresisKMH(progset.getHysteresisKmh());
+      data.setHysteresisTIME(progset.getHysteresisTime());
+
       try
       {
         //safe config File
@@ -1100,9 +1127,13 @@ public class Gui extends javax.swing.JFrame
       if(data.isAutomatic() != vehicleset.isAutomatic())
         data.setAutomatic(vehicleset.isAutomatic());
 
-      //MEASrpm
+      //MEASRPM
       if(data.isMeasRPM() != vehicleset.isMeasRpm())
         data.setMeasRPM(vehicleset.isMeasRpm());
+
+      //SCHLEPPENABLE
+      if(data.isSchleppEnable() != vehicleset.isSchleppEnable())
+        data.setSchleppEnable(vehicleset.isSchleppEnable());
 
       //VEHICLENAME
       data.setVehicle(vehicleset.getVehicleName());
@@ -1295,7 +1326,7 @@ public class Gui extends javax.swing.JFrame
   /**
    * calculates Power and Torque and updates the Chart
    *
-   * @author Robert Tinauer
+   * @author Levin Messing
    */
   private void calculate()
   {
@@ -1314,7 +1345,7 @@ public class Gui extends javax.swing.JFrame
     ArrayList<Double> omega = new ArrayList<>();
     ArrayList<Double> omegaSchl = new ArrayList<>();
 
-    boolean schleppEnable = true;
+    boolean schleppEnable = data.isSchleppEnable();
 
     double tempFactor = (1013 / data.getPressure()) * Math.sqrt((273 + data.getTemperature()) / 293); //Korrekturfaktor temp
 
@@ -1331,13 +1362,14 @@ public class Gui extends javax.swing.JFrame
         i--;
       }
     }
-    
+
     data.setMeasureList(tempList);
 
     if(removeCount > 1)
       LOG.info("Removed " + removeCount + " Datapoints which are over 20000Rpm");
 
-//    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
+    //add values and filter wss
+    //    LOG.debug("RPM1: " + data.getMeasureList().get(1).getRpm());
     for(int i = 0; i < data.getMeasureList().size() - 1; i++)
     {
       omega.add(data.getMeasureList().get(i).getWss());
@@ -1350,6 +1382,7 @@ public class Gui extends javax.swing.JFrame
     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
 
     //alpha berechnen
+    //aenderung der drehzahl zur zeit
     for(int i = 0; i < omega.size() - 1; i++)
     {
       alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
@@ -1357,15 +1390,15 @@ public class Gui extends javax.swing.JFrame
     alpha = filterValuesOrder(alpha, 0.1, 2);
 
     //faktor fuer berechnungseinheit
-    double factor;
+    double unitFactor;
 
     if(data.getPowerunit().contains("PS"))
     {
-      factor = 1.36;
+      unitFactor = 1.36;
     }
     else
     {
-      factor = 1;
+      unitFactor = 1;
     }
 
     //drehmoment roller
@@ -1448,14 +1481,14 @@ public class Gui extends javax.swing.JFrame
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * omega.get(i) / 1000) * factor * tempFactor);
+        pwr.add((trq.get(i) * omega.get(i) / 1000) * unitFactor * tempFactor);
       }
     }
     else
     {
       for(int i = 0; i < trq.size(); i++)
       {
-        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * factor * tempFactor);
+        pwr.add((trq.get(i) * ((rpm.get(i) / 60) * (2 * Math.PI)) / 1000) * unitFactor * tempFactor);
       }
     }
 
@@ -1483,12 +1516,11 @@ public class Gui extends javax.swing.JFrame
 //        System.out.println(i + " Leistung: " + pwr.get(i) + " Drehmoment: " + trq.get(i) + " Motordrehzahl: " + rpm.get(i));
         if(i == getValMaxIndex(rpm))
         {
-         break;
+          break;
         }
 
-       
-     series1.add(rpm.get(i), pwr.get(i));
-      series2.add(rpm.get(i), trq.get(i));
+        series1.add(rpm.get(i), pwr.get(i));
+        series2.add(rpm.get(i), trq.get(i));
 
       }
     }
@@ -1643,6 +1675,7 @@ public class Gui extends javax.swing.JFrame
       data.setMeasureList(worker.get());
       calculate();
       enableStarting();
+      showResults();
     }
     catch (ExecutionException ex)
     {
@@ -1682,6 +1715,20 @@ public class Gui extends javax.swing.JFrame
   public static String getVERSION()
   {
     return VERSION;
+  }
+
+  private void showResults()
+  {
+    ResultDialog resultDialog = new ResultDialog(this, true);
+
+    resultDialog.setKMH(data.getVmax());
+    if(data.getPowerunit().equals("PS"))
+      resultDialog.setPS(data.getMaxpower());
+    else
+      resultDialog.setKW(data.getMaxpower());
+
+    resultDialog.update();
+    resultDialog.setVisible(true);
   }
 
 }

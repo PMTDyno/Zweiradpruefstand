@@ -1,8 +1,12 @@
 package measure;
 
 import data.Data;
+import data.Datapoint;
+import data.ReadCSV;
+import gui.MeasureDialog;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -31,9 +35,13 @@ public class Communication
   public static final byte EOT = 3; //0x03
 
   private PortCom port;
+  private MeasureDialog dialog;
   private Thread receiveThread;
   private final LinkedList<Frame> receivedFrameList = new LinkedList<>();
   private long refreshLock = 0;
+  private ArrayList<Datapoint> simData = null;
+  private int simCount = 0;
+  private final boolean simEnable = false;
 
   public enum Request
   {
@@ -48,6 +56,16 @@ public class Communication
   {
     LOG.setLevel(Level.ALL);
     port = new PortCom();
+  }
+
+  public void setMeasureDialog(MeasureDialog dialog)
+  {
+    this.dialog = dialog;
+  }
+
+  public void setStatus(String status)
+  {
+    dialog.setStatus(status);
   }
 
   public void connect(String serialPort) throws CommunicationException,
@@ -88,6 +106,33 @@ public class Communication
    */
   public String[] getFrameData() throws CommunicationException, TimeoutException
   {
+
+    if(simEnable)
+    {
+      try
+      {
+        if(simData == null)
+          simData = new ReadCSV("C:\\Users\\Levin\\Desktop\\SimulationData.csv").read();
+
+        Datapoint dp = simData.get(simCount);
+        String[] string =
+        {
+          String.format("%.0f", ((1 / (dp.getWss() / 2.0 / Math.PI )) / 26.0) * 1000000.0),
+          String.format("%.0f", 1 / (dp.getRpm() / 60) * 1000000.0),
+          String.format("%.0f", dp.getTime() * 1000000.0)
+        };
+        simCount++;
+        //LOG.fine("Simulation returned(" + simCount + "): " + string[0] + ':' + string[1] + ':' + string[2]);
+
+        return string;
+
+      }
+      catch (Exception ex)
+      {
+        throw new CommunicationException("Simulation Error:" + ex.getMessage());
+      }
+    }
+
     try
     {
       return readFrame(TIMEOUT, TIMOUT_UNIT).getData().split(":");
@@ -111,7 +156,7 @@ public class Communication
    *
    * @param timeout
    * @param unit
-   * @return
+   * @return the Frame
    * @throws CommunicationException
    * @throws TimeoutException
    * @throws InterruptedException
@@ -241,6 +286,9 @@ public class Communication
                                                 TimeoutException,
                                                 IllegalArgumentException
   {
+    if(simEnable)
+      return;
+
     if(port == null)
     {
       throw new CommunicationException("port not initialized!");
@@ -361,7 +409,7 @@ public class Communication
                 frame.update(b);
                 LOG.info(String.format("Frame received: %s",
                                        new String(frame.getFrameBytes(), "utf-8")));
-                
+
                 synchronized (receivedFrameList)
                 {
                   receivedFrameList.add(new Frame(frame));

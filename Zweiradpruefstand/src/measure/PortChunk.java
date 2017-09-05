@@ -1,7 +1,6 @@
 package measure;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -20,7 +19,7 @@ public class PortChunk implements Iterable<Byte>
     {
       throw new NullPointerException();
     }
-
+    
     this.data = data;
     singleByteValue = 0;
   }

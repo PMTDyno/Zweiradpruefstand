@@ -14,7 +14,6 @@ public class Crc16
   private static int crc;
   private static int polynomial;
 
-
 //    public static void main(String[] args) throws Exception
 //    {
 //        byte[] bits = new byte[30];
@@ -27,13 +26,13 @@ public class Crc16
 //    }
   /**
    * Calculates the checksum of the source and compares it with the given
-   * checksum <br>
+   * checksum<br>(do not include "0x" in the checksum parameter!) <br>
    * The CRC-CCITT 0xFFFF is used
    * https://www.lammertbies.nl/comm/info/crc-calculation.html
    * http://introcs.cs.princeton.edu/java/61data/CRC16CCITT.java.html
-   * 
-   * @param data
-   * @param checksum
+   *
+   * @param data the data String
+   * @param checksum the checksum without "0x"
    * @return true if the checksum matches <br>
    * false if the checksum does not match or an error occured
    */
@@ -60,7 +59,7 @@ public class Crc16
 
       crc &= 0xffff;
 
-      //System.out.println(crc + "   " + checksum);
+//      System.out.println(crc + " ?= " + checksum);
       return crc == Integer.decode("0x" + checksum);
     }
     catch (Exception ex)
@@ -105,7 +104,7 @@ public class Crc16
         str = "0" + str;
       }
 
-      return str;
+      return str.toUpperCase();
     }
     catch (Exception ex)
     {

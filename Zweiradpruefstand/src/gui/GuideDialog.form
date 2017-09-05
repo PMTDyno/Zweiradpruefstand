@@ -48,7 +48,7 @@
         <Component class="javax.swing.JLabel" name="jLabelGuideMeasure">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;h2&gt;   1. Motorrad auf den Pr&#xfc;fstand stellen und befestigen &lt;br&gt;&lt;br&gt; 2. Pr&#xfc;fstand mit USB verbinden &lt;br&gt;&lt;br&gt; 3. Klicken Sie auf &lt;i&gt;Verbinden&lt;/i&gt; &lt;br&gt;&lt;br&gt;  4. Starten Sie das Motorrad &lt;br&gt;&lt;br&gt; 5. Klicken Sie auf &lt;i&gt;Start&lt;/i&gt; &lt;br&gt;&lt;br&gt; 6. Beschleunigen Sie mit Vollgas &lt;br&gt;&lt;br&gt; 7. Bei maximaler Motordrehzahl klicken Sie auf &lt;i&gt;Stop&lt;/i&gt;&lt;br&gt; &lt;br&gt;  &lt;/h2&gt;" noResource="true"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;h2&gt;   1. Motorrad auf den Pr&#xfc;fstand stellen und befestigen &lt;br&gt;&lt;br&gt; 2. Pr&#xfc;fstand mit USB verbinden &lt;br&gt;&lt;br&gt; 3. Klicken Sie auf &lt;i&gt;Verbinden&lt;/i&gt; &lt;br&gt;&lt;br&gt;  4. Starten Sie das Motorrad &lt;br&gt;&lt;br&gt; 5. Klicken Sie auf &lt;i&gt;Start&lt;/i&gt; &lt;br&gt;&lt;br&gt; 6. Beschleunigen Sie mit Vollgas bis die H&#xf6;chstgeschwindigkeit erreicht ist. &lt;br&gt;&lt;br&gt; 7. Programm stoppt automatisch &lt;br&gt; &lt;br&gt;  &lt;/h2&gt;" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

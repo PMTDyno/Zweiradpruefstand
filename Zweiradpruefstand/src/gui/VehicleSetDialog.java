@@ -2,6 +2,7 @@ package gui;
 
 import data.Data;
 import java.awt.Dimension;
+import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.JOptionPane;
 
@@ -16,10 +17,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private final Data data = Data.getInstance();
   private static final Logger LOG = Logger.getLogger(VehicleSetDialog.class.getName());
 
-  private boolean measRpm = false;
+  private boolean measRpm;
   private boolean confirmed = false;
   private boolean twoStroke;
   private boolean automatic;
+  private boolean schleppEnable;
   private String vehicleName;
 
   /**
@@ -32,17 +34,19 @@ public class VehicleSetDialog extends javax.swing.JDialog
   public VehicleSetDialog(java.awt.Frame parent, boolean modal)
   {
     super(parent, modal);
+    LOG.setLevel(Level.ALL);
     initComponents();
 
     setTitle("Fahrzeugeinstellungen");
-    setSize(new Dimension(300, 250));
+    setSize(new Dimension(325, 275));
     setResizable(false);
 
     this.vehicleName = data.getVehicle();
     this.twoStroke = data.isTwoStroke();
+    this.schleppEnable = data.isSchleppEnable();
+    this.measRpm = data.isMeasRPM();
 
     jButConfirm.requestFocusInWindow();
-
   }
 
   /**
@@ -64,6 +68,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
     jLabelVehicleName = new javax.swing.JLabel();
     jPanRpm = new javax.swing.JPanel();
     jMeasRpm = new javax.swing.JCheckBox();
+    jSchleppEnable = new javax.swing.JCheckBox();
     jPanStroke = new javax.swing.JPanel();
     j2Takt = new javax.swing.JRadioButton();
     j4Takt = new javax.swing.JRadioButton();
@@ -112,6 +117,8 @@ public class VehicleSetDialog extends javax.swing.JDialog
     gridBagConstraints.gridwidth = 2;
     jPanMain.add(jPanName, gridBagConstraints);
 
+    jPanRpm.setLayout(new java.awt.GridLayout(2, 1));
+
     jMeasRpm.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jMeasRpm.setSelected(true);
     jMeasRpm.setText("Motordrehzahl messen");
@@ -124,11 +131,23 @@ public class VehicleSetDialog extends javax.swing.JDialog
     });
     jPanRpm.add(jMeasRpm);
 
+    jSchleppEnable.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+    jSchleppEnable.setSelected(true);
+    jSchleppEnable.setText("Schleppleistung messen");
+    jSchleppEnable.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        jSchleppEnableActionPerformed(evt);
+      }
+    });
+    jPanRpm.add(jSchleppEnable);
+
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
     gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+    gridBagConstraints.insets = new java.awt.Insets(12, 0, 12, 0);
     jPanMain.add(jPanRpm, gridBagConstraints);
 
     jPanStroke.setLayout(new java.awt.GridBagLayout());
@@ -293,6 +312,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
     // TODO add your handling code here:
   }//GEN-LAST:event_jAutomaticActionPerformed
 
+  private void jSchleppEnableActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jSchleppEnableActionPerformed
+  {//GEN-HEADEREND:event_jSchleppEnableActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_jSchleppEnableActionPerformed
+
   /**
    * @param args the command line arguments
    */
@@ -351,6 +375,7 @@ public class VehicleSetDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanRpm;
   private javax.swing.JPanel jPanStroke;
   private javax.swing.JPanel jPanTransmission;
+  private javax.swing.JCheckBox jSchleppEnable;
   private javax.swing.JTextField jVehicleName;
   private javax.swing.ButtonGroup taktButGroup;
   private javax.swing.ButtonGroup transmissionButGroup;
@@ -379,11 +404,16 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
       //VEHICLENAME
       jVehicleName.setText(vehicleName);
+      
+      //MEASRPM
+      jMeasRpm.setSelected(measRpm);
+      
+      //SCHLEPPENABLE
+      jSchleppEnable.setSelected(schleppEnable);
 
     }
 
     super.setVisible(b);
-    LOG.finest("VehicleSetDialog visible");
   }
 
   /**
@@ -411,6 +441,11 @@ public class VehicleSetDialog extends javax.swing.JDialog
   {
     return automatic;
   }
+  
+  public boolean isSchleppEnable()
+  {
+    return schleppEnable;
+  }
 
   /**
    * @return true if the settings have changed
@@ -436,6 +471,9 @@ public class VehicleSetDialog extends javax.swing.JDialog
 
     //MEASRPM
     measRpm = jMeasRpm.isSelected();
+    
+    //SCHLEPPENABLE
+    schleppEnable = jSchleppEnable.isSelected();
 
     //VEHICLENAME
     if(jVehicleName.getText().length() >= 25)

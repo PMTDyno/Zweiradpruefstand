@@ -42,7 +42,10 @@ public class Data
   private double maxpower = 0.0;
   private double maxtorque = 0.0;
 
+  private int startKMH = 10;
   private int startRPM = 2000;
+  private int idleKMH = 4;
+  private int idleRPM = 1600;
   private int pngWidth = 800;
   private int pngHeight = 600;
   private int windowWidth = 1200;
@@ -51,13 +54,17 @@ public class Data
   private int windowRelativeY = 0;
   private int periodTimeMs = 40;
   private int humidity = 40;
+  private int hysteresisRPM = 200;
+  private int hysteresisKMH = 2;
+  private int hysteresisTIME = 3000;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
-  private ArrayList<Datapoint> measureList = new ArrayList<>();
+  private ArrayList<Datapoint> measureList = null;
 
   private boolean twoStroke = true;
   private boolean measRPM = true;
   private boolean automatic = false;
+  private boolean schleppEnable = true;
 
   /*
    * ------------------------------------------------------------------------
@@ -70,6 +77,57 @@ public class Data
   public void setMeasureList(ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;
+  }
+
+  public int getIdleRPM()
+  {
+    return idleRPM;
+  }
+
+  public int getHysteresisTIME()
+  {
+    return hysteresisTIME;
+  }
+
+  public void setHysteresisTIME(int hysteresisTIME)
+  {
+    this.hysteresisTIME = hysteresisTIME;
+  }
+  
+
+  public int getHysteresisRPM()
+  {
+    return hysteresisRPM;
+  }
+
+  public int getIdleKMH()
+  {
+    return idleKMH;
+  }
+
+  public void setIdleKMH(int idleKMH)
+  {
+    this.idleKMH = idleKMH;
+  }
+
+  public int getHysteresisKMH()
+  {
+    return hysteresisKMH;
+  }
+
+  public void setHysteresisKMH(int hysteresisKMH)
+  {
+    this.hysteresisKMH = hysteresisKMH;
+  }
+
+  public void setHysteresisRPM(int hysteresisRPM)
+  {
+    this.hysteresisRPM = hysteresisRPM;
+  }
+
+  public void setIdleRPM(int idleRPM)
+  {
+    this.idleRPM = idleRPM;
   }
 
   public ArrayList<RawDatapoint> getRawDataList()
@@ -92,8 +150,16 @@ public class Data
     this.automatic = automatic;
   }
 
-  
-  
+  public int getStartKMH()
+  {
+    return startKMH;
+  }
+
+  public void setStartKMH(int startKMH)
+  {
+    this.startKMH = startKMH;
+  }
+
   public int getStartRPM()
   {
     return startRPM;
@@ -102,6 +168,16 @@ public class Data
   public void setStartRPM(int startRPM)
   {
     this.startRPM = startRPM;
+  }
+
+  public boolean isSchleppEnable()
+  {
+    return schleppEnable;
+  }
+
+  public void setSchleppEnable(boolean schleppEnable)
+  {
+    this.schleppEnable = schleppEnable;
   }
 
   public boolean isMeasRPM()

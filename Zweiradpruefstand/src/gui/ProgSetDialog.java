@@ -52,7 +52,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     initComponents();
 
-    setSize(new Dimension(600, 400));
+    setSize(new Dimension(900, 500));
 
     this.inertia = data.getInertia();
 

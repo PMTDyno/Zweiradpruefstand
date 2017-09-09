@@ -43,18 +43,18 @@ public class Data
   private double maxtorque = 0.0;
 
   private int startKMH = 10;
-  private int startRPM = 2000;
+  private int startRPM = 3200;
   private int idleKMH = 4;
-  private int idleRPM = 1600;
+  private int idleRPM = 2500;
   private int pngWidth = 800;
   private int pngHeight = 600;
   private int windowWidth = 1200;
   private int windowHeight = 700;
   private int windowRelativeX = 0;
   private int windowRelativeY = 0;
-  private int periodTimeMs = 40;
+  private int periodTimeMs = 20;
   private int humidity = 40;
-  private int hysteresisRPM = 200;
+  private int hysteresisRPM = 400;
   private int hysteresisKMH = 2;
   private int hysteresisTIME = 3000;
 

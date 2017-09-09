@@ -55,7 +55,7 @@ public class Frame
         throw new CommunicationException("frame not ending with EOT");
       }
 
-      LOG.fine("SOT/EOT CORRECT");
+      //LOG.fine("SOT/EOT CORRECT");
 
       //DATA AVAILABLE?
       int index = frame.indexOf('=');
@@ -75,7 +75,7 @@ public class Frame
         throw new CommunicationException("Wrong format! Wrong number of ':'");
       }
 
-      LOG.fine("DATA AVAILABLE");
+      //LOG.fine("DATA AVAILABLE");
 
       //CHECKSUM
       String checksum = frame.substring(index + 1, frame.indexOf(Communication.EOT));
@@ -84,9 +84,9 @@ public class Frame
         throw new CommunicationException("checksum not matching");
       }
 
-      LOG.fine("CHECKSUM MATCHING");
+      //LOG.fine("CHECKSUM MATCHING");
 
-      LOG.info("Frame correct!");
+      //LOG.info("Frame correct!");
     }
     catch (CommunicationException ex)
     {

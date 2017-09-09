@@ -1376,7 +1376,7 @@ public class Gui extends javax.swing.JFrame
       rpm.add(data.getMeasureList().get(i).getRpm());
       time.add(data.getMeasureList().get(i).getTime());
     }
-    omega = filterValuesOrder(omega, 0.5, 2);
+    omega = filterValuesOrder(omega, 1, 1);
 
     //VMAX ermitteln
     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
@@ -1387,7 +1387,7 @@ public class Gui extends javax.swing.JFrame
     {
       alpha.add((omega.get(i + 1) - omega.get(i)) / (time.get(i + 1) - time.get(i)));
     }
-    alpha = filterValuesOrder(alpha, 0.1, 2);
+    alpha = filterValuesOrder(alpha, 1, 1);
 
     //faktor fuer berechnungseinheit
     double unitFactor;
@@ -1414,7 +1414,7 @@ public class Gui extends javax.swing.JFrame
     else//drehmoment kein roller
     {
 
-      rpm = filterValuesOrder(rpm, 0.19, 2);
+      rpm = filterValuesOrder(rpm, 1, 2);
       //uebersetzungsverhaeltnis:
       for(int i = 0; i < alpha.size(); i++)
       {
@@ -1473,7 +1473,7 @@ public class Gui extends javax.swing.JFrame
         }
       }
 
-      trq = filterValuesOrder(trq, 0.13, 2);
+      trq = filterValuesOrder(trq, 0.14, 2);
     }
 
     //leistung berechnen

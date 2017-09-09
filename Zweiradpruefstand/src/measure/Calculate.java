@@ -194,7 +194,7 @@ public class Calculate
   public XYSeries[] calc() throws ArithmeticException
   {
 
-    LOG.fine("calculating...");
+    //LOG.fine("calculating...");
 
     double inertia = data.getInertia();
     double n; //uebersetzungsverhaeltnis rolle zu motor
@@ -383,7 +383,7 @@ public class Calculate
       }
     }
 
-    LOG.fine("done calculating");
+    //LOG.fine("done calculating");
 
     XYSeries[] rv =
     {

@@ -3,7 +3,6 @@ package measure;
 import data.Data;
 import data.Datapoint;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import logging.Logger;
 import org.jfree.data.xy.XYSeries;
 
@@ -14,23 +13,13 @@ import org.jfree.data.xy.XYSeries;
 public class Calculate
 {
 
-  private final Logger LOG = Logger.getLogger(Calculate.class.getName());
+  private static final Logger LOG = Logger.getLogger(Calculate.class.getName());
+  private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
+
   private final Data data = Data.getInstance();
 
-  private XYSeries seriesPower = new XYSeries("tempPower series");
-  private XYSeries seriesTorque = new XYSeries("tempTorque series");
-
-  private double filterTrqSmoothing = 0.14;
-  private int filterTrqOrder = 2;
-
-  private double filterRpmSmoothing = 0.5;
-  private int filterRpmOrder = 2;
-
-  private double filterOmegaSmoothing = 0.5;
-  private int filterOmegaOrder = 1;
-
-  private double filterAlphaSmoothing = 0.5;
-  private int filterAlphaOrder = 1;
+  private XYSeries seriesPower = new XYSeries("Power Final");
+  private XYSeries seriesTorque = new XYSeries("Torque Final");
 
   private ArrayList<Double> trq = new ArrayList<>();
   private ArrayList<Double> trqNoFilter = new ArrayList<>();
@@ -52,102 +41,63 @@ public class Calculate
 
   public Calculate()
   {
-    LOG.setLevel(Level.ALL);
+    LOG.setDebugLevel(DEBUGLEVEL);
 
   }
 
-  public void setFilterTrqSmoothing(double filterTrqSmoothing)
+  public XYSeries getSeriesTrq()
   {
-    this.filterTrqSmoothing = filterTrqSmoothing;
+    return convertListToSeries(trq, "Torque");
   }
 
-  public void setFilterTrqOrder(int filterTrqOrder)
+  public XYSeries getSeriesTrqNoFilter()
   {
-    this.filterTrqOrder = filterTrqOrder;
+    return convertListToSeries(trqNoFilter, "Torque No Filter");
   }
 
-  public void setFilterRpmSmoothing(double filterRpmSmoothing)
+  public XYSeries getSeriesOmega()
   {
-    this.filterRpmSmoothing = filterRpmSmoothing;
+    return convertListToSeries(omega, "Omega");
   }
 
-  public void setFilterRpmOrder(int filterRpmOrder)
+  public XYSeries getSeriesOmegaNoFilter()
   {
-    this.filterRpmOrder = filterRpmOrder;
+    return convertListToSeries(omegaNoFilter, "Omega No Filter");
   }
 
-  public void setFilterOmegaSmoothing(double filterOmegaSmoothing)
+  public XYSeries getSeriesAlpha()
   {
-    this.filterOmegaSmoothing = filterOmegaSmoothing;
+    return convertListToSeries(alpha, "Alpha");
   }
 
-  public void setFilterOmegaOrder(int filterOmegaOrder)
+  public XYSeries getSeriesAlphaNoFilter()
   {
-    this.filterOmegaOrder = filterOmegaOrder;
+    return convertListToSeries(alphaNoFilter, "Alpha No Filter");
   }
 
-  public void setFilterAlphaSmoothing(double filterAlphaSmoothing)
+  public XYSeries getSeriesRpm()
   {
-    this.filterAlphaSmoothing = filterAlphaSmoothing;
+    return convertListToSeries(rpm, "Rpm");
   }
 
-  public void setFilterAlphaOrder(int filterAlphaOrder)
+  public XYSeries getSeriesRpmNoFilter()
   {
-    this.filterAlphaOrder = filterAlphaOrder;
+    return convertListToSeries(rpmNoFilter, "Rpm No Filter");
   }
 
-  
-  
-  public ArrayList<Double> getTrq()
+  private XYSeries convertListToSeries(ArrayList<Double> list, String key)
   {
-    return trq;
+    XYSeries tmp = new XYSeries(key);
+
+    for(int i = 0; i < list.size(); i++)
+    {
+      tmp.add(time.get(i), list.get(i));
+    }
+
+    return tmp;
   }
 
-  public ArrayList<Double> getTrqNoFilter()
-  {
-    return trqNoFilter;
-  }
-
-  public ArrayList<Double> getPwr()
-  {
-    return pwr;
-  }
-
-  public ArrayList<Double> getRpm()
-  {
-    return rpm;
-  }
-
-  public ArrayList<Double> getRpmNoFilter()
-  {
-    return rpmNoFilter;
-  }
-
-  public ArrayList<Double> getTime()
-  {
-    return time;
-  }
-
-  public ArrayList<Double> getAlpha()
-  {
-    return alpha;
-  }
-
-  public ArrayList<Double> getAlphaNoFilter()
-  {
-    return alphaNoFilter;
-  }
-
-  public ArrayList<Double> getOmega()
-  {
-    return omega;
-  }
-
-  public ArrayList<Double> getOmegaNoFilter()
-  {
-    return omegaNoFilter;
-  }
-
+  //--------------------------------------------
   private int getValMaxIndex(ArrayList<Double> aL)
   {
     int valMax = 0;
@@ -195,7 +145,6 @@ public class Calculate
   {
 
     //LOG.fine("calculating...");
-
     double inertia = data.getInertia();
     double n; //uebersetzungsverhaeltnis rolle zu motor
 
@@ -232,7 +181,7 @@ public class Calculate
     }
 
     omegaNoFilter = omega;
-    omega = filterValuesOrder(omega, filterOmegaSmoothing, filterOmegaOrder);
+    omega = filterValuesOrder(omega, data.getFilterOmegaSmoothing(), data.getFilterOmegaOrder());
 
     //VMAX ermitteln
     data.setVmax(omega.get(getValMaxIndex(omega)) * 0.175 * 3.6);
@@ -245,7 +194,7 @@ public class Calculate
     }
 
     alphaNoFilter = alpha;
-    alpha = filterValuesOrder(alpha, filterAlphaSmoothing, filterAlphaOrder);
+    alpha = filterValuesOrder(alpha, data.getFilterAlphaSmoothing(), data.getFilterAlphaOrder());
 
     //faktor fuer berechnungseinheit
     double unitFactor;
@@ -273,7 +222,7 @@ public class Calculate
     {
       rpmNoFilter = rpm;
 
-      rpm = filterValuesOrder(rpm, filterRpmSmoothing, filterRpmOrder);
+      rpm = filterValuesOrder(rpm, data.getFilterRpmSmoothing(), data.getFilterRpmOrder());
       //uebersetzungsverhaeltnis:
       for(int i = 0; i < alpha.size(); i++)
       {
@@ -334,7 +283,7 @@ public class Calculate
       }
 
       trqNoFilter = trq;
-      trq = filterValuesOrder(trq, filterTrqSmoothing, filterTrqOrder);
+      trq = filterValuesOrder(trq, data.getFilterTrqSmoothing(), data.getFilterTrqOrder());
     }
 
     //leistung berechnen
@@ -384,7 +333,6 @@ public class Calculate
     }
 
     //LOG.fine("done calculating");
-
     XYSeries[] rv =
     {
       seriesPower, seriesTorque

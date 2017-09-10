@@ -2,7 +2,6 @@ package gui;
 
 import data.Config;
 import data.Data;
-import data.Datapoint;
 import data.RawDatapoint;
 import data.ReadCSV;
 import measure.MeasurementWorker;
@@ -14,7 +13,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -47,12 +45,12 @@ import org.jfree.ui.TextAnchor;
  * This shows the general user interface and also includes various functions
  *
  * @author Levin Messing (meslem12@htl-kaindorf.ac.at)
- * @version 0.9.11
+ * @version 0.9.12
  */
 public class Gui extends javax.swing.JFrame
 {
 
-  private static final String VERSION = "0.9.11";
+  private static final String VERSION = "0.9.12";
 
   private static final Logger LOGP = Logger.getParentLogger();
   private static final Logger LOG = Logger.getLogger(Gui.class.getName());
@@ -154,7 +152,6 @@ public class Gui extends javax.swing.JFrame
     jSeparator5 = new javax.swing.JPopupMenu.Separator();
     jMenuClose = new javax.swing.JMenuItem();
     jHelp = new javax.swing.JMenu();
-    jMenuGuide = new javax.swing.JMenuItem();
     jMenuAbout = new javax.swing.JMenuItem();
     jMenuStartSim = new javax.swing.JMenuItem();
 
@@ -384,18 +381,6 @@ public class Gui extends javax.swing.JFrame
 
     jHelp.setText("Hilfe");
 
-    jMenuGuide.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
-    jMenuGuide.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/manual16.png"))); // NOI18N
-    jMenuGuide.setText("Anleitung");
-    jMenuGuide.addActionListener(new java.awt.event.ActionListener()
-    {
-      public void actionPerformed(java.awt.event.ActionEvent evt)
-      {
-        jMenuGuideActionPerformed(evt);
-      }
-    });
-    jHelp.add(jMenuGuide);
-
     jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo16.png"))); // NOI18N
     jMenuAbout.setText("Über");
     jMenuAbout.addActionListener(new java.awt.event.ActionListener()
@@ -484,12 +469,6 @@ public class Gui extends javax.swing.JFrame
 //      jFrameAbout.setLocationRelativeTo(this);
 //      jFrameAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
-
-    private void jMenuGuideActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jMenuGuideActionPerformed
-    {//GEN-HEADEREND:event_jMenuGuideActionPerformed
-      guide.setLocationRelativeTo(this);
-      guide.setVisible(true);
-    }//GEN-LAST:event_jMenuGuideActionPerformed
 
     private void jRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRefreshActionPerformed
       refreshEco();
@@ -610,7 +589,6 @@ public class Gui extends javax.swing.JFrame
   private javax.swing.JMenuBar jMenuBar;
   private javax.swing.JMenuItem jMenuClose;
   private javax.swing.JMenuItem jMenuExport;
-  private javax.swing.JMenuItem jMenuGuide;
   private javax.swing.JMenuItem jMenuOpen;
   private javax.swing.JMenuItem jMenuPrint;
   private javax.swing.JMenuItem jMenuSave;

@@ -57,6 +57,18 @@ public class Data
   private int hysteresisRPM = 400;
   private int hysteresisKMH = 2;
   private int hysteresisTIME = 3000;
+  
+  private double filterTrqSmoothing = 0.4;
+  private int filterTrqOrder = 4;
+
+  private double filterOmegaSmoothing = 0.5;
+  private int filterOmegaOrder = 1;
+
+  private double filterAlphaSmoothing = 0.4;
+  private int filterAlphaOrder = 4;
+
+  private double filterRpmSmoothing = 0.5;
+  private int filterRpmOrder = 2;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = null;
@@ -74,6 +86,48 @@ public class Data
     return measureList;
   }
 
+  public double getFilterTrqSmoothing()
+  {
+    return filterTrqSmoothing;
+  }
+
+  public int getFilterTrqOrder()
+  {
+    return filterTrqOrder;
+  }
+
+  public double getFilterOmegaSmoothing()
+  {
+    return filterOmegaSmoothing;
+  }
+
+  public int getFilterOmegaOrder()
+  {
+    return filterOmegaOrder;
+  }
+
+  public double getFilterAlphaSmoothing()
+  {
+    return filterAlphaSmoothing;
+  }
+
+  public int getFilterAlphaOrder()
+  {
+    return filterAlphaOrder;
+  }
+
+  public double getFilterRpmSmoothing()
+  {
+    return filterRpmSmoothing;
+  }
+
+  public int getFilterRpmOrder()
+  {
+    return filterRpmOrder;
+  }
+
+  
+  
   public void setMeasureList(ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;

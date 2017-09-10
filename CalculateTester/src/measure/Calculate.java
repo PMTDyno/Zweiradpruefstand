@@ -3,7 +3,6 @@ package measure;
 import data.Data;
 import data.Datapoint;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import logging.Logger;
 import org.jfree.data.xy.XYSeries;
 
@@ -14,16 +13,13 @@ import org.jfree.data.xy.XYSeries;
 public class Calculate
 {
 
-    private static final Logger LOG = Logger.getLogger(Calculate.class.getName());
-  private static final Logger LOGP = Logger.getParentLogger();
+  private static final Logger LOG = Logger.getLogger(Calculate.class.getName());
   private static final java.util.logging.Level DEBUGLEVEL = java.util.logging.Level.ALL;
-  
+
   private final Data data = Data.getInstance();
 
   private XYSeries seriesPower = new XYSeries("Power Final");
   private XYSeries seriesTorque = new XYSeries("Torque Final");
-
-
 
   private ArrayList<Double> trq = new ArrayList<>();
   private ArrayList<Double> trqNoFilter = new ArrayList<>();
@@ -148,7 +144,6 @@ public class Calculate
   public XYSeries[] calc() throws ArithmeticException
   {
 
-    
     //LOG.fine("calculating...");
     double inertia = data.getInertia();
     double n; //uebersetzungsverhaeltnis rolle zu motor

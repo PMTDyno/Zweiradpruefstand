@@ -105,6 +105,12 @@ Features without an ![d] are planned.
 * ![d] measurement starts automatically  
   
 
+#### v0.9.12  
+* ![d] changed filters
+* ![d] added CalculateTester for testing filters and Calculate class
+* ![d] design bug fixes
+ 
+
 ## v1.0
 * Measurement with referential bike correct
   

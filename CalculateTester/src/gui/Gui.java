@@ -66,7 +66,7 @@ public class Gui extends javax.swing.JFrame
   XYSeries seriesRpmNoFilter = new XYSeries("Rpm No Filter");
   XYSeriesCollection datasetRpmNoFilter = new XYSeriesCollection(seriesRpmNoFilter);
 
-  private static final String VERSION = "1.0.1";
+  private static final String VERSION = "1.0.2";
   
   /**
    * Creates new form Gui

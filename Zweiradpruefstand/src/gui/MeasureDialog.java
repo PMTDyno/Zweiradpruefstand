@@ -4,6 +4,7 @@ import data.Data;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.LayoutManager;
 import java.util.List;
 import java.util.logging.Level;
 import javax.swing.JInternalFrame;
@@ -49,20 +50,22 @@ public class MeasureDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     setTitle("Messung läuft...");
     setResizable(false);
-    setMinimumSize(new Dimension(620, 400));
+    setMinimumSize(new Dimension(620, 450));
 
     initComponents();
     createDial(kmh, "km/h", jFrameSpeed, 0, 150, 10);
 
     if(data.isMeasRPM())
     {
+
       createDial(rpm, "U/min x 1000", jFrameRpm, 0, 13, 1);
     }
     else
     {
       jPanDial.remove(jFrameRpm);
-      setMinimumSize(new Dimension(310, 400));
-      setSize(new Dimension(310, 400));
+      //setMinimumSize(new Dimension(310, 400));
+      //setSize(new Dimension(310, 400));
+
     }
 
   }
@@ -87,10 +90,12 @@ public class MeasureDialog extends javax.swing.JDialog
 
     jPanMain = new javax.swing.JPanel();
     jPanStatus = new javax.swing.JPanel();
+    jPanelStatusText = new javax.swing.JPanel();
     jLabelCount = new javax.swing.JLabel();
     jProgressBar = new javax.swing.JProgressBar();
     jLabel = new javax.swing.JLabel();
     jLabelStatus = new javax.swing.JLabel();
+    jPanelStatusColor = new javax.swing.JPanel();
     jPanDial = new javax.swing.JPanel();
     jFrameSpeed = new javax.swing.JInternalFrame();
     jFrameRpm = new javax.swing.JInternalFrame();
@@ -103,8 +108,10 @@ public class MeasureDialog extends javax.swing.JDialog
 
     jPanMain.setLayout(new java.awt.BorderLayout());
 
+    jPanStatus.setLayout(new java.awt.GridLayout(2, 0));
+
     jLabelCount.setText("Anzahl der Messpunkte: ");
-    jPanStatus.add(jLabelCount);
+    jPanelStatusText.add(jLabelCount);
 
     jProgressBar.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
     jProgressBar.setToolTipText("Anzahl der Messpunkte");
@@ -112,16 +119,21 @@ public class MeasureDialog extends javax.swing.JDialog
     jProgressBar.setPreferredSize(new java.awt.Dimension(150, 25));
     jProgressBar.setString("0");
     jProgressBar.setStringPainted(true);
-    jPanStatus.add(jProgressBar);
+    jPanelStatusText.add(jProgressBar);
 
     jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jLabel.setText("Status:");
     jLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
-    jPanStatus.add(jLabel);
+    jPanelStatusText.add(jLabel);
 
     jLabelStatus.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
     jLabelStatus.setText("HOCHSCHALTEN");
-    jPanStatus.add(jLabelStatus);
+    jPanelStatusText.add(jLabelStatus);
+
+    jPanStatus.add(jPanelStatusText);
+
+    jPanelStatusColor.setLayout(new java.awt.GridLayout());
+    jPanStatus.add(jPanelStatusColor);
 
     jPanMain.add(jPanStatus, java.awt.BorderLayout.PAGE_START);
 
@@ -208,34 +220,34 @@ public class MeasureDialog extends javax.swing.JDialog
 
       });
 
-//      new Thread(
-//              new Runnable()
-//      {
-//
-//        @Override
-//        public void run()
-//        {
-//          while(true)
-//          {
-//            try
-//            {
-//              dialog.setStatus("HOCHSCHALTEN");
-//              Thread.sleep(1000);
-//              dialog.setStatus("WARTEN");
-//              Thread.sleep(1000);
-//              dialog.setStatus("BEREIT");
-//              Thread.sleep(1000);
-//              dialog.setStatus("LÄUFT");
-//              Thread.sleep(1000);
-//            }
-//            catch (InterruptedException ex)
-//            {
-//              java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//          }
-//        }
-//
-//      }).start();
+      new Thread(
+              new Runnable()
+      {
+
+        @Override
+        public void run()
+        {
+          while(true)
+          {
+            try
+            {
+              dialog.setStatus("HOCHSCHALTEN");
+              Thread.sleep(2000);
+              dialog.setStatus("WARTEN");
+              Thread.sleep(2000);
+              dialog.setStatus("BEREIT");
+              Thread.sleep(2000);
+              dialog.setStatus("LÄUFT");
+              Thread.sleep(2000);
+            }
+            catch (InterruptedException ex)
+            {
+              java.util.logging.Logger.getLogger(MeasureDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          }
+        }
+
+      }).start();
       dialog.setVisible(true);
 
     });
@@ -252,6 +264,8 @@ public class MeasureDialog extends javax.swing.JDialog
   private javax.swing.JPanel jPanDial;
   private javax.swing.JPanel jPanMain;
   private javax.swing.JPanel jPanStatus;
+  private javax.swing.JPanel jPanelStatusColor;
+  private javax.swing.JPanel jPanelStatusText;
   private javax.swing.JProgressBar jProgressBar;
   private javax.swing.JButton jbutCancel;
   private javax.swing.JButton jbutFinish;
@@ -275,21 +289,33 @@ public class MeasureDialog extends javax.swing.JDialog
     switch (status)
     {
       case "HOCHSCHALTEN":
-        jLabelStatus.setForeground(Color.RED);
+        jPanelStatusColor.setBackground(Color.RED);
+        jLabelStatus.setText(status + "  " + (data.isMeasRPM() ? data.getStartRPM() : data.getStartKMH()));
         break;
       case "WARTEN":
-        jLabelStatus.setForeground(Color.ORANGE);
+        jPanelStatusColor.setBackground(Color.ORANGE);
+        jLabelStatus.setText(status + "  "
+                + (data.isMeasRPM()
+                ? data.getIdleRPM() + " ±" + data.getHysteresisRPM()
+                : data.getHysteresisKMH() + " ±" + data.getHysteresisKMH())
+        );
         break;
       case "BEREIT":
-        jLabelStatus.setForeground(Color.GREEN);
+        jPanelStatusColor.setBackground(new Color(30, 200, 30));
+        jLabelStatus.setText(status + "  " + (data.isMeasRPM() ? data.getStartRPM() : data.getStartKMH()));
         break;
 
       default:
-        jLabelStatus.setForeground(Color.BLACK);
+        jPanelStatusColor.setBackground(jPanelStatusText.getBackground());
+        jLabelStatus.setText(status);
     }
 
-    jLabelStatus.setText(status);
     LOG.fine("Set status: " + status);
+  }
+
+  private void setLabelStatus(String status)
+  {
+
   }
 
   private void finish()

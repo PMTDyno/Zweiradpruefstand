@@ -13,7 +13,6 @@
     <Property name="location" type="java.awt.Point" editor="org.netbeans.beaninfo.editors.PointEditor">
       <Point value="[0, 0]"/>
     </Property>
-    <Property name="locationByPlatform" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
@@ -482,6 +481,9 @@
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Hysterese f&#xfc;r die Geschwindigkeit wenn bereit.&lt;br&gt;Der eingestellte Wert gilt f&#xfc;r + als auch -"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinStartKmhStateChanged"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="4" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
@@ -516,6 +518,10 @@
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Wenn diese Motordrehzahl einige Sekunden konstant bleibt&lt;br&gt;kann die Messung gestartet werden"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinIdleRpmStateChanged"/>
+                        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jSpinIdleRpmPropertyChange"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="5" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
@@ -546,10 +552,13 @@
                     <Component class="javax.swing.JSpinner" name="jSpinHysteresisRpm">
                       <Properties>
                         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                          <SpinnerModel initial="200" maximum="5000" minimum="25" numberType="java.lang.Integer" stepSize="50" type="number"/>
+                          <SpinnerModel initial="200" maximum="5000" minimum="100" numberType="java.lang.Integer" stepSize="100" type="number"/>
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Hysterese f&#xfc;r die Motordrehzahl wenn bereit.&lt;br&gt;Der eingestellte Wert gilt f&#xfc;r + als auch -"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinHysteresisRpmStateChanged"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="6" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
@@ -584,6 +593,9 @@
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Motordrehzahl erreicht wurde"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinStartRpmStateChanged"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="7" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
@@ -618,6 +630,9 @@
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Die Messdaten werden erst erfasst wenn&lt;br&gt;diese Geschwindigkeit erreicht wurde&lt;br&gt;Wird nur verwendet falls&lt;br&gt;Motordrehzahl nicht gemessen wird"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinIdleKmhStateChanged"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="2" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
@@ -652,6 +667,9 @@
                         </Property>
                         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Wenn diese Geschwindigkeit einige Sekunden konstant bleibt&lt;br&gt;kann die Messung gestartet werden&lt;br&gt;Wird nur verwendet falls&lt;br&gt;Motordrehzahl nicht gemessen wird"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinHysteresisKmhStateChanged"/>
+                      </Events>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                           <GridBagConstraints gridX="1" gridY="3" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="4" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>

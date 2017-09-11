@@ -998,7 +998,6 @@ public class Gui extends javax.swing.JFrame
       if(data.getPeriodTimeMs() != progset.getPeriodTimeMs())
       {
         data.setPeriodTimeMs(progset.getPeriodTimeMs());
-        updateLevel = 3;
       }
 
       //update
@@ -1016,15 +1015,12 @@ public class Gui extends javax.swing.JFrame
 
           case 2:
             LOG.finest("entering level 2");
-            if(updateLevel == 3 && data.getPowerunit().equals("PS"))
-            {
-              convertToPs(series1);
-            }
-            else if(updateLevel == 2 && data.getPowerunit().equals("kW"))
+            
+            if(updateLevel == 2 && data.getPowerunit().equals("kW"))
             {
               convertToKw(series1);
             }
-            else if(data.getPowerunit().endsWith("PS"))
+            else if(updateLevel == 2 && data.getPowerunit().endsWith("PS"))
             {
               convertToPs(series1);
             }
@@ -1264,7 +1260,6 @@ public class Gui extends javax.swing.JFrame
     chart.fireChartChanged();
   }
 
-
   /**
    * calculates Power and Torque and updates the Chart
    *
@@ -1275,13 +1270,13 @@ public class Gui extends javax.swing.JFrame
     LOG.fine("calculating...");
 
     Calculate calc = new Calculate();
-    
+
     XYSeries[] finalValues = calc.calc();
-    
+
+
     series1 = finalValues[0];
     series2 = finalValues[1];
-    
-    
+
     dataset1.removeSeries(seriesPower);
     seriesPower = correctByFactor(series1, "Leistung", data.getCorrectionPower());
     dataset1.addSeries(seriesPower);

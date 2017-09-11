@@ -171,7 +171,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
         Thread.sleep(data.getPeriodTimeMs());
 
-      } while(rpm < 2000);
+      } while(rpm < data.getStartRPM());
 
       LOG.info("High RPM reached once");
       LOG.info("Entering Hysteresis Loop now...");
@@ -197,7 +197,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         if(rpm > hysteresisMin && rpm < hysteresisMax)
         {
           accepted++;
-          if((accepted % 10) == 0)
+          if((accepted % 2) == 0)
             LOG.fine("Accepted Hysteresis " + accepted + " of " + hysteresisCount);
         }
         else
@@ -391,7 +391,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
         return measureList;
       }
 
-      Thread.sleep(data.getPeriodTimeMs());
+      //Thread.sleep(data.getPeriodTimeMs());
     }
   }
 

@@ -57,18 +57,18 @@ public class Data
   private int hysteresisRPM = 400;
   private int hysteresisKMH = 2;
   private int hysteresisTIME = 3000;
-  
-  private double filterTrqSmoothing = 0.3;//0.4;
+
+  private double filterTrqSmoothing = 0.3;
   private int filterTrqOrder = 4;
 
-  private double filterOmegaSmoothing = 0.6;//0.5;
-  private int filterOmegaOrder = 4;//1;
+  private double filterOmegaSmoothing = 0.6;
+  private int filterOmegaOrder = 4;
 
   private double filterAlphaSmoothing = 0.4;
-  private int filterAlphaOrder = 5;//4;
+  private int filterAlphaOrder = 5;
 
-  private double filterRpmSmoothing = 0.6;//0.5;
-  private int filterRpmOrder = 5;//2;
+  private double filterRpmSmoothing = 0.6;
+  private int filterRpmOrder = 5;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = null;
@@ -91,29 +91,19 @@ public class Data
     return filterTrqSmoothing;
   }
 
+  public void setFilterTrqSmoothing(double filterTrqSmoothing)
+  {
+    this.filterTrqSmoothing = filterTrqSmoothing;
+  }
+
   public int getFilterTrqOrder()
   {
     return filterTrqOrder;
   }
 
-  public double getFilterOmegaSmoothing()
+  public void setFilterTrqOrder(int filterTrqOrder)
   {
-    return filterOmegaSmoothing;
-  }
-
-  public int getFilterOmegaOrder()
-  {
-    return filterOmegaOrder;
-  }
-
-  public double getFilterAlphaSmoothing()
-  {
-    return filterAlphaSmoothing;
-  }
-
-  public int getFilterAlphaOrder()
-  {
-    return filterAlphaOrder;
+    this.filterTrqOrder = filterTrqOrder;
   }
 
   public double getFilterRpmSmoothing()
@@ -121,13 +111,61 @@ public class Data
     return filterRpmSmoothing;
   }
 
+  public void setFilterRpmSmoothing(double filterRpmSmoothing)
+  {
+    this.filterRpmSmoothing = filterRpmSmoothing;
+  }
+
   public int getFilterRpmOrder()
   {
     return filterRpmOrder;
   }
 
-  
-  
+  public void setFilterRpmOrder(int filterRpmOrder)
+  {
+    this.filterRpmOrder = filterRpmOrder;
+  }
+
+  public double getFilterOmegaSmoothing()
+  {
+    return filterOmegaSmoothing;
+  }
+
+  public void setFilterOmegaSmoothing(double filterOmegaSmoothing)
+  {
+    this.filterOmegaSmoothing = filterOmegaSmoothing;
+  }
+
+  public int getFilterOmegaOrder()
+  {
+    return filterOmegaOrder;
+  }
+
+  public void setFilterOmegaOrder(int filterOmegaOrder)
+  {
+    this.filterOmegaOrder = filterOmegaOrder;
+  }
+
+  public double getFilterAlphaSmoothing()
+  {
+    return filterAlphaSmoothing;
+  }
+
+  public void setFilterAlphaSmoothing(double filterAlphaSmoothing)
+  {
+    this.filterAlphaSmoothing = filterAlphaSmoothing;
+  }
+
+  public int getFilterAlphaOrder()
+  {
+    return filterAlphaOrder;
+  }
+
+  public void setFilterAlphaOrder(int filterAlphaOrder)
+  {
+    this.filterAlphaOrder = filterAlphaOrder;
+  }
+
   public void setMeasureList(ArrayList<Datapoint> measureList)
   {
     this.measureList = measureList;
@@ -147,7 +185,6 @@ public class Data
   {
     this.hysteresisTIME = hysteresisTIME;
   }
-  
 
   public int getHysteresisRPM()
   {

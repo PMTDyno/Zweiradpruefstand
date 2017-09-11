@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.util.logging.Level;
 import logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * Displays a Dialog to enter several settings
@@ -30,14 +31,14 @@ public class ProgSetDialog extends javax.swing.JDialog
   private double correctionTorque = 1.0;
   private double inertia = 3.7017;
   //COMMUNICATION
-  private int periodTimeMs = 40;
-  private int startKmh = 10;
-  private int idleKmh = 4;
-  private int hysteresisKmh = 2;
-  private int startRpm = 2000;
-  private int idleRpm = 1600;
-  private int hysteresisRpm = 200;
-  private int hysteresisTime = 3000;
+  private int periodTimeMs;
+  private int startKmh;
+  private int idleKmh;
+  private int hysteresisKmh;
+  private int startRpm;
+  private int idleRpm;
+  private int hysteresisRpm;
+  private int hysteresisTime;
 
   /**
    * Creates the frame with the given values
@@ -52,7 +53,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     LOG.setLevel(Level.ALL);
     initComponents();
 
-    setSize(new Dimension(600, 400));
+    setSize(new Dimension(900, 500));
 
     this.inertia = data.getInertia();
 
@@ -199,7 +200,6 @@ public class ProgSetDialog extends javax.swing.JDialog
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Programmeinstellungen");
     setLocation(new java.awt.Point(0, 0));
-    setLocationByPlatform(true);
     setResizable(false);
 
     jPanMain.setLayout(new java.awt.GridLayout(1, 2));
@@ -396,7 +396,7 @@ public class ProgSetDialog extends javax.swing.JDialog
     jPanPowerButtons.add(jButRadioUnitkW, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.ipadx = 60;
+    gridBagConstraints.ipadx = 80;
     gridBagConstraints.ipady = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     jPanPower.add(jPanPowerButtons, gridBagConstraints);
@@ -474,6 +474,13 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jSpinStartKmh.setModel(new javax.swing.SpinnerNumberModel(10, 1, 100, 1));
     jSpinStartKmh.setToolTipText("<html>Hysterese für die Geschwindigkeit wenn bereit.<br>Der eingestellte Wert gilt für + als auch -");
+    jSpinStartKmh.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinStartKmhStateChanged(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 4;
@@ -499,6 +506,20 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jSpinIdleRpm.setModel(new javax.swing.SpinnerNumberModel(1600, 100, 20000, 100));
     jSpinIdleRpm.setToolTipText("<html>Wenn diese Motordrehzahl einige Sekunden konstant bleibt<br>kann die Messung gestartet werden");
+    jSpinIdleRpm.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinIdleRpmStateChanged(evt);
+      }
+    });
+    jSpinIdleRpm.addPropertyChangeListener(new java.beans.PropertyChangeListener()
+    {
+      public void propertyChange(java.beans.PropertyChangeEvent evt)
+      {
+        jSpinIdleRpmPropertyChange(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 5;
@@ -522,8 +543,15 @@ public class ProgSetDialog extends javax.swing.JDialog
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     jPanSerialButtons.add(jLabelHysteresisRpm, gridBagConstraints);
 
-    jSpinHysteresisRpm.setModel(new javax.swing.SpinnerNumberModel(200, 25, 5000, 50));
+    jSpinHysteresisRpm.setModel(new javax.swing.SpinnerNumberModel(200, 100, 5000, 100));
     jSpinHysteresisRpm.setToolTipText("<html>Hysterese für die Motordrehzahl wenn bereit.<br>Der eingestellte Wert gilt für + als auch -");
+    jSpinHysteresisRpm.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinHysteresisRpmStateChanged(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 6;
@@ -549,6 +577,13 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jSpinStartRpm.setModel(new javax.swing.SpinnerNumberModel(2000, 100, 20000, 100));
     jSpinStartRpm.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Motordrehzahl erreicht wurde");
+    jSpinStartRpm.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinStartRpmStateChanged(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 7;
@@ -574,6 +609,13 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jSpinIdleKmh.setModel(new javax.swing.SpinnerNumberModel(4, 1, 100, 1));
     jSpinIdleKmh.setToolTipText("<html>Die Messdaten werden erst erfasst wenn<br>diese Geschwindigkeit erreicht wurde<br>Wird nur verwendet falls<br>Motordrehzahl nicht gemessen wird");
+    jSpinIdleKmh.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinIdleKmhStateChanged(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -599,6 +641,13 @@ public class ProgSetDialog extends javax.swing.JDialog
 
     jSpinHysteresisKmh.setModel(new javax.swing.SpinnerNumberModel(2, 1, 100, 1));
     jSpinHysteresisKmh.setToolTipText("<html>Wenn diese Geschwindigkeit einige Sekunden konstant bleibt<br>kann die Messung gestartet werden<br>Wird nur verwendet falls<br>Motordrehzahl nicht gemessen wird");
+    jSpinHysteresisKmh.addChangeListener(new javax.swing.event.ChangeListener()
+    {
+      public void stateChanged(javax.swing.event.ChangeEvent evt)
+      {
+        jSpinHysteresisKmhStateChanged(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
@@ -684,6 +733,107 @@ public class ProgSetDialog extends javax.swing.JDialog
   {//GEN-HEADEREND:event_jPNGResolutionComboActionPerformed
 
   }//GEN-LAST:event_jPNGResolutionComboActionPerformed
+
+  private void jSpinIdleRpmStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinIdleRpmStateChanged
+  {//GEN-HEADEREND:event_jSpinIdleRpmStateChanged
+
+    SpinnerNumberModel model = (SpinnerNumberModel) jSpinStartRpm.getModel();
+
+    int value = (int) jSpinIdleRpm.getValue() + (int) jSpinHysteresisRpm.getValue() + 100;
+
+    model.setMinimum(value);
+
+    if(value > (int) jSpinStartRpm.getValue())
+    {
+      //LOG.fine("[idle]set minStart to " + value + "from" + jSpinStartRpm.getValue());
+
+      jSpinStartRpm.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinIdleRpmStateChanged
+
+  private void jSpinStartRpmStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinStartRpmStateChanged
+  {//GEN-HEADEREND:event_jSpinStartRpmStateChanged
+
+    SpinnerNumberModel model = (SpinnerNumberModel) jSpinIdleRpm.getModel();
+
+
+    int value = (int) jSpinStartRpm.getValue() - (int) jSpinHysteresisRpm.getValue() - 100;
+    model.setMaximum(value);
+
+    if(value < (int) jSpinIdleRpm.getValue())
+    {
+      //LOG.fine("[start]set maxIdle to " + value + "from" + jSpinIdleRpm.getValue());
+
+      jSpinIdleRpm.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinStartRpmStateChanged
+
+  private void jSpinHysteresisRpmStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinHysteresisRpmStateChanged
+  {//GEN-HEADEREND:event_jSpinHysteresisRpmStateChanged
+    SpinnerNumberModel model = (SpinnerNumberModel) jSpinStartRpm.getModel();
+
+    int value = (int) jSpinIdleRpm.getValue() + (int) jSpinHysteresisRpm.getValue() + 100;
+    model.setMinimum(value);
+
+    if(value > (int) jSpinStartRpm.getValue())
+    {
+      //LOG.fine("[hyst]set minStart to " + value + "from" + jSpinStartRpm.getValue());
+
+      jSpinStartRpm.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinHysteresisRpmStateChanged
+
+  private void jSpinIdleRpmPropertyChange(java.beans.PropertyChangeEvent evt)//GEN-FIRST:event_jSpinIdleRpmPropertyChange
+  {//GEN-HEADEREND:event_jSpinIdleRpmPropertyChange
+
+  }//GEN-LAST:event_jSpinIdleRpmPropertyChange
+
+  private void jSpinStartKmhStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinStartKmhStateChanged
+  {//GEN-HEADEREND:event_jSpinStartKmhStateChanged
+    SpinnerNumberModel model = (SpinnerNumberModel) jSpinIdleKmh.getModel();
+
+
+    int value = (int) jSpinStartKmh.getValue() - (int) jSpinHysteresisKmh.getValue() - 2;
+    model.setMaximum(value);
+
+    if(value < (int) jSpinIdleKmh.getValue())
+    {
+      //LOG.fine("[start]set maxIdle to " + value + "from" + jSpinIdleKmh.getValue());
+
+      jSpinIdleKmh.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinStartKmhStateChanged
+
+  private void jSpinHysteresisKmhStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinHysteresisKmhStateChanged
+  {//GEN-HEADEREND:event_jSpinHysteresisKmhStateChanged
+    SpinnerNumberModel model = (SpinnerNumberModel) jSpinStartKmh.getModel();
+
+    int value = (int) jSpinIdleKmh.getValue() + (int) jSpinHysteresisKmh.getValue() + 2;
+    model.setMinimum(value);
+
+    if(value > (int) jSpinStartKmh.getValue())
+    {
+      //LOG.fine("[hyst]set minStart to " + value + "from" + jSpinStartRpm.getValue());
+
+      jSpinStartKmh.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinHysteresisKmhStateChanged
+
+  private void jSpinIdleKmhStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSpinIdleKmhStateChanged
+  {//GEN-HEADEREND:event_jSpinIdleKmhStateChanged
+        SpinnerNumberModel model = (SpinnerNumberModel) jSpinStartKmh.getModel();
+
+    int value = (int) jSpinIdleKmh.getValue() + (int) jSpinHysteresisKmh.getValue() + 2;
+
+    model.setMinimum(value);
+
+    if(value > (int) jSpinStartKmh.getValue())
+    {
+      //LOG.fine("[idle]set minStart to " + value + "from" + jSpinStartKmh.getValue());
+
+      jSpinStartKmh.setValue(value);
+    }
+  }//GEN-LAST:event_jSpinIdleKmhStateChanged
 
   /*---PUBLIC METHODS----------------------------*/
   /**

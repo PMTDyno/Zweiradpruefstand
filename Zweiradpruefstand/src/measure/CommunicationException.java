@@ -40,6 +40,6 @@ public class CommunicationException extends Exception
 
   CommunicationException ()
   {
-    throw new UnsupportedOperationException("CommunicationException.CommunicationException not implemented");
+    super();
   }
 }

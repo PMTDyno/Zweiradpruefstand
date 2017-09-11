@@ -272,15 +272,15 @@ public class Calculate
       int min=0,i,i2;
       for(i2 = 0; i2 < limitSchl; i2++)
       {
-        System.out.println("i2="+i2);
+        //System.out.println("i2="+i2);
         double temp=100000;
           for(i = 0; i < omegaSchl.size(); i++)
           {
             temp2=(omega.get(i2)-omegaSchl.get(i));
-            System.out.println("temp2="+temp2);
+            //System.out.println("temp2="+temp2);
             if (temp2<temp && temp2>0)
             {
-              System.out.println("omegaSchl="+omegaSchl.get(i)+" trqSchl="+trqSchl.get(i));
+              //System.out.println("omegaSchl="+omegaSchl.get(i)+" trqSchl="+trqSchl.get(i));
               temp=temp2;
               min=i;
             } 

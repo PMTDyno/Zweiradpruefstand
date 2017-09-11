@@ -230,6 +230,8 @@ public class Calculate
         try
         {
           trq.add(alpha.get(i) * inertia * ((omega.get(i) / (rpm.get(i) / 60 * 2 * 3.14)) + (omega.get(i + 1) / (rpm.get(i + 1) / 60 * 2 * Math.PI))) / 2);  //M=dOmega/dt * J
+       
+
         }
         catch (IndexOutOfBoundsException ex)
         {
@@ -265,26 +267,36 @@ public class Calculate
       trqSchl = new ArrayList<>(trq.subList(limitSchl, trq.size()));
       omegaSchl = new ArrayList<>(omega.subList(limitSchl, omega.size()));
 //      ArrayList<Double> timeSchl = new ArrayList<>(time.subList(limitSchl, time.size()));
-
-      for(int i2 = 0; i2 < limitSchl; i2++)
+      
+      double temp2;
+      int min=0,i,i2;
+      for(i2 = 0; i2 < limitSchl; i2++)
       {
-        for(int i = 0; i < trqSchl.size(); i++)
-        {
-          if(omega.get(i2) - (omegaSchl.get(i)) < 2 && omega.get(i2) - (omegaSchl.get(i)) > 0)
+        System.out.println("i2="+i2);
+        double temp=100000;
+          for(i = 0; i < omegaSchl.size(); i++)
           {
-            if(trqSchl.get(i) > 0)
+            temp2=(omega.get(i2)-omegaSchl.get(i));
+            System.out.println("temp2="+temp2);
+            if (temp2<temp && temp2>0)
             {
-              break;
+              System.out.println("omegaSchl="+omegaSchl.get(i)+" trqSchl="+trqSchl.get(i));
+              temp=temp2;
+              min=i;
+            } 
+          }  
+          //
+          if(trqSchl.get(min) < 0)
+            {
+              
+              trq.set(i2, (trq.get(i2) + trqSchl.get(min) * -1));
             }
-            trq.set(i2, trq.get(i2) + trqSchl.get(i) * -1);
-            i2++;
-          }
-        }
+         }
       }
 
       trqNoFilter = trq;
       trq = filterValuesOrder(trq, data.getFilterTrqSmoothing(), data.getFilterTrqOrder());
-    }
+    
 
     //leistung berechnen
     if(!data.isMeasRPM())
@@ -325,9 +337,10 @@ public class Calculate
         {
           break;
         }
-
         seriesPower.add(rpm.get(i), pwr.get(i));
         seriesTorque.add(rpm.get(i), trq.get(i));
+       // seriesPower.add(time.get(i), omega.get(i));
+        //seriesTorque.add(time.get(i), trq.get(i));
 
       }
     }

@@ -110,6 +110,9 @@ Features without an ![d] are planned.
 * ![d] added CalculateTester for testing filters and Calculate class
 * ![d] design bug fixes
  
+#### v0.9.13
+* ![d] fixed calculate
+  
 
 ## v1.0
 * Measurement with referential bike correct

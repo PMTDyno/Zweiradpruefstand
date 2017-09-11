@@ -58,17 +58,17 @@ public class Data
   private int hysteresisKMH = 2;
   private int hysteresisTIME = 3000;
 
-  private double filterTrqSmoothing = 0.4;
+  private double filterTrqSmoothing = 0.3;
   private int filterTrqOrder = 4;
 
-  private double filterOmegaSmoothing = 0.5;
-  private int filterOmegaOrder = 1;
+  private double filterOmegaSmoothing = 0.6;
+  private int filterOmegaOrder = 4;
 
   private double filterAlphaSmoothing = 0.4;
-  private int filterAlphaOrder = 4;
+  private int filterAlphaOrder = 5;
 
-  private double filterRpmSmoothing = 0.5;
-  private int filterRpmOrder = 2;
+  private double filterRpmSmoothing = 0.6;
+  private int filterRpmOrder = 5;
 
   private ArrayList<RawDatapoint> rawDataList = new ArrayList<>();
   private ArrayList<Datapoint> measureList = null;

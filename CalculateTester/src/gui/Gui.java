@@ -421,7 +421,7 @@ public class Gui extends javax.swing.JFrame
     seriesRpmNoFilter = calc.getSeriesRpmNoFilter();
 
     refreshDiagrams();
-    LOG.info("DONE");
+    //LOG.info("DONE");
 
   }
 

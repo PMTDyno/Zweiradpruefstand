@@ -112,16 +112,15 @@ Features without an ![d] are planned.
  
 #### v0.9.13
 * ![d] fixed calculate
+* ![d] bugfixes changing periodTime/inertia leading to wrong measurement
+* ![d] added better visual for measuring status
+* ![d] added automatic limiters to progset spinners
   
 
 ## v1.0
-* Measurement with referential bike correct
+* ![d] Measurement with referential bike correct
   
   
-
-
-
-
-
-
+  
+  
 [d]: http://atlanticdecisionsciences.com/sites/default/files/checkmark.png " DONE "

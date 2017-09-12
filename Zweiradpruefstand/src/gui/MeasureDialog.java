@@ -219,7 +219,7 @@ public class MeasureDialog extends javax.swing.JDialog
         }
 
       });
-
+/*
       new Thread(
               new Runnable()
       {
@@ -248,6 +248,8 @@ public class MeasureDialog extends javax.swing.JDialog
         }
 
       }).start();
+      */
+      
       dialog.setVisible(true);
 
     });

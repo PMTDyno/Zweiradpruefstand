@@ -120,6 +120,9 @@ Features without an ![d] are planned.
 ## v1.0
 * ![d] Measurement with referential bike correct
   
+#### v1.0.1
+* ![d] Measurement now works with deactivated clutch
+
   
   
   

@@ -29,6 +29,7 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
   private final ArrayList<Datapoint> measureList = new ArrayList<>();
 
   private final AtomicBoolean stopRequest = new AtomicBoolean(false);
+  private double KmhAtStart;
 
   public MeasurementWorker(Communication com)
   {
@@ -323,6 +324,8 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
 
     } while(rpm < data.getStartRPM() && kmh < data.getStartKMH());
 
+    KmhAtStart = kmh;
+
     com.setStatus("LÄUFT");
 
     return dp;
@@ -342,20 +345,59 @@ public class MeasurementWorker extends SwingWorker<ArrayList<Datapoint>, Double>
   {
     RawDatapoint dp;
 
+    boolean clutchActivated = true;
+    int clutchCount = 0;
+    double maxUmin = 0;
+
     while(true)
     {
+
+      if(clutchActivated && measRPM)
+      {
+        com.sendFrame(Communication.Request.MEASURE);
+        dp = getNextDatapoint();
+        double rpm = toUmin(Integer.parseInt(dp.getRpm()));
+
+        Thread.sleep(data.getPeriodTimeMs());
+
+        count++;
+        rawList.add(dp);
+        addAndPublish(dp);
+
+        if(rpm > maxUmin)
+        {
+          maxUmin = rpm;
+          clutchCount = 0;
+          continue;
+        }
+        else
+        {
+          clutchCount++;
+          LOG.fine("Clutch Count: %d", clutchCount);
+        }
+
+        if(clutchCount >= 5)
+        {
+          clutchActivated = false;
+          LOG.info("CLUTCH DEACTIVATED");
+        }
+        else
+        {
+          continue;
+        }
+
+      }
 
       int stopCount = 0;
       do
       {
-        if(measRPM)
-          com.sendFrame(Communication.Request.MEASURE);
-        else
-          com.sendFrame(Communication.Request.MEASURENORPM);
+//        if(measRPM)
+//          com.sendFrame(Communication.Request.MEASURE);
+//        else
+        com.sendFrame(Communication.Request.MEASURENORPM);
 
         dp = getNextDatapoint();
-
-        if(toUmin(Integer.parseInt(dp.getRpm())) < data.getStartRPM())
+        if(toKmh(toRads(Integer.parseInt(dp.getWss()))) < KmhAtStart)
           stopCount++;
         else
           stopCount = 0;
